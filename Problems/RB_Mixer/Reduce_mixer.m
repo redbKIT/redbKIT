@@ -1,6 +1,6 @@
 %   For reference, see Section 3.8, 6.6 and 7.2 of
 %
-%   Quarteroni, Manzoni, Negri - REDUCED BASIS METHOD FOR PARTIAL
+%   Quarteroni, Manzoni, Negri - REDUCED BASIS METHODS FOR PARTIAL
 %   DIFFERENTIAL EQUATIONS. AN INTRODUCTION. Springer, 2015
 %
 %   The high-fidelity (full-order) model is already provided in the FOM.mat

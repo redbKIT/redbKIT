@@ -1,6 +1,11 @@
 %   mu1 geometric parameter
 %   mu2 Peclet in the fluid domain
 %   mu3 diffusivity in domain \Omega_3
+%
+%   For reference, see Section 8.3 and 9.1 of
+%
+%   Quarteroni, Manzoni, Negri - REDUCED BASIS METHODS FOR PARTIAL
+%   DIFFERENTIAL EQUATIONS. AN INTRODUCTION. Springer, 2015
 
 %   This file is part of redbKIT.
 %   Copyright (c) 2015, Ecole Polytechnique Fédérale de Lausanne (EPFL)

@@ -3,7 +3,7 @@
 %
 %   For reference, see Section 10.5 of
 %
-%   Quarteroni, Manzoni, Negri - REDUCED BASIS METHOD FOR PARTIAL
+%   Quarteroni, Manzoni, Negri - REDUCED BASIS METHODS FOR PARTIAL
 %   DIFFERENTIAL EQUATIONS. AN INTRODUCTION. Springer, 2015
 
 %   This file is part of redbKIT.

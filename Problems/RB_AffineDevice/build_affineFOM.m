@@ -1,4 +1,9 @@
 function [ FOM ] = build_affineFOM( elements, vertices, boundaries, fem, data_file )
+%   For reference, see Section 8.3 and 9.1 of
+%
+%   Quarteroni, Manzoni, Negri - REDUCED BASIS METHODS FOR PARTIAL
+%   DIFFERENTIAL EQUATIONS. AN INTRODUCTION. Springer, 2015
+
 %   This file is part of redbKIT.
 %   Copyright (c) 2015, Ecole Polytechnique Fédérale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch> 
