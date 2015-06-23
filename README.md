@@ -1,6 +1,4 @@
-redbKIT : a Matlab library for reduced-order modeling of parametrized PDEs
-=========================================
-
+##redbKIT : a Matlab library for reduced-order modeling of parametrized PDEs
 
 License
 -------
@@ -30,9 +28,9 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
 Contact
 -------
-
 Should you have any questions regarding redbKIT, do not hestitate to contact 
-us by email at
+us by email at <redbkit@gmail.com>
 
