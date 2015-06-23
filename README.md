@@ -1,4 +1,16 @@
-##redbKIT : a Matlab library for reduced-order modeling of parametrized PDEs
+##redbKIT : a MATLAB(R) library for reduced-order modeling of parametrized PDEs
+
+add info about the book
+
+Download and Installation
+-------
+
+....
+
+Usage
+-------
+
+...
 
 License
 -------
