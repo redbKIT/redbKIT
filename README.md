@@ -1,10 +1,10 @@
 ##redbKIT : a MATLAB(R) library for reduced-order modeling of parametrized PDEs
 
-redbKIT is a [MATLAB](http://www.mathworks.com/products/matlab/) library (developed at [EPFL](https://www.epfl.ch/) -- [Chair of Modeling and Scientific Computing](http://cmcs.epfl.ch/)) which implements some Reduced Basis (RB) methods for parametrized Partial Differential Equations (PDEs). In particular, it includes straightforward implementations of many of the algorithms presented in the book [**[QMN15] Reduced Basis Methods for Partial Differential Equations (Springer, 2015)** by **A. Quarteroni, A. Manzoni and F. Negri**](http://www.springer.com/us/book/9783319154305#aboutBook).
+redbKIT is a [MATLAB](http://www.mathworks.com/products/matlab/) library (developed at [EPFL](https://www.epfl.ch/) - [Chair of Modeling and Scientific Computing](http://cmcs.epfl.ch/)) which implements some Reduced Basis (RB) methods for parametrized Partial Differential Equations (PDEs). In particular, it includes straightforward implementations of many of the algorithms presented in the book [**[QMN15] Reduced Basis Methods for Partial Differential Equations (Springer, 2015)** by **A. Quarteroni, A. Manzoni and F. Negri**](http://www.springer.com/us/book/9783319154305#aboutBook).
 
 `redbKIT` consists of three main packages: [`RB_library`](https://github.com/redbKIT/redbKIT/tree/master/RB_library), [`FEM_library`](https://github.com/redbKIT/redbKIT/tree/master/FEM_library) and [`Problems`](https://github.com/redbKIT/redbKIT/tree/master/Problems), which are briefly described below.
 
-##### RB_library
+#### RB_library
 
 Implements in the MATLAB language many of the algorithms and methods presented in Chapters 3, 6, 7 and 10 of the book **[QMN15]**, such as
 - proper orthogonal decomposition
@@ -16,10 +16,10 @@ Implements in the MATLAB language many of the algorithms and methods presented i
 The implementation is almost independent of the underlying high-fidelity approximation, provided that the high-fidelity model is described in a specified format. Here, we rely on the finite element method as high-fidelity approximation. See below.
 
 
-##### FEM_library
+#### FEM_library
 Provides a flexible implementation of the finite element method for two-dimensional, stationary  advection-diffusion-reaction PDEs. The package can load linear triangular meshes either in the .msh format or in the [MATLAB Partial Differential Equation Toolbox(R)](http://www.mathworks.com/products/pde/index.html?s_tid=gn_loc_drop) format. Results can be either visualized in MATLAB or exported in the [VTK format](http://www.vtk.org/wp-content/uploads/2015/04/file-formats.pdf) for post-processing with [Paraview](http://www.paraview.org/).
 
-##### Problems
+#### Problems
 Contains a gallery of examples and applications. Many of them are described in Chapters 8, 9 and 10 of the book **[QMN15]**.
 
 
@@ -60,7 +60,7 @@ An HTML documentation of redbKIT can be automatically generated using [`M2HTML`]
 
 	url_M2HTML = 'http://www.artefact.tk/software/matlab/m2html/m2html.zip';
 	unzip(url_M2HTML);
-	addpath(genpath(strcat(pwd,sslash,'m2html')));
+	addpath(genpath(strcat(pwd,'/m2html')));
 
 Then generate the documentation
 
@@ -71,7 +71,8 @@ Then generate the documentation
 
 License
 -------
-redbKIT is distributed under BSD 2-clause license by Ecole Polytechnique Fédérale de Lausanne (EPFL)
+
+	redbKIT is distributed under BSD 2-clause license
 
 Copyright (c) 2015, Ecole Polytechnique Fédérale de Lausanne (EPFL)
 All rights reserved.
