@@ -26,10 +26,9 @@ Contains a gallery of examples and applications. Many of them are described in C
 Download
 -------
 
-You can directly download the latest release at <https://github.com/redbKIT/redbKIT/archive/master.zip>
-or clone the git repository
+You can directly [**`download the latest release`**](https://github.com/redbKIT/redbKIT/archive/master.zip) or clone the git repository
 
-	git clone https://github.com/redbKIT/redbKIT.git /folder_path
+	$ git clone https://github.com/redbKIT/redbKIT.git /folder_path
 
 
 `redbKIT` contains the following files and folders
@@ -41,7 +40,7 @@ Usage
 
 Start MATLAB (R) and navigate to the `redbKIT` folder. Then, type in the MATLAB prompt
 
-	setPath
+	>> setPath
 
 to add the [`FEM_library/`](https://github.com/redbKIT/redbKIT/tree/master/FEM_library) and [`RB_library/`](https://github.com/redbKIT/redbKIT/tree/master/RB_library) folders to the current path.
 A welcome message should appear: you can now start using redbKIT!
@@ -51,20 +50,20 @@ A gallery of applications is provided in the folder [`Problems/`](https://github
 If you want to speedup the finite element assembling operations, you can "mexify" the function
 `ADR_mex_assembler.m` by running the following command in the MATLAB prompt ([`MATLAB Coder`](http://www.mathworks.com/products/matlab-coder/?refresh=true) needed):
 
-	coder -build FEM_library/ADR_assembly.prj
+	>> coder -build FEM_library/ADR_assembly.prj
 
 Then replace `ADR_mex_assembler` with `ADR_mex_assembler_mex` at line 109
 of `Assembler_2D.m`
 
 An HTML documentation of redbKIT can be automatically generated using [`M2HTML`](http://www.artefact.tk/software/matlab/m2html/). To this end, you should download, extract and add to the path [`M2HTML`](http://www.artefact.tk/software/matlab/m2html/) using the following commands:
 
-	url_M2HTML = 'http://www.artefact.tk/software/matlab/m2html/m2html.zip';
-	unzip(url_M2HTML);
-	addpath(genpath(strcat(pwd,'/m2html')));
+	>> url_M2HTML = 'http://www.artefact.tk/software/matlab/m2html/m2html.zip';
+	>> unzip(url_M2HTML);
+	>> addpath(genpath(strcat(pwd,'/m2html')));
 
 Then generate the documentation
 
-	m2html('mfiles',{'RB_library', 'RB_library/RBF_interpolation' 'FEM_library'}, ...
+	>> m2html('mfiles',{'RB_library', 'RB_library/RBF_interpolation' 'FEM_library'}, ...
 	   'htmldir','Documentation', 'recursive','off', 'global','on',...
 	   'template','frame', 'index','menu', 'graph','on');
 
@@ -106,8 +105,8 @@ Please use the following citation to reference `redbKIT`
 	A. Quarteroni, A. Manzoni and F. Negri.
     Reduced Basis Methods for Partial Differential Equations. An Introduction.
     Springer, 2015.
-    
-Bibtex entry
+
+BibTex entry
 
     @book{QMN_RBspringer,
   	author  = {Quarteroni, A. and  Manzoni, A. and Negri, F.},
@@ -119,5 +118,5 @@ Bibtex entry
 
 Contact
 -------
-Should you have any questions regarding `redbKIT`, do not hestitate to contact us by email at <redbkit@gmail.com>. 
+Should you have any questions regarding `redbKIT`, do not hesitate to contact us by email at <redbkit@gmail.com>.
 We also encourage contributions that can help to improve the code or the documentation, and to make `redbKIT` more useful.
