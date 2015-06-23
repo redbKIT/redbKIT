@@ -1,16 +1,62 @@
 ##redbKIT : a MATLAB(R) library for reduced-order modeling of parametrized PDEs
 
-add info about the book
+redbKIT is a MATLAB library (developed at [EPFL](https://www.epfl.ch/) -- [Chair of Modeling and Scientific Computing](http://cmcs.epfl.ch/)) which implements some Reduced Basis (RB) methods for parametrized Partial Differential Equations (PDEs). In particular, it includes straightforward implementations of many of the algorithms presented in the book [**Reduced Basis Methods for Partial Differential Equations (Springer, 2015)** by **A. Quarteroni, A. Manzoni and F. Negri.**](http://www.springer.com/us/book/9783319154305#aboutBook), such as
+- the proper orthogonal decomposition
+- the greedy algorithm
+- radial basis function interpolation of stability factors
+- Galerkin and least-squares reduced basis methods
+- the empirical interpolation method
 
-Download and Installation
+In all cases, the construction of the RB approximation is based
+
+Download
 -------
 
-....
+You can directly download the latest release at
+
+	https://github.com/redbKIT/redbKIT/archive/master.zip
+
+or clone the git repository
+
+	git clone https://github.com/redbKIT/redbKIT.git /folder_path
+
+
+`redbKIT` contains the following files and folders
+
+[`FEM_library/`](https://github.com/redbKIT/redbKIT/tree/master/FEM_library)  [`LICENSE`](https://github.com/redbKIT/redbKIT/blob/master/LICENSE)  [`Problems/`](https://github.com/redbKIT/redbKIT/tree/master/Problems)  [`RB_library/`](https://github.com/redbKIT/redbKIT/tree/master/RB_library)  [`README.md`](https://github.com/redbKIT/redbKIT/blob/master/README.md)  [`setPath.m`](https://github.com/redbKIT/redbKIT/blob/master/setPath.m)
 
 Usage
 -------
 
-...
+Start MATLAB (R) and navigate to the `redbKIT` folder. Then, type in the MATLAB prompt
+
+	setPath
+
+to add the [`FEM_library/`](https://github.com/redbKIT/redbKIT/tree/master/FEM_library) and [`RB_library/`](https://github.com/redbKIT/redbKIT/tree/master/RB_library) to the current path.
+A welcome message should appear: you can now start using redbKIT!
+
+A gallery of applications is provided in the folder [`Problems/`](https://github.com/redbKIT/redbKIT/tree/master/Problems).
+
+If you want to speedup the finite element assembling operations, you can "mexify" the function
+`ADR_mex_assembler.m` by running the following command in the MATLAB prompt ([`MATLAB Coder`](http://it.mathworks.com/products/matlab-coder/?refresh=true) needed):
+
+	coder -build FEM_library/ADR_assembly.prj
+
+Then replace `ADR_mex_assembler` with `ADR_mex_assembler_mex` at line 109
+of `Assembler_2D.m`
+
+An HTML documentation of redbKIT can be automatically generated using [`M2HTML`](http://www.artefact.tk/software/matlab/m2html/). To this end, you should download, extract and add to the path [`M2HTML`](http://www.artefact.tk/software/matlab/m2html/) using the following commands:
+
+	url_M2HTML = 'http://www.artefact.tk/software/matlab/m2html/m2html.zip';
+	unzip(url_M2HTML);
+	addpath(genpath(strcat(pwd,sslash,'m2html')));
+
+Then generate the documentation
+
+	m2html('mfiles',{'RB_library', 'RB_library/RBF_interpolation' 'FEM_library'}, ...
+	   'htmldir','Documentation', 'recursive','off', 'global','on',...
+	   'template','frame', 'index','menu', 'graph','on');
+
 
 License
 -------
@@ -43,6 +89,5 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 Contact
 -------
-Should you have any questions regarding redbKIT, do not hestitate to contact 
+Should you have any questions regarding `redbKIT`, do not hestitate to contact
 us by email at <redbkit@gmail.com>
-
