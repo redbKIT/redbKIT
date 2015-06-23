@@ -1,0 +1,12 @@
+*.aux
+*.log
+.DS_Store
+*.dvi
+*eps-converted-to.pdf
+*.synctex.gz
+*~
+*.toc
+*.mexa64
+*.mexmaci64
+*.vtk
+FEM_library/codegen/
