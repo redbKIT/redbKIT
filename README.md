@@ -103,16 +103,18 @@ How to cite
 -------
 Please use the following citation to reference `redbKIT`
 
-	A. Quarteroni, A. Manzoni and F. Negri. Reduced Basis Methods for Partial Differential Equations. An Introduction, Springer, 2015.
+	A. Quarteroni, A. Manzoni and F. Negri.
+    Reduced Basis Methods for Partial Differential Equations. An Introduction.
+    Springer, 2015.
     
 Bibtex entry
 
     @book{QMN_RBspringer,
-  	author    = {Quarteroni, A. and  Manzoni, A. and Negri, F.},
-  	title     = {Reduced Basis Methods for Partial Differential Equations. An Introduction},
-  	year      = {2015},
+  	author  = {Quarteroni, A. and  Manzoni, A. and Negri, F.},
+  	title   = {Reduced Basis Methods for Partial Differential Equations. An Introduction},
+  	year    = {2015},
   	publisher = {Springer},
-      address   = {...}
+    address = {...}
 	}
 
 Contact
