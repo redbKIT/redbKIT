@@ -135,7 +135,7 @@ Interpolant_data      =  RBF_setup(mu_beta_sample_UNIT(mu_interp_index,conv_indx
 
 %% perform interpolation on log(beta)                         
 fprintf(          '\n 2) Build RBF interpolant with %s functions \n', rbf_type);
-beta_interp           = @(mu,op) exp( rbfinterp(RBF_transformUnit(mu,mu_MapToUnit(mu_interp_index,:))', op ) ); 
+beta_interp           = @(mu,data) exp( RBF_evaluate(RBF_transformUnit(mu,mu_MapToUnit(mu_interp_index,:))', data ) ); 
 
 %% Plot Interpolant on test grid if length(mu_interp_index) = 1 or 2
 
