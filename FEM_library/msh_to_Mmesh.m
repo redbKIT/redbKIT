@@ -10,7 +10,7 @@ function [vertices, boundaries, elements] = msh_to_Mmesh(filename, dimension)
 
 fprintf('\nLoading mesh from file %s.msh ... ',filename);
 
-if nargin == 2
+if nargin < 2
       dimension = 2;
 end
 
