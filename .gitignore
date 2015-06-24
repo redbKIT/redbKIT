@@ -11,3 +11,8 @@
 *.vtk
 FEM_library/codegen/
 Problems/test_log.txt
+Problems/RB_AffineDevice/Figures/
+Problems/RB_Cookies/Figures/
+Problems/RB_EIM_Gaussian/EIM/
+Problems/RB_EIM_Gaussian/Figures/
+Problems/RB_EIM_Gaussian/FOM.mat
