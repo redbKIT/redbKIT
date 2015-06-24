@@ -23,7 +23,7 @@ function [ ROM ] = build_PODbased_ROM(FOM, sample_grid, tolPOD, method, D)
 %   The output is a struct ROM.
 
 %   This file is part of redbKIT.
-%   Copyright (c) 2015, Ecole Polytechnique Fédérale de Lausanne (EPFL)
+%   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch> 
 
 if nargin < 5

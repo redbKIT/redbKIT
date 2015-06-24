@@ -23,7 +23,7 @@ function [FOM] = RBF_OfflineInterpolation(FOM)
 %     - stabFactor.rbf_type: 'thinplate' by default
 
 %   This file is part of redbKIT.
-%   Copyright (c) 2015, Ecole Polytechnique Fédérale de Lausanne (EPFL)
+%   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch> 
 
 mu_interp_index            =  FOM.stabFactor.mu_interp_index;

@@ -13,7 +13,7 @@ function [MESH] = BC_info(MESH, DATA)
 %   internal_dofs, Dirichlet_dofs, Neumann_side, Robin_side
    
 %   This file is part of redbKIT.
-%   Copyright (c) 2015, Ecole Polytechnique Fédérale de Lausanne (EPFL)
+%   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch> 
 
 %% Parse MESH struct to check if the the required fields are available

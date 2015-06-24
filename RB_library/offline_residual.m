@@ -9,7 +9,7 @@ function [Cqq, dqq, Eqq] = offline_residual(FOM, V)
 %   a ROM.Qa x ROM.Qa cell array of ROM.N x ROM.N matrices.
 
 %   This file is part of redbKIT.
-%   Copyright (c) 2015, Ecole Polytechnique Fédérale de Lausanne (EPFL)
+%   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch> 
 
 for q1 = 1 : FOM.Qf

@@ -9,7 +9,7 @@ function [ FOM ] = build_affineFOM( elements, vertices, boundaries, fem, data_fi
 %   DIFFERENTIAL EQUATIONS. AN INTRODUCTION. Springer, 2015
 
 %   This file is part of redbKIT.
-%   Copyright (c) 2015, Ecole Polytechnique Fédérale de Lausanne (EPFL)
+%   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch> 
 
 

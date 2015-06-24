@@ -14,7 +14,7 @@ function ADR_export_solution(dim, u, vertices, elements, outputFileName, iter, v
 %   the name of the variable in the vtk file is VARIABLENAME
 
 %   This file is part of redbKIT.
-%   Copyright (c) 2015, Ecole Polytechnique Fédérale de Lausanne (EPFL)
+%   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch> 
 
 titleData = 'Scalar_solution';

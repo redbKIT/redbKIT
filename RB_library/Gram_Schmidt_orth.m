@@ -10,7 +10,7 @@ function [Pv] = Gram_Schmidt_orth(Z, v, X)
 %   product X.
 
 %   This file is part of redbKIT.
-%   Copyright (c) 2015, Ecole Polytechnique Fédérale de Lausanne (EPFL)
+%   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri@epfl.ch> 
 
 if nargin < 3 || isempty(X)

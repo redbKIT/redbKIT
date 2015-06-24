@@ -6,7 +6,7 @@ function [uh] = solve_HFsystem(FOM, mu)
 %   arrays stored in FOM, and solves it.
 
 %   This file is part of redbKIT.
-%   Copyright (c) 2015, Ecole Polytechnique Fédérale de Lausanne (EPFL)
+%   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch> 
 
 [ theta_a, theta_f ] = evaluate_ThetaFunctions( mu );

@@ -23,7 +23,7 @@ function [A, F, M] = Assembler_2D(MESH, DATA, FE_SPACE, OPERATOR, TC_d, TC_t, su
 %   A spatial dependent coefficient has to be defined in DATA.transport{i}
 
 %   This file is part of redbKIT.
-%   Copyright (c) 2015, Ecole Polytechnique Fédérale de Lausanne (EPFL)
+%   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri@epfl.ch> 
 
 if nargin < 4 || isempty(OPERATOR)

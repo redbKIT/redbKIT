@@ -14,7 +14,7 @@ function [IDEIM, PHI, P] = DiscreteEmpiricalInterpolation(U, m)
 %   INTERPOLATION, S. Chaturantabut & D. Sorensen, SIAM J. SCI. COMPUT.
 
 %   This file is part of redbKIT.
-%   Copyright (c) 2015, Ecole Polytechnique Fédérale de Lausanne (EPFL)
+%   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
 %
 %   The original DEIM algorithm has been provided by 
 %   David Amsallem (Standford University), January 2014.

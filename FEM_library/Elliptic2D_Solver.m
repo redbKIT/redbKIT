@@ -23,7 +23,7 @@ function [u, FE_SPACE, MESH, DATA, errorL2, errorH1] = Elliptic2D_Solver(element
 %     DATA: struct containing problem data
 
 %   This file is part of redbKIT.
-%   Copyright (c) 2015, Ecole Polytechnique Fédérale de Lausanne (EPFL)
+%   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch> 
 
 if nargin < 5

@@ -18,7 +18,7 @@ function [A_in, F_in, u_Dirichlet] =  ApplyBC_2D(A, F, FE_SPACE, MESH, DATA, t)
 %   problems.
 
 %   This file is part of redbKIT.
-%   Copyright (c) 2015, Ecole Polytechnique Fédérale de Lausanne (EPFL)
+%   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch> 
 
 if nargin < 6

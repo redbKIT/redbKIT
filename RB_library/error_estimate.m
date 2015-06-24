@@ -7,7 +7,7 @@ function [ deltaN ] = error_estimate(ROM, uN, mu, varargin)
 %   estimate of the error between the reduced and full order solutions.
 
 %   This file is part of redbKIT.
-%   Copyright (c) 2015, Ecole Polytechnique Fédérale de Lausanne (EPFL)
+%   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch> 
 
 N = length(uN);

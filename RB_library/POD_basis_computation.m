@@ -14,7 +14,7 @@ function [V,Sigma,PSI] = POD_basis_computation(u, Xnorm, N_tol, D)
 %         Sigma  : singular values
 
 %   This file is part of redbKIT.
-%   Copyright (c) 2015, Ecole Polytechnique Fédérale de Lausanne (EPFL)
+%   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch>
 
 n  = size(u,1);

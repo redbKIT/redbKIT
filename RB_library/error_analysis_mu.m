@@ -1,6 +1,6 @@
 function [ Error ] = error_analysis_mu(FOM, ROM, N_samples, N, mu_index, mu_fixed, value_mu_fixed)
 %   This file is part of redbKIT.
-%   Copyright (c) 2015, Ecole Polytechnique Fédérale de Lausanne (EPFL)
+%   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch> 
 
 n_N = length(N);

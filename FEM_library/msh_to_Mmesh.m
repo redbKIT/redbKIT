@@ -5,7 +5,7 @@ function [vertices, boundaries, elements] = msh_to_Mmesh(filename, dimension)
 %   [VERTICES, BOUNDARIES, ELEMENTS] = GMSH_TO_MMESH(FILENAME, DIMENSION)
 
 %   This file is part of redbKIT.
-%   Copyright (c) 2015, Ecole Polytechnique Fédérale de Lausanne (EPFL)
+%   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch> 
 
 fprintf('\nLoading mesh from file %s.msh ... ',filename);

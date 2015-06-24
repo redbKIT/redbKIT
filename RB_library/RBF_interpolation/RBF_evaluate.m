@@ -7,7 +7,7 @@ function [I_f] = RBF_evaluate(x, RBF_data)
 %   interpolant in the points X.
 
 %   This file is part of redbKIT.
-%   Copyright (c) 2015, Ecole Polytechnique Fédérale de Lausanne (EPFL)
+%   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch> 
 
 interp_points     = RBF_data.x;

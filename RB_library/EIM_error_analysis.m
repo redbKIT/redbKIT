@@ -1,6 +1,6 @@
 function [ Error ] = EIM_error_analysis(FOM, ROM, N_samples, data_file, N_vec, varargin)
 %   This file is part of redbKIT.
-%   Copyright (c) 2015, Ecole Polytechnique Fédérale de Lausanne (EPFL)
+%   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch> 
 
 if nargin < 5 || isempty(N_vec)

@@ -18,7 +18,7 @@ function [IEIM, PHI, muEIM] = EmpiricalInterpolation(fun, Omega_h, Xi_train, tol
 %   EQUATIONS, M. Barrault, Y. Maday, N.C. Nguyen, A.T. Patera
 
 %   This file is part of redbKIT.
-%   Copyright (c) 2015, Ecole Polytechnique Fédérale de Lausanne (EPFL)
+%   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch> 
 
 Ns   = size(Xi_train, 1);
