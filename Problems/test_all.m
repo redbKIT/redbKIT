@@ -88,6 +88,20 @@ catch err
 end
 cd(TestFolder)
 
+% Test 5
+try
+    testname = 'Test_Coder_Assembly';
+    coder -build ../FEM_library/ADR_assembly.prj
+    print_test_passed(fid,testname);
+    
+catch err
+    print_error_toFile(fid,err,testname);
+end
+cd(TestFolder)
+
+
+
+
 %% End Testing
 
 t = now;
@@ -97,6 +111,10 @@ fprintf(fid,'-------------------------------------------\n');
 fprintf(fid, '\nFinished: %s\n', s );
 
 fclose(fid);
+
+fprintf('\n-------------------------------------------\n');
+fprintf('-------------------------------------------\n');
+type('test_log.txt')
 
 end
 

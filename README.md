@@ -23,10 +23,10 @@ Provides a flexible implementation of the finite element method for two-dimensio
 Contains a gallery of examples and applications. Many of them are described in Chapters 8, 9 and 10 of the book **[QMN15]**.
 
 
-Download
+Download and Installation
 -------
 
-You can directly [**`download the latest release`**](https://github.com/redbKIT/redbKIT/archive/master.zip) or clone the git repository
+You can directly [**`download the current release`**](https://github.com/redbKIT/redbKIT/archive/master.zip) or clone the git repository
 
 	$ git clone https://github.com/redbKIT/redbKIT.git /folder_path
 
@@ -35,10 +35,18 @@ You can directly [**`download the latest release`**](https://github.com/redbKIT/
 
 [`FEM_library/`](https://github.com/redbKIT/redbKIT/tree/master/FEM_library)  [`LICENSE`](https://github.com/redbKIT/redbKIT/blob/master/LICENSE)  [`Problems/`](https://github.com/redbKIT/redbKIT/tree/master/Problems)  [`RB_library/`](https://github.com/redbKIT/redbKIT/tree/master/RB_library)  [`README.md`](https://github.com/redbKIT/redbKIT/blob/master/README.md)  [`setPath.m`](https://github.com/redbKIT/redbKIT/blob/master/setPath.m)
 
+To check that your operating system and MATLAB installation are supported, and that the code is correctly working, please follow the following instructions. Start MATLAB and navigate to the `redbKIT` folder. Then, type in the MATLAB prompt
+
+	>> setPath
+	>> cd Problems
+	>> test_all
+
+The `test_all.m` functions launches a series of tests and generates a log file `test_log.txt`. If all the tests are marked as *passed*, you can start enjoying `redbKIT`. Otherwise, do not hesitate to contact us by email at <redbkit@gmail.com>.
+
 Usage
 -------
 
-Start MATLAB (R) and navigate to the `redbKIT` folder. Then, type in the MATLAB prompt
+Start MATLAB(R) and navigate to the `redbKIT` folder. Then, type in the MATLAB prompt
 
 	>> setPath
 
