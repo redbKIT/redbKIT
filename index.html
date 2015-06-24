@@ -61,9 +61,9 @@
 <p>Contains a gallery of examples and applications. Many of them are described in Chapters 8, 9 and 10 of the book <strong>[QMN15]</strong>.</p>
 
 <h2>
-<a id="download" class="anchor" href="#download" aria-hidden="true"><span class="octicon octicon-link"></span></a>Download</h2>
+<a id="download-and-installation" class="anchor" href="#download-and-installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Download and Installation</h2>
 
-<p>You can directly <a href="https://github.com/redbKIT/redbKIT/archive/master.zip"><strong><code>download the latest release</code></strong></a> or clone the git repository</p>
+<p>You can directly <a href="https://github.com/redbKIT/redbKIT/archive/master.zip"><strong><code>download the current release</code></strong></a> or clone the git repository</p>
 
 <pre><code>$ git clone https://github.com/redbKIT/redbKIT.git /folder_path
 </code></pre>
@@ -72,10 +72,19 @@
 
 <p><a href="https://github.com/redbKIT/redbKIT/tree/master/FEM_library"><code>FEM_library/</code></a>  <a href="https://github.com/redbKIT/redbKIT/blob/master/LICENSE"><code>LICENSE</code></a>  <a href="https://github.com/redbKIT/redbKIT/tree/master/Problems"><code>Problems/</code></a>  <a href="https://github.com/redbKIT/redbKIT/tree/master/RB_library"><code>RB_library/</code></a>  <a href="https://github.com/redbKIT/redbKIT/blob/master/README.md"><code>README.md</code></a>  <a href="https://github.com/redbKIT/redbKIT/blob/master/setPath.m"><code>setPath.m</code></a></p>
 
+<p>To check that your operating system and MATLAB installation are supported, and that the code is correctly working, please follow the following instructions. Start MATLAB and navigate to the <code>redbKIT</code> folder. Then, type in the MATLAB prompt</p>
+
+<pre><code>&gt;&gt; setPath
+&gt;&gt; cd Problems
+&gt;&gt; test_all
+</code></pre>
+
+<p>The <code>test_all.m</code> functions launches a series of tests and generates a log file <code>test_log.txt</code>. If all the tests are marked as <em>passed</em>, you can start enjoying <code>redbKIT</code>. Otherwise, do not hesitate to contact us by email at <a href="mailto:redbkit@gmail.com">redbkit@gmail.com</a>.</p>
+
 <h2>
 <a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
 
-<p>Start MATLAB (R) and navigate to the <code>redbKIT</code> folder. Then, type in the MATLAB prompt</p>
+<p>Start MATLAB(R) and navigate to the <code>redbKIT</code> folder. Then, type in the MATLAB prompt</p>
 
 <pre><code>&gt;&gt; setPath
 </code></pre>
