@@ -10,3 +10,4 @@
 *.mexmaci64
 *.vtk
 FEM_library/codegen/
+Problems/test_log.txt
