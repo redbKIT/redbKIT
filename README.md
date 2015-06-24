@@ -1,6 +1,8 @@
 ##redbKIT : a MATLAB(R) library for reduced-order modeling of parametrized PDEs
 
-redbKIT is a [MATLAB](http://www.mathworks.com/products/matlab/) library (developed at [EPFL](https://www.epfl.ch/) - [Chair of Modeling and Scientific Computing](http://cmcs.epfl.ch/)) which implements some Reduced Basis (RB) methods for parametrized Partial Differential Equations (PDEs). In particular, it includes straightforward implementations of many of the algorithms presented in the book [**[QMN15] Reduced Basis Methods for Partial Differential Equations (Springer, 2015)** by **A. Quarteroni, A. Manzoni and F. Negri**](http://www.springer.com/us/book/9783319154305#aboutBook).
+redbKIT is a [MATLAB](http://www.mathworks.com/products/matlab/) library (developed at [EPFL](https://www.epfl.ch/) - [Chair of Modeling and Scientific Computing](http://cmcs.epfl.ch/)) which implements some Reduced Basis (RB) methods for parametrized Partial Differential Equations (PDEs). In particular, it includes straightforward implementations of many of the algorithms presented in the book
+
+>[**[QMN15] A. Quarteroni, A. Manzoni, F. Negri. Reduced Basis Methods for Partial Differential Equations**, Springer, 2015.](http://www.springer.com/us/book/9783319154305#aboutBook)
 
 `redbKIT` consists of three main packages: [`RB_library`](https://github.com/redbKIT/redbKIT/tree/master/RB_library), [`FEM_library`](https://github.com/redbKIT/redbKIT/tree/master/FEM_library) and [`Problems`](https://github.com/redbKIT/redbKIT/tree/master/Problems), which are briefly described below.
 
@@ -79,7 +81,7 @@ Then generate the documentation
 License
 -------
 
-	redbKIT is distributed under BSD 2-clause license
+**redbKIT is distributed under BSD 2-clause license**
 
 Copyright (c) 2015, Ecole Polytechnique Fédérale de Lausanne (EPFL)
 All rights reserved.
