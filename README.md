@@ -45,6 +45,17 @@ To check that your operating system and MATLAB installation are supported, and t
 
 The `test_all.m` functions launches a series of tests and generates a log file `test_log.txt`. If all the tests are marked as *passed*, you can start enjoying `redbKIT`. Otherwise, do not hesitate to contact us by email at <redbkit@gmail.com>.
 
+`redbKIT` has been succesfully tested on the following operating systems/MATLAB versions:
+
+| MATLAB version / OS  |  Linux 64 bit  |  MAC 64 Bit | Windows 64 Bit | Windows 32 Bit |
+|:--------------------:|:--------------:|:-----------:|:--------------:|:--------------:|
+|           **R2014b** |                |      x      |                |                |
+|           **R2014a** |        x       |             |                |                |
+|           **R2013a** |        x       |             |                |                |
+|           **R2012a** |        x       |             |                |                |
+|           **R2011a** |        x       |             |                |                |
+
+
 Usage
 -------
 
