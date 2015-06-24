@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="redbKIT : a MATLAB library for reduced-order modeling of parametrized PDEs">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>redbKIT</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/redbKIT/redbKIT">View on GitHub</a>
+
+          <h1 id="project_title">redbKIT</h1>
+          <h2 id="project_tagline">a MATLAB library for reduced-order modeling of parametrized PDEs</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/redbKIT/redbKIT/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/redbKIT/redbKIT/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <p>redbKIT is a <a href="http://www.mathworks.com/products/matlab/">MATLAB</a> library (developed at <a href="https://www.epfl.ch/">EPFL</a> - <a href="http://cmcs.epfl.ch/">Chair of Modeling and Scientific Computing</a>) which implements some Reduced Basis (RB) methods for parametrized Partial Differential Equations (PDEs). In particular, it includes straightforward implementations of many of the algorithms presented in the book <a href="http://www.springer.com/us/book/9783319154305#aboutBook"><strong>[QMN15] Reduced Basis Methods for Partial Differential Equations (Springer, 2015)</strong> by <strong>A. Quarteroni, A. Manzoni and F. Negri</strong></a>.</p>
+
+<p><code>redbKIT</code> consists of three main packages: <a href="https://github.com/redbKIT/redbKIT/tree/master/RB_library"><code>RB_library</code></a>, <a href="https://github.com/redbKIT/redbKIT/tree/master/FEM_library"><code>FEM_library</code></a> and <a href="https://github.com/redbKIT/redbKIT/tree/master/Problems"><code>Problems</code></a>, which are briefly described below.</p>
+
+<h4>
+<a id="rb_library" class="anchor" href="#rb_library" aria-hidden="true"><span class="octicon octicon-link"></span></a>RB_library</h4>
+
+<p>Implements in the MATLAB language many of the algorithms and methods presented in Chapters 3, 6, 7 and 10 of the book <strong>[QMN15]</strong>, such as</p>
+
+<ul>
+<li>proper orthogonal decomposition</li>
+<li>the greedy algorithm</li>
+<li>radial basis function interpolation of stability factors</li>
+<li>Galerkin and least-squares reduced basis methods</li>
+<li>the empirical interpolation method</li>
+</ul>
+
+<p>The implementation is almost independent of the underlying high-fidelity approximation, provided that the high-fidelity model is described in a specified format. Here, we rely on the finite element method as high-fidelity approximation. See below.</p>
+
+<h4>
+<a id="fem_library" class="anchor" href="#fem_library" aria-hidden="true"><span class="octicon octicon-link"></span></a>FEM_library</h4>
+
+<p>Provides a flexible implementation of the finite element method for two-dimensional, stationary  advection-diffusion-reaction PDEs. The package can load linear triangular meshes either in the .msh format or in the <a href="http://www.mathworks.com/products/pde/index.html?s_tid=gn_loc_drop">MATLAB Partial Differential Equation Toolbox(R)</a> format. Results can be either visualized in MATLAB or exported in the <a href="http://www.vtk.org/wp-content/uploads/2015/04/file-formats.pdf">VTK format</a> for post-processing with <a href="http://www.paraview.org/">Paraview</a>.</p>
+
+<h4>
+<a id="problems" class="anchor" href="#problems" aria-hidden="true"><span class="octicon octicon-link"></span></a>Problems</h4>
+
+<p>Contains a gallery of examples and applications. Many of them are described in Chapters 8, 9 and 10 of the book <strong>[QMN15]</strong>.</p>
+
+<h2>
+<a id="download" class="anchor" href="#download" aria-hidden="true"><span class="octicon octicon-link"></span></a>Download</h2>
+
+<p>You can directly <a href="https://github.com/redbKIT/redbKIT/archive/master.zip"><strong><code>download the latest release</code></strong></a> or clone the git repository</p>
+
+<pre><code>$ git clone https://github.com/redbKIT/redbKIT.git /folder_path
+</code></pre>
+
+<p><code>redbKIT</code> contains the following files and folders</p>
+
+<p><a href="https://github.com/redbKIT/redbKIT/tree/master/FEM_library"><code>FEM_library/</code></a>  <a href="https://github.com/redbKIT/redbKIT/blob/master/LICENSE"><code>LICENSE</code></a>  <a href="https://github.com/redbKIT/redbKIT/tree/master/Problems"><code>Problems/</code></a>  <a href="https://github.com/redbKIT/redbKIT/tree/master/RB_library"><code>RB_library/</code></a>  <a href="https://github.com/redbKIT/redbKIT/blob/master/README.md"><code>README.md</code></a>  <a href="https://github.com/redbKIT/redbKIT/blob/master/setPath.m"><code>setPath.m</code></a></p>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>Start MATLAB (R) and navigate to the <code>redbKIT</code> folder. Then, type in the MATLAB prompt</p>
+
+<pre><code>&gt;&gt; setPath
+</code></pre>
+
+<p>to add the <a href="https://github.com/redbKIT/redbKIT/tree/master/FEM_library"><code>FEM_library/</code></a> and <a href="https://github.com/redbKIT/redbKIT/tree/master/RB_library"><code>RB_library/</code></a> folders to the current path.
+A welcome message should appear: you can now start using redbKIT!</p>
+
+<p>A gallery of applications is provided in the folder <a href="https://github.com/redbKIT/redbKIT/tree/master/Problems"><code>Problems/</code></a>.</p>
+
+<p>If you want to speedup the finite element assembling operations, you can "mexify" the function
+<code>ADR_mex_assembler.m</code> by running the following command in the MATLAB prompt (<a href="http://www.mathworks.com/products/matlab-coder/?refresh=true"><code>MATLAB Coder</code></a> needed):</p>
+
+<pre><code>&gt;&gt; coder -build FEM_library/ADR_assembly.prj
+</code></pre>
+
+<p>Then replace <code>ADR_mex_assembler</code> with <code>ADR_mex_assembler_mex</code> at line 109
+of <code>Assembler_2D.m</code></p>
+
+<p>An HTML documentation of redbKIT can be automatically generated using <a href="http://www.artefact.tk/software/matlab/m2html/"><code>M2HTML</code></a>. To this end, you should download, extract and add to the path <a href="http://www.artefact.tk/software/matlab/m2html/"><code>M2HTML</code></a> using the following commands:</p>
+
+<pre><code>&gt;&gt; url_M2HTML = 'http://www.artefact.tk/software/matlab/m2html/m2html.zip';
+&gt;&gt; unzip(url_M2HTML);
+&gt;&gt; addpath(genpath(strcat(pwd,'/m2html')));
+</code></pre>
+
+<p>Then generate the documentation</p>
+
+<pre><code>&gt;&gt; m2html('mfiles',{'RB_library', 'RB_library/RBF_interpolation' 'FEM_library'}, ...
+   'htmldir','Documentation', 'recursive','off', 'global','on',...
+   'template','frame', 'index','menu', 'graph','on');
+</code></pre>
+
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
+
+<pre><code>redbKIT is distributed under BSD 2-clause license
+</code></pre>
+
+<p>Copyright (c) 2015, Ecole Polytechnique Fédérale de Lausanne (EPFL)
+All rights reserved.</p>
+
+<p>Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:</p>
+
+<ul>
+<li><p>Redistributions of source code must retain the above copyright notice, this
+list of conditions and the following disclaimer.</p></li>
+<li><p>Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.</p></li>
+</ul>
+
+<p>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
+
+<h2>
+<a id="how-to-cite" class="anchor" href="#how-to-cite" aria-hidden="true"><span class="octicon octicon-link"></span></a>How to cite</h2>
+
+<p>Please use the following citation to reference <code>redbKIT</code></p>
+
+<pre><code>A. Quarteroni, A. Manzoni and F. Negri.
+Reduced Basis Methods for Partial Differential Equations. An Introduction.
+Springer, 2015.
+</code></pre>
+
+<p>BibTex entry</p>
+
+<pre><code>@book{QMN_RBspringer,
+author  = {Quarteroni, A. and  Manzoni, A. and Negri, F.},
+title   = {Reduced Basis Methods for Partial Differential Equations. An Introduction},
+year    = {2015},
+publisher = {Springer},
+address = {...}
+}
+</code></pre>
+
+<h2>
+<a id="contact" class="anchor" href="#contact" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contact</h2>
+
+<p>Should you have any questions regarding <code>redbKIT</code>, do not hesitate to contact us by email at <a href="mailto:redbkit@gmail.com">redbkit@gmail.com</a>.
+We also encourage contributions that can help to improve the code or the documentation, and to make <code>redbKIT</code> more useful.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">redbKIT maintained by <a href="https://github.com/redbKIT">redbKIT</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
