@@ -21,6 +21,8 @@ function [IEIM, PHI, muEIM] = EmpiricalInterpolation(fun, Omega_h, Xi_train, tol
 %   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch> 
 
+fprintf('\n** Start Empirical Interpolation **\n')
+
 Ns   = size(Xi_train, 1);
 Nq   = size(Omega_h, 1);
 
@@ -73,5 +75,7 @@ while EIM_error > tol && M < Max_Iter
     r            = fun_next - PHI * (B \ fun_next(IEIM));
      
 end
+
+fprintf('\n** End Empirical Interpolation **\n')
 
 end

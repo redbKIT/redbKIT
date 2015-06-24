@@ -19,7 +19,7 @@ FOM.u_D   = eval(FOM.u_D_str);
 
 %% Build Approximation of the Stability Factor (by RBF interpolation)
 FOM.stabFactor.mu_interp_index   = [4];
-FOM.stabFactor.interp_step       = [12];
+FOM.stabFactor.interp_step       = [24];
 FOM.stabFactor.rbf_parfor        = 1;
 FOM.stabFactor.inf_sup           = 0;
 [FOM]                            = RBF_OfflineInterpolation(FOM);
