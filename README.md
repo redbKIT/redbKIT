@@ -37,7 +37,7 @@ You can directly [**`download the current release`**](https://github.com/redbKIT
 
 [`FEM_library/`](https://github.com/redbKIT/redbKIT/tree/master/FEM_library)  [`LICENSE`](https://github.com/redbKIT/redbKIT/blob/master/LICENSE)  [`Problems/`](https://github.com/redbKIT/redbKIT/tree/master/Problems)  [`RB_library/`](https://github.com/redbKIT/redbKIT/tree/master/RB_library)  [`README.md`](https://github.com/redbKIT/redbKIT/blob/master/README.md)  [`setPath.m`](https://github.com/redbKIT/redbKIT/blob/master/setPath.m)
 
-To check that your operating system and MATLAB installation are supported, and that the code is correctly working, please follow the following instructions. Start MATLAB and navigate to the `redbKIT` folder. Then, type in the MATLAB prompt
+To check that your operating system and MATLAB installation are supported, and that the code is correctly working, please follow these instructions. Start MATLAB and navigate to the `redbKIT` folder. Then, type in the MATLAB prompt
 
 	>> setPath
 	>> cd Problems
