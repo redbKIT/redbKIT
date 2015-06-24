@@ -2,7 +2,7 @@
 
 redbKIT is a [MATLAB](http://www.mathworks.com/products/matlab/) library (developed at [EPFL](https://www.epfl.ch/) - [Chair of Modeling and Scientific Computing](http://cmcs.epfl.ch/)) which implements some Reduced Basis (RB) methods for parametrized Partial Differential Equations (PDEs). In particular, it includes straightforward implementations of many of the algorithms presented in the book
 
->[**[QMN15] A. Quarteroni, A. Manzoni, F. Negri. Reduced Basis Methods for Partial Differential Equations**, Springer, 2015.](http://www.springer.com/us/book/9783319154305#aboutBook)
+>[**[QMN15] A. Quarteroni, A. Manzoni, F. Negri. Reduced Basis Methods for Partial Differential Equations. An Introduction**, Springer, 2015.](http://www.springer.com/us/book/9783319154305#aboutBook)
 
 `redbKIT` consists of three main packages: [`RB_library`](https://github.com/redbKIT/redbKIT/tree/master/RB_library), [`FEM_library`](https://github.com/redbKIT/redbKIT/tree/master/FEM_library) and [`Problems`](https://github.com/redbKIT/redbKIT/tree/master/Problems), which are briefly described below.
 
