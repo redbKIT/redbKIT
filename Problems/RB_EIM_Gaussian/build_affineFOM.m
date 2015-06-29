@@ -110,7 +110,7 @@ FOM.Aq{3} =  A_3(FOM.MESH.internal_dof,FOM.MESH.internal_dof);
 
 
 %% EIM on RHS
-rng('default')
+reset_randomSeed;
 Ns         =  1000;
 EIM_mu_min =  [ 0.2     0.15     ];
 EIM_mu_max =  [ 0.8     0.35     ];

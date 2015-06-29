@@ -8,7 +8,7 @@ if nargin < 5 || isempty(N_vec)
 end
 
 %% generate mu_sample
-rng('default');
+reset_randomSeed;
 fprintf('Ntest = %d \n',N_samples);
 for i = 1 : FOM.P
     sample(:,i) = rand(N_samples,1)*(FOM.mu_max(i)-FOM.mu_min(i))+FOM.mu_min(i);

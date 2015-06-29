@@ -6,7 +6,7 @@ function [ Error ] = error_analysis_mu(FOM, ROM, N_samples, N, mu_index, mu_fixe
 n_N = length(N);
 
 %% generate mu_sample
-rng('default');
+reset_randomSeed;
 ii_fix = 1;
 for i = mu_fixed
       if nargin > 6

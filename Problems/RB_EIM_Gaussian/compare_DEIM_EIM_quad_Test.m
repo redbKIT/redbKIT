@@ -112,11 +112,11 @@ plot(quad_nodes(:,1), quad_nodes(:,2), 'or')
 
 %% ========================================================================
 % Parameter discretization (for EIM and DEIM)
-rng('default')
+reset_randomSeed;
 mu_cube         =  lhsdesign(Ns_DEIM, P); % generate normalized design
 mu_train_DEIM   =  bsxfun(@plus,mu_min,bsxfun(@times,mu_cube,(mu_max-mu_min)));
 
-rng('default')
+reset_randomSeed;
 mu_cube         =  lhsdesign(Ns_EIM, P); % generate normalized design
 mu_train_EIM    =  bsxfun(@plus,mu_min,bsxfun(@times,mu_cube,(mu_max-mu_min)));
 
