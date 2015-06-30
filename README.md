@@ -49,12 +49,12 @@ The `test_all.m` functions launches a series of tests and generates a log file `
 
 | MATLAB version / OS  |  Linux 64 bit  |  MAC 64 Bit | Windows 64 Bit | Windows 32 Bit |
 |:--------------------:|:--------------:|:-----------:|:--------------:|:--------------:|
-|           **R2014b** |        x       |      x      |                |                |
+|           **R2014b** |        x       |      x      |       x        |                |
 |           **R2014a** |        x       |             |                |                |
 |           **R2013a** |        x       |             |                |                |
 |           **R2012a** |        x       |             |                |                |
 |           **R2011a** |        x       |             |                |                |
-
+|           **R2010a** |        x       |             |                |                |
 
 Usage
 -------
