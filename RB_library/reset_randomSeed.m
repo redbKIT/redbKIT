@@ -8,9 +8,11 @@ function [] = reset_randomSeed()
 
 if verLessThan('matlab', '7.12')
     
-    type      = RandStream.DefaultStartupType;
-    s         = RandStream(type,'Seed',0);
-    RandStream.setGlobalStream(s);
+    %type      = RandStream.DefaultStartupType;
+    %s         = RandStream(type,'Seed',0);
+    %RandStream.setGlobalStream(s);
+    
+    reset(RandStream.getDefaultStream);
     
 else
     
