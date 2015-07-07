@@ -89,15 +89,15 @@ end
 cd(TestFolder)
 
 % Test 5
-try
-    testname = 'Test_Coder_Assembly';
-    coder -build ../FEM_library/ADR_assembly.prj
-    print_test_passed(fid,testname);
-    
-catch err
-    print_error_toFile(fid,err,testname);
-end
-cd(TestFolder)
+%try
+%    testname = 'Test_Coder_Assembly';
+%    coder -build ../FEM_library/ADR_assembly.prj
+%    print_test_passed(fid,testname);
+%    
+%catch err
+%    print_error_toFile(fid,err,testname);
+%end
+%cd(TestFolder)
 
 
 

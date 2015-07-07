@@ -45,7 +45,7 @@ To check that your operating system and MATLAB installation are supported, and t
 
 The `test_all.m` functions launches a series of tests and generates a log file `test_log.txt`. If all the tests are marked as *passed*, you can start enjoying `redbKIT`. Otherwise, do not hesitate to contact us by email at <redbkit@gmail.com>.
 
-`redbKIT` has been succesfully tested on the following operating systems/MATLAB versions:
+`redbKIT` has been successfully tested on the following operating systems/MATLAB versions:
 
 | MATLAB version / OS  |  Linux 64 bit  |  MAC 64 Bit | Windows 64 Bit | Windows 32 Bit |
 |:--------------------:|:--------------:|:-----------:|:--------------:|:--------------:|
@@ -55,6 +55,7 @@ The `test_all.m` functions launches a series of tests and generates a log file `
 |           **R2012a** |        x       |             |                |                |
 |           **R2011a** |        x       |             |                |                |
 |           **R2010a** |        x       |             |                |                |
+|           **R2009b** |                |             |                |        x       |
 
 Usage
 -------
@@ -136,6 +137,17 @@ BibTex entry
   	publisher = {Springer},
     address = {...}
 	}
+
+Development
+-------
+
+redbKIT was developed and is currently maintained by Federico Negri (EPFL).
+
+Paola Gervasio (Università degli Studi di Brescia ) is gratefully acknowledged for granting the use of parts of the finite element code MLife.
+
+<!---
+Very important contributions have been made by Carlo de Falco and Alessandro Reali. The following people have also contributed to the development of GeoPDEs, either by writing lines of code, testing the packages, or giving some advice: Andrea Bressan, Annalisa Buffa, Durkbin Cho, Timo Lähivaara, Massimiliano Martinelli, Marco Pingaro, Giancarlo Sangalli.
+-->
 
 Contact
 -------
