@@ -1,0 +1,6 @@
+// To generate the meshes
+
+gmsh Cubeh1.geo -3 -optimize
+gmsh Cubeh2.geo -3 -optimize
+gmsh Cubeh3.geo -3 -optimize
+gmsh Cubeh4.geo -3 -optimize
