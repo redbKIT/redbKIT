@@ -1,10 +1,10 @@
-%EXAMPLE3D shows how to solve a problem with the FEM library. Also performs
+%EXAMPLE3D shows how to solve a 3D problem with the FEM library. Also performs
 %convergence analysis.
 %
 % GENERATE the meshes before running (see readme in gmsh subfolder)
 
 %   This file is part of redbKIT.
-%   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
+%   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch>
 
 clc

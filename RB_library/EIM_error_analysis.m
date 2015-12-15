@@ -25,7 +25,7 @@ for k = 1 : N_samples
       mu = sample(k,:);
       fprintf('k_sample = %d \n',k);     
       
-      [uh] = Elliptic2D_Solver(FOM.MESH.elements, FOM.MESH.vertices, FOM.MESH.boundaries, FOM.FE_SPACE.fem, data_file, mu);
+      [uh] = Elliptic_Solver(FOM.MESH.dim, FOM.MESH.elements, FOM.MESH.vertices, FOM.MESH.boundaries, FOM.FE_SPACE.fem, data_file, mu);
       %uh = solve_HFsystem(FOM, mu);
       uh  = uh(FOM.MESH.internal_dof);
             

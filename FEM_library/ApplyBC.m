@@ -41,7 +41,7 @@ switch MESH.dim
         if ~isempty(MESH.Neumann_side)
             
             [csi,wi]       =  xwgl(FE_SPACE.quad_order, 0, 1);
-            [phi]          =  fem_basis2D(FE_SPACE.fem, csi, 0*csi, 1);
+            [phi]          =  fem_basis(MESH.dim, FE_SPACE.fem, [csi; 0*csi], 1);
             eta            =  1 - csi;
             nqn            =  length(csi);
             
@@ -87,7 +87,7 @@ switch MESH.dim
         if ~isempty(MESH.Robin_side)
             
             [csi,wi]       =  xwgl(FE_SPACE.quad_order, 0, 1);
-            [phi]          =  fem_basis2D(FE_SPACE.fem, csi, 0*csi, 1);
+            [phi]          =  fem_basis(MESH.dim, FE_SPACE.fem, [csi;0*csi], 1);
             eta            =  1 - csi;
             nqn            =  length(csi);
             

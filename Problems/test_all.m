@@ -22,7 +22,7 @@ fprintf(fid, 'Platform: %s\n\n', s );
 
 %% Start Testing
 
-% Test 1
+% Test 1a
 cd FEM_Test_2DLaplacian/
 try
     testname = 'FEM_Test_2DLaplacian_P1';
@@ -41,6 +41,29 @@ try
     test('P2','Dirichlet_data');    
     test('P2','DirichletNeumann_data');
     test('P2','DirichletRobin_data');
+    close all;
+    print_test_passed(fid,testname);
+    
+catch err
+    print_error_toFile(fid,err,testname);
+end
+cd(TestFolder)
+
+% Test 1b
+cd FEM_Test_3DLaplacian/
+try
+    testname = 'FEM_Test_3DLaplacian_P1';
+    test('P1','Dirichlet_data');    
+    close all;
+    
+    print_test_passed(fid,testname);
+    
+catch err
+    print_error_toFile(fid,err,testname);
+end
+try
+    testname = 'FEM_Test_3DLaplacian_P2';
+    test('P2','Dirichlet_data');    
     close all;
     print_test_passed(fid,testname);
     
@@ -87,20 +110,6 @@ catch err
     print_error_toFile(fid,err,testname);
 end
 cd(TestFolder)
-
-% Test 5
-%try
-%    testname = 'Test_Coder_Assembly';
-%    coder -build ../FEM_library/ADR_assembly.prj
-%    print_test_passed(fid,testname);
-%    
-%catch err
-%    print_error_toFile(fid,err,testname);
-%end
-%cd(TestFolder)
-
-
-
 
 %% End Testing
 
