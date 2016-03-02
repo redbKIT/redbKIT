@@ -145,9 +145,6 @@ redbKIT was developed and is currently maintained by Federico Negri (EPFL).
 
 Paola Gervasio (Università degli Studi di Brescia ) is gratefully acknowledged for granting the use of parts of the finite element code MLife.
 
-<!---
-Very important contributions have been made by Carlo de Falco and Alessandro Reali. The following people have also contributed to the development of GeoPDEs, either by writing lines of code, testing the packages, or giving some advice: Andrea Bressan, Annalisa Buffa, Durkbin Cho, Timo Lähivaara, Massimiliano Martinelli, Marco Pingaro, Giancarlo Sangalli.
--->
 
 Contact
 -------
