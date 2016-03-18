@@ -18,12 +18,12 @@ for i = 1 : n_mu
     
     MESH_tmp            =  FOM.HyRED.MESH;
     MESH_tmp.vertices   =  RBF_DeformGeometry(mu(i,FOM.DATA.shape_param),MESH_tmp.vertices);
-    [MESH_tmp.jac, MESH_tmp.invjac, MESH_tmp.h] = geotrasf2D(MESH_tmp.vertices, MESH_tmp.elements);   
+    [MESH_tmp.jac, MESH_tmp.invjac, MESH_tmp.h] = geotrasf(MESH_tmp.dim, MESH_tmp.vertices, MESH_tmp.elements);   
     DATA_tmp            =  FOM.DATA;
     DATA_tmp.param      =  mu(i,:);
     
     [A, F]              =  Assembler_2D(MESH_tmp, DATA_tmp, FOM.HyRED.FE_SPACE);
-    [A_in, F_in]        =  ApplyBC_2D(A, F, FOM.HyRED.FE_SPACE, MESH_tmp, DATA_tmp);
+    [A_in, F_in]        =  ApplyBC(A, F, FOM.HyRED.FE_SPACE, MESH_tmp, DATA_tmp);
     
     A_in  = A_in(:);
     

@@ -1,4 +1,4 @@
-function [ FOM ] = build_affineFOM(elements, vertices, boundaries, fem, data_file, tolPOD)
+function [ FOM ] = build_basicFOM(elements, vertices, boundaries, fem, data_file)
 %BUILD_AFFINEFOM returns a FOM (for full-order model) struct containing all
 %the structures required for the reduction.
 
@@ -81,53 +81,6 @@ FOM.MESH     = MESH;
 FOM.FE_SPACE = FE_SPACE;
 FOM.DATA     = DATA;
 
-%% Assemble MATRIX wih DEIM
-% [mu_train]         = FullFactorial_ParameterSpace(FOM.P, FOM.mu_min, FOM.mu_max, FOM.mu_ref, Tgrid_dimension);
-% mu_train           = [mu_ref; mu_train];
-% mu_train_Dimension = size(mu_train,1);
-
-mu_train_Dimension = 100; % number of samples
-mu_cube            = lhsdesign(mu_train_Dimension,FOM.P); % generate normalized design
-mu_train           = bsxfun(@plus,FOM.mu_min,bsxfun(@times,mu_cube,(FOM.mu_max-FOM.mu_min)));
-
-
-%% compute FEM snapshots, store matrices and rhs
-ndf       = FE_SPACE.numDof; % number of DOFs
-S_matrix  = sparse(ndf*ndf,mu_train_Dimension);
-S_rhs     = sparse(ndf,mu_train_Dimension);
-
-parfor i = 1 : size(mu_train,1)
-    
-    MESH_tmp            =  MESH;
-    MESH_tmp.vertices   =  RBF_DeformGeometry(mu_train(i,FOM.DATA.shape_param),MESH.vertices);
-    [MESH_tmp.jac, MESH_tmp.invjac, MESH_tmp.h] = geotrasf(MESH_tmp.dim, MESH_tmp.vertices, MESH_tmp.elements);   
-    DATA_tmp            =  DATA;
-    DATA_tmp.param      =  mu_train(i,:);
-    
-    [A, F]              =  Assembler_2D(MESH_tmp, DATA_tmp, FE_SPACE);
-    [A_in, F_in]        =  ApplyBC(A, F, FE_SPACE, MESH_tmp, DATA_tmp);
-
-    S_matrix(:,i)       = A_in(:);
-    S_rhs(:,i)          = F_in;
-    
-    fprintf('\nAssembled Snapshot Matrix and Vector %d of %d', i, mu_train_Dimension);
-end
-
-%% Generate Approximate Affine Model by (M)DEIM
-[FOM.HyRED, U_matrix, U_rhs]  = HyperReduction_offline(FOM, S_rhs, S_matrix, tolPOD);
-
-FOM.Qa    = size(U_matrix,2);
-FOM.Qf    = size(U_rhs,2);
-
-for q = 1 : FOM.Qa
-      FOM.Aq{q} = reshape(U_matrix(:,q), ndf, ndf);
-end
-
-for q = 1 : FOM.Qf
-      FOM.Fq{q} = U_rhs(:,q);
-end
-%clear U_matrix U_rhs S_matrix S_rhs;
-
 %% Compute Xnorm
 DATA.diffusion =  @(x,y,t,param)(1+0.*x.*y);
 X              =  Assembler_2D(MESH, DATA, FE_SPACE, 'diffusion', [], [], []);
@@ -137,7 +90,5 @@ M              =  Assembler_2D(MESH, DATA, FE_SPACE, 'reaction');
 FOM.Xnorm =  X(FOM.MESH.internal_dof,FOM.MESH.internal_dof) +...
              M(FOM.MESH.internal_dof,FOM.MESH.internal_dof);
 
-%clear MESH DATA FE_SPACE elements vertices boundaries;       
-%FOM.u_D = @(x,mu) [];
-
+ 
 end

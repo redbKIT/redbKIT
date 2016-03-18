@@ -1,8 +1,8 @@
 clear all
 clc
 
-addpath([pwd,'RBF'])
-addpath([pwd,'gmsh'])
+addpath([pwd,'/RBF'])
+addpath([pwd,'/gmsh'])
 
 %% Set FE Space and load mesh
 fem          =  'P1';
@@ -54,5 +54,5 @@ lighting phong
 ADR_export_solution(2, real(uNh(1:ROM.MESH.numVertices)), def_vertices, ROM.MESH.elements(1:3,:), 'Figures/Horn_RBsol');
 
 %% Perform Error analysis with respect to Affine FOM
-Ntest_sample  = 1;
+Ntest_sample  = 10;
 [ Error ]     = error_analysis(FOM, ROM, Ntest_sample);

@@ -10,5 +10,5 @@ addpath(genpath(strcat(pwd,sslash,'RB_library')));
 addpath(genpath(strcat(pwd,sslash,'FEM_library')));
 
 fprintf('\n------------------------------------------')
-fprintf('\n      *** Welcome to redbKIT ***')
+fprintf('\n      *** Welcome to redbKIT v2.0 ***')
 fprintf('\n------------------------------------------\n\n')
