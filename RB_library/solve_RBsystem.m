@@ -22,7 +22,7 @@ if nargin < 3 || isempty(N)
 end
 
 %% Evaluate Theta functions
-[ theta_a, theta_f ] = evaluate_ThetaFunctions( mu, varargin{:} );
+[ theta_a, theta_f ] = evaluate_ThetaFunctions( mu, ROM, varargin{:} );
 
 INDX = 1:N;
 

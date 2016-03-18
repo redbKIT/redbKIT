@@ -130,7 +130,7 @@ switch MESH.dim
                 face = MESH.Robin_side(l);
                 
                 u_Robin_loc  = u_Robin(l,:).*wi;
-                u_Robin_loc  = u_Robin_loc(1,:)';
+                u_Robin_loc  = u_Robin_loc(1,:).';
                 
                 alphaR_loc   = alphaR(l,:).*wi;
                 alphaR_loc   = alphaR_loc(ones(nbn, 1),:);

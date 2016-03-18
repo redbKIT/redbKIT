@@ -9,7 +9,7 @@ function [uh] = solve_HFsystem(FOM, mu)
 %   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch> 
 
-[ theta_a, theta_f ] = evaluate_ThetaFunctions( mu );
+[ theta_a, theta_f ] = evaluate_ThetaFunctions( mu, FOM );
 
 Ah = theta_a(1) * FOM.Aq{1};
 Fh = theta_f(1) * FOM.Fq{1};

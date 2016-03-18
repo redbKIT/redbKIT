@@ -34,7 +34,7 @@ for k = 1 : N_samples
             X_error(n,k)    =  sqrt(abs(diff'* (FOM.Xnorm * diff))); % absolute error
       end
       
-      normU                  =  sqrt(uh'* (FOM.Xnorm * uh));
+      normU                  =  sqrt(abs(uh'* (FOM.Xnorm * uh)));
       X_error_rel(:,k)       =  X_error(:,k)./normU; % relative error
       delta_N_rel(:,k)       =  delta_N(:,k)./normU;
 end

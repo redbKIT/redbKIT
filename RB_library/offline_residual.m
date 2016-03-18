@@ -12,28 +12,30 @@ function [Cqq, dqq, Eqq] = offline_residual(FOM, V)
 %   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch> 
 
+fprintf('\n     Compute Cholesky factorization of Xnorm')
+[L, ~, perm] = chol(FOM.Xnorm,'lower','vector');
+
+fprintf('\n     Compute Fq''*(X^(-1) Fq) and Fq''*(X^(-1) Aq V) terms')
 for q1 = 1 : FOM.Qf
     
-    t = FOM.Xnorm\FOM.Fq{q1};
+    t = Riesz_representer_Xnorm(FOM.Fq{q1}, L, L', perm);%FOM.Xnorm\FOM.Fq{q1};
     
     for q2 = 1: FOM.Qf
-        
         Cqq{q1,q2} = t'*FOM.Fq{q2};
-        
     end
-    
+
 end
 
-
+fprintf('\n     Compute V''Aq''*(X^(-1) Fq) and V''Aq''*(X^(-1) (Aq * V)) terms \n')
 for q1 = 1 : FOM.Qa
     
-    Z = FOM.Xnorm\(FOM.Aq{q1}*V);
+    Z = Riesz_representer_Xnorm(FOM.Aq{q1}*V, L, L', perm);%FOM.Xnorm\(FOM.Aq{q1}*V);
     
-    for q2 = 1 : FOM.Qa
+    parfor q2 = 1 : FOM.Qa
         Eqq{q1,q2} = Z'*(FOM.Aq{q2}*V);
     end
     
-    for q2 = 1 : FOM.Qf
+    parfor q2 = 1 : FOM.Qf
         dqq{q1,q2} = Z'*FOM.Fq{q2};
     end
 end

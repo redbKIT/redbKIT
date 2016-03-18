@@ -32,6 +32,8 @@ end
 
 %% initialize ROM struct
 ROM.MESH   = FOM.MESH;
+ROM.DATA   = FOM.DATA;
+ROM.HyRED  = FOM.HyRED;
 ROM.Qa     = FOM.Qa;
 ROM.Qf     = FOM.Qf;
 ROM.P      = FOM.P;
