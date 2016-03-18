@@ -1,23 +1,23 @@
-function [A, F, M] = Assembler_2D(MESH, DATA, FE_SPACE, OPERATOR, TC_d, TC_t, subdomain, t)
-%ASSEMBLER_2D assembler for 2D ADR equations with numerical
+function [A, F, M] = Assembler_3D(MESH, DATA, FE_SPACE, OPERATOR, TC_d, TC_t, subdomain, t)
+%ASSEMBLER_3D assembler for 3D ADR equations with numerical
 %quadratures.
 %
-%   [A, F] = ASSEMBLER_2D(MESH, DATA, FE_SPACE) given MESH and 
+%   [A, F] = ASSEMBLER_3D(MESH, DATA, FE_SPACE) given MESH and 
 %   FE_SPACE structs, assemble the stiffness matrix A and rhs vector F
 %   of the advection-diffusion-reaction differential operator using the
 %   parameters specified in the DATA struct. The resulting matrix and
 %   vector doesn't take into account for Boundary Conditions.
 %
-%   [A, F, M] = ASSEMBLER_2D(MESH, DATA, FE_SPACE, T) as before, but also
+%   [A, F, M] = ASSEMBLER_3D(MESH, DATA, FE_SPACE, T) as before, but also
 %   returns the mass matrix M. Moreover, the problem's parameters are
 %   evaluated with respect to a given time T.
 %
-%   [A] = Assembler_2D(MESH, DATA, FE_SPACE, 'diffusion', [i j], [], k);
+%   [A] = Assembler_3D(MESH, DATA, FE_SPACE, 'diffusion', [i j], [], k);
 %   returns the matrix corresponding to the (i,j)-th second derivative
 %   (diffusion operator) assembled over the subdomain \Omega_k
 %   A spatial dependent coefficient has to be defined in DATA.diffusion
 %
-%   [A] = Assembler_2D(MESH, DATA, FE_SPACE, 'transport', [], [i], k);
+%   [A] = Assembler_3D(MESH, DATA, FE_SPACE, 'transport', [], [i], k);
 %   returns the matrix corresponding to the (i)-th first derivative 
 %   (advection operator) assembled over the subdomain \Omega_k
 %   A spatial dependent coefficient has to be defined in DATA.transport{i}
@@ -59,25 +59,26 @@ end
 
 
 %% Computations of all quadrature nodes in the elements
-x = zeros(MESH.numElem,FE_SPACE.numQuadNodes); y = x;
+x = zeros(MESH.numElem,FE_SPACE.numQuadNodes); y = x; z = x;
 coord_ref = MESH.chi;
 
-for j = 1 : 3
-      i = MESH.elements(j,:);
-      vtemp = MESH.vertices(1,i);
-      x = x + vtemp'*coord_ref(j,:);
-      vtemp = MESH.vertices(2,i);
-      y = y + vtemp'*coord_ref(j,:);
+for j = 1:4
+    i = MESH.elements(j,:);
+    vtemp = MESH.vertices(1,i);
+    x = x + vtemp'*coord_ref(j,:);
+    vtemp = MESH.vertices(2,i);
+    y = y + vtemp'*coord_ref(j,:);
+    vtemp = MESH.vertices(3,i);
+    z = z + vtemp'*coord_ref(j,:);
 end
 
-
 %% Evaluation of coefficients in the quadrature nodes
-mu  = DATA.diffusion(x,y,t,DATA.param);
-si  = DATA.reaction(x,y,t,DATA.param);
+mu  = DATA.diffusion(x,y,z,t,DATA.param);
+si  = DATA.reaction(x,y,z,t,DATA.param);
 
 switch class(DATA.force)
       case {'function_handle','inline'}
-            f  = DATA.force(x,y,t,DATA.param);
+            f  = DATA.force(x,y,z,t,DATA.param);
             
       case 'double'
             if size(DATA.force,1)>1 && size(DATA.force,2)>1
@@ -93,22 +94,29 @@ switch class(DATA.force)
             end
 end
 
-bx  = DATA.transport{1}(x,y,t,DATA.param);
-by  = DATA.transport{2}(x,y,t,DATA.param);
+bx  = DATA.transport{1}(x,y,z,t,DATA.param);
+by  = DATA.transport{2}(x,y,z,t,DATA.param);
+bz  = DATA.transport{3}(x,y,z,t,DATA.param);
 
 one = ones(MESH.numElem,FE_SPACE.numQuadNodes);
 
 mu  = mu.*one;
 bx  = bx.*one;
 by  = by.*one;
+bz  = bz.*one;
 si  = si.*one;
 f   = f.*one;
 
 
 %% Vectorized assemly, returns matrices in sparse vector format
-[Arows, Acols, Acoef, Mcoef, Rrows, Rcoef] = ADR_mex_assembler_mex(OPERATOR, TC_d, TC_t, MESH.elements, FE_SPACE.numElemDof, mu, bx, by, si, f,...
-                      FE_SPACE.quad_weights,MESH.invjac(index_subd,1,1)',MESH.invjac(index_subd,2,1)',MESH.invjac(index_subd,1,2)',MESH.invjac(index_subd,2,2)',...
-                      FE_SPACE.phi,FE_SPACE.dphi_ref(:,:,1),FE_SPACE.dphi_ref(:,:,2), MESH.jac(index_subd));
+[Arows, Acols, Acoef, Mcoef, Rrows, Rcoef] = ADR_mex_assembler3D_mex(OPERATOR, TC_d, TC_t, MESH.elements, FE_SPACE.numElemDof, ...
+                        mu, bx, by, bz, si, f, ...
+                        FE_SPACE.quad_weights, ...
+                        MESH.invjac(index_subd,1,1)',MESH.invjac(index_subd,2,1)',MESH.invjac(index_subd,3,1)',...
+                        MESH.invjac(index_subd,1,2)',MESH.invjac(index_subd,2,2)',MESH.invjac(index_subd,3,2)',...
+                        MESH.invjac(index_subd,1,3)',MESH.invjac(index_subd,2,3)',MESH.invjac(index_subd,3,3)',...
+                        FE_SPACE.phi,FE_SPACE.dphi_ref(:,:,1),FE_SPACE.dphi_ref(:,:,2),FE_SPACE.dphi_ref(:,:,3),...
+                        MESH.jac(index_subd));
 
 
 %% Build sparse matrices and rhs

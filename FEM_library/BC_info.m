@@ -25,11 +25,13 @@ if verLessThan('matlab', '8.2')
       addParamValue(MESH_parser,'boundaries',0);
       addParamValue(MESH_parser,'elements',0);
       addParamValue(MESH_parser,'numNodes',0);
+      addParamValue(MESH_parser,'dim',0);
 else
       addParameter(MESH_parser,'nodes',0);
       addParameter(MESH_parser,'boundaries',0);
       addParameter(MESH_parser,'elements',0);
       addParameter(MESH_parser,'numNodes',0);
+      addParameter(MESH_parser,'dim',0);
 end
 
 parse(MESH_parser,MESH);
@@ -51,6 +53,12 @@ if isempty(type_Dirichlet) && isempty(type_Neumann) && isempty(type_Robin)
     error('No boundary conditions are imposed');
 end
 
+switch MESH.dim
+    case 2
+        bc_flag_row = 5;
+    case 3
+        bc_flag_row = 12;
+end
 
 %% Find Dirichlet dofs (if any)
 if ~isempty(type_Dirichlet)
@@ -60,7 +68,7 @@ if ~isempty(type_Dirichlet)
     Dirichlet_side          = [];
     flag_Dirichlet_vertices = [];
     for k = 1 : nDir
-        Dirichlet_side          = [Dirichlet_side,find(MESH.boundaries(5,:) == type_Dirichlet(k))];
+        Dirichlet_side          = [Dirichlet_side,find(MESH.boundaries(bc_flag_row,:) == type_Dirichlet(k))];
         flag_Dirichlet_vertices = [flag_Dirichlet_vertices,type_Dirichlet(k)];
     end
     Dirichlet_side             = unique(Dirichlet_side);
@@ -81,7 +89,7 @@ if ~isempty(type_Neumann)
     nNeu         = length(type_Neumann);
     Neumann_side = [];
     for k = 1 : nNeu
-        Neumann_side = [Neumann_side,find(MESH.boundaries(5,:) == type_Neumann(k))];
+        Neumann_side = [Neumann_side,find(MESH.boundaries(bc_flag_row,:) == type_Neumann(k))];
     end
     MESH.Neumann_side = unique(Neumann_side);
     
@@ -97,7 +105,7 @@ if ~isempty(type_Robin)
     nRob       = length(type_Robin);
     Robin_side = [];
     for k = 1 : nRob
-        Robin_side = [Robin_side,find(MESH.boundaries(5,:) == type_Robin(k))];
+        Robin_side = [Robin_side,find(MESH.boundaries(bc_flag_row,:) == type_Robin(k))];
     end
     MESH.Robin_side = unique(Robin_side);
     

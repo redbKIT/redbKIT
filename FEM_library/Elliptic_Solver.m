@@ -1,4 +1,4 @@
-function [u, FE_SPACE, MESH, DATA, errorL2, errorH1] = Elliptic2D_Solver(elements, vertices, boundaries, fem, data_file, param)
+function [u, FE_SPACE, MESH, DATA, errorL2, errorH1] = Elliptic_Solver(dim, elements, vertices, boundaries, fem, data_file, param)
 %ELLIPTIC2D_SOLVER 2D diffusion-transport-reaction finite element solver
 %
 %   [U, FE_SPACE, MESH, DATA, ERRORL2, ERRORH1] = ...
@@ -26,8 +26,8 @@ function [u, FE_SPACE, MESH, DATA, errorL2, errorH1] = Elliptic2D_Solver(element
 %   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch> 
 
-if nargin < 5
-    error('Missing input arguments. Please type help Elliptic1D_Solver')
+if nargin < 6
+    error('Missing input arguments. Please type help Elliptic_Solver')
 end
 
 if isempty(data_file)
@@ -36,7 +36,7 @@ end
 
 %% Read problem parameters and BCs from data_file
 DATA   = read_DataFile(data_file);
-if nargin < 6
+if nargin < 7
     DATA.param = [];
 else
     DATA.param = param;
@@ -44,22 +44,25 @@ end
 t      = [];
 
 %% Fill MESH data structure
+MESH.dim         = dim;
 MESH.vertices    = vertices;
 MESH.boundaries  = boundaries;
-MESH.elements  = elements;
+MESH.elements    = elements;
 MESH.numVertices = size(vertices,2);
 
 %% Build higher order (P2 or P3) mesh if required
 if ~strcmp(fem,'P1')
+    fprintf('\n Generate P2 mesh\n')
     [MESH.elements, MESH.nodes, MESH.boundaries] = ...
-        feval(strcat('P1to',fem,'mesh','2D'),elements, vertices, boundaries);
+        feval(['P1to',fem,'mesh',num2str(dim),'D'],elements, vertices, boundaries);
+    fprintf('\n Done\n')
 else
     MESH.nodes = vertices;
 end
 
 
 %% Update Mesh data with BC information and geometrical maps
-[numElemDof,numBoundaryDof]  = select2D(fem);
+[numElemDof,numBoundaryDof]  = select(fem, dim);
 MESH.numNodes                = size(MESH.nodes,2);
 MESH.numElem                 = size(MESH.elements,2);
 MESH.numBoundaryDof          = numBoundaryDof;
@@ -68,14 +71,18 @@ MESH.numBoundaryDof          = numBoundaryDof;
 [MESH]         = BC_info(MESH, DATA);
 
 % Compute geometrical map (ref to physical elements) information
-[MESH.jac, MESH.invjac, MESH.h] = geotrasf2D(MESH.vertices, MESH.elements);   
+[MESH.jac, MESH.invjac, MESH.h] = geotrasf(dim, MESH.vertices, MESH.elements);   
 
 % Compute quadrature nodes and weights on the reference element
-quad_order                  = 4; 
-[quad_nodes, quad_weights]  = dunavant_quad(quad_order);
+if dim == 2
+    quad_order       = 4;
+elseif dim == 3
+    quad_order       = 5;
+end
+[quad_nodes, quad_weights]  = quadrature(dim, quad_order);
 
 % Evaluate P1 geometrical mapping basis functions in the quad points
-[MESH.chi]                  =  fem_basis2D('P1', quad_nodes(1,:), quad_nodes(2,:));
+[MESH.chi]                  =  fem_basis(dim, 'P1', quad_nodes);
 
 %% Create and fill the FE_SPACE data structure
 FE_SPACE.fem              = fem;
@@ -90,8 +97,11 @@ FE_SPACE.quad_weights  = quad_weights;
 FE_SPACE.numQuadNodes  = length(FE_SPACE.quad_nodes);
 
 % Evaluate basis functions in the quad points on the reference element
-[FE_SPACE.phi, FE_SPACE.dcsiphi, FE_SPACE.detaphi]  =  ...
-    fem_basis2D(FE_SPACE.fem, FE_SPACE.quad_nodes(1,:), FE_SPACE.quad_nodes(2,:));
+% [FE_SPACE.phi, FE_SPACE.dcsiphi, FE_SPACE.detaphi]  =  ...
+%     fem_basis(FE_SPACE.fem, FE_SPACE.quad_nodes);
+
+[FE_SPACE.phi, FE_SPACE.dphi_ref]  =  ...
+    fem_basis(dim, FE_SPACE.fem, FE_SPACE.quad_nodes);
 
 
 fprintf('\n **** PROBLEM''S SIZE INFO ****\n');
@@ -104,14 +114,19 @@ fprintf('-------------------------------------------\n');
 %% Assemble matrix and right-hand side
 fprintf('\n Assembling ... ');
 t_assembly = tic;
-[A, F]              =  Assembler_2D(MESH, DATA, FE_SPACE);
+switch dim
+    case 2
+        [A, F]  =  Assembler_2D(MESH, DATA, FE_SPACE);
+    case 3
+        [A, F]  =  Assembler_3D(MESH, DATA, FE_SPACE);     
+end
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s', t_assembly);
 
 
 %% Apply boundary conditions
 fprintf('\n Apply boundary conditions ');
-[A_in, F_in, u_D]   =  ApplyBC_2D(A, F, FE_SPACE, MESH, DATA);
+[A_in, F_in, u_D]   =  ApplyBC(A, F, FE_SPACE, MESH, DATA);
 
 
 %% Solve
@@ -123,16 +138,15 @@ u(MESH.Dirichlet_dof)     = u_D;t_solve = toc(t_solve);
 fprintf('done in %3.3f s \n', t_solve);
 
 
-
 %% Compute L2 and H1 errors
 errorL2 = [];
 errorH1 = [];
 
 if nargout == 5
-    [errorL2] = error2D(u, MESH, DATA, FE_SPACE);
+    [errorL2] = FEM_error(u, MESH, DATA, FE_SPACE);
     fprintf(' L2-error : %e\n', errorL2);
 elseif nargout == 6
-    [errorL2,errorH1] = error2D(u, MESH, DATA, FE_SPACE);
+    [errorL2,errorH1] = FEM_error(u, MESH, DATA, FE_SPACE);
     fprintf(' L2-error : %e H1-error : %e\n',errorL2, errorH1);
 end
 

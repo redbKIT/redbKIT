@@ -26,6 +26,8 @@ t      = [];
 
 
 %% Fill MESH data structure
+dim              = 2;
+MESH.dim         = dim;
 MESH.vertices    = vertices;
 MESH.boundaries  = boundaries;
 MESH.elements    = elements;
@@ -41,7 +43,7 @@ end
 
 
 %% Update Mesh data with BC information and geometrical maps
-[numElemDof,numBoundaryDof]  = select2D(fem);
+[numElemDof,numBoundaryDof]  = select(fem, dim);
 MESH.numNodes                = size(MESH.nodes,2);
 MESH.numElem                 = size(MESH.elements,2);
 MESH.numBoundaryDof          = numBoundaryDof;
@@ -50,14 +52,14 @@ MESH.numBoundaryDof          = numBoundaryDof;
 [MESH]         = BC_info(MESH, DATA);
 
 % Compute geometrical map (ref to physical elements) information
-[MESH.jac, MESH.invjac, MESH.h] = geotrasf2D(MESH.vertices, MESH.elements);   
+[MESH.jac, MESH.invjac, MESH.h] = geotrasf(MESH.dim, MESH.vertices, MESH.elements);   
 
 % Compute quadrature nodes and weights on the reference element
 quad_order                  = 4;  
-[quad_nodes, quad_weights]  = dunavant_quad(quad_order);
+[quad_nodes, quad_weights]  = quadrature(dim, quad_order);
 
 % Evaluate P1 geometrical mapping basis functions in the quad points
-[MESH.chi]                  =  fem_basis2D('P1', quad_nodes(1,:), quad_nodes(2,:));
+[MESH.chi]                  =  fem_basis(dim, 'P1', quad_nodes);
 
 %% Create and fill the FE_SPACE data structure
 FE_SPACE.fem              = fem;
@@ -72,8 +74,8 @@ FE_SPACE.quad_weights  = quad_weights;
 FE_SPACE.numQuadNodes  = length(FE_SPACE.quad_nodes);
 
 % Evaluate basis functions in the quad points on the reference element
-[FE_SPACE.phi, FE_SPACE.dcsiphi, FE_SPACE.detaphi]  =  ...
-    fem_basis2D(FE_SPACE.fem, FE_SPACE.quad_nodes(1,:), FE_SPACE.quad_nodes(2,:));
+[FE_SPACE.phi, FE_SPACE.dphi_ref]  =  ...
+    fem_basis(dim, FE_SPACE.fem, FE_SPACE.quad_nodes);
 
 
 fprintf('\n **** PROBLEM''S SIZE INFO ****\n');
@@ -126,7 +128,7 @@ FOM.Aq{6} =  A_6(FOM.MESH.internal_dof,FOM.MESH.internal_dof);
 
 % F_1: diffusion
 [~, F_1]       =  Assembler_2D(MESH, DATA, FE_SPACE, 'source', [], [], 2);
-[~, F_1, u_D]  =  ApplyBC_2D([], F_1, FE_SPACE, MESH, DATA);
+[~, F_1, u_D]  =  ApplyBC([], F_1, FE_SPACE, MESH, DATA);
 FOM.Fq{1}      =  F_1;
 
 FOM.u_D        =  @(x,mu)(FOM.DATA.bcDir(x(1,:),x(2,:),[],mu));

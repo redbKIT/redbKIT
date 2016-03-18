@@ -1,21 +1,23 @@
 function [] = test(fem, datafile)
 
-dim = 2;
+%   This file is part of redbKIT.
+%   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
+%   Author: Federico Negri <federico.negri at epfl.ch>
 
-%% build P1 mesh
-[vertices, boundaries, elements] = initmesh('mesh_square','Jiggle','minimum','Hgrad',1.01,'Hmax',0.5);
+addpath([pwd,'/gmsh'])
 
+dim = 3;
+h   = [2/9 2/19];
 
 %% solve for different level of refinement
-for i = 1 : 4
+for i = 1 : 2
     
-    %% refine mesh
-    [vertices, boundaries, elements] = refinemesh('mesh_square',vertices, boundaries, elements);
-    h(i) = 1/(2^(i+1));
+    %% load P1 mesh
+    [vertices, boundaries, elements] = msh_to_Mmesh(strcat('Cubeh',num2str(i)), dim);
     
     %% Solve   
     [~, ~, ~, ~, errorL2(i), errorH1(i)]  = Elliptic_Solver(dim, elements, vertices, boundaries, fem, datafile);
-    
+        
 end
 
 %% Plot convergence order
