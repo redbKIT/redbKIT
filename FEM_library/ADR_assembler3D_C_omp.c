@@ -1,9 +1,19 @@
+/*   This file is part of redbKIT.
+ *   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
+ *   Author: Federico Negri <federico.negri@epfl.ch> 
+ */
+        
 #include "mex.h"
 #include <stdio.h>
 #include <math.h>
-#include <omp.h>
 #include "blas.h"
 #include <string.h>
+#ifdef _OPENMP
+    #include <omp.h>
+#else
+    #warning "OpenMP not enabled. Compile with mex ADR_assembler3D_C_omp.c CFLAGS="\$CFLAGS -fopenmp" LDFLAGS="\$LDFLAGS -fopenmp""
+#endif
+
 
 void mexFunction(int nlhs,mxArray* plhs[], int nrhs, const mxArray* prhs[])
 {
@@ -22,7 +32,6 @@ void mexFunction(int nlhs,mxArray* plhs[], int nrhs, const mxArray* prhs[])
     int numRowsElements  = mxGetM(prhs[3]); 
     int nln2    = nln*nln;
     
-    /**/
     plhs[0] = mxCreateDoubleMatrix(nln2*noe,1, mxREAL); 
     plhs[1] = mxCreateDoubleMatrix(nln2*noe,1, mxREAL); 
     plhs[2] = mxCreateDoubleMatrix(nln2*noe,1, mxREAL);
