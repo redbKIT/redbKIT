@@ -1,11 +1,20 @@
+/*   This file is part of redbKIT.
+ *   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
+ *   Author: Federico Negri <federico.negri@epfl.ch> 
+ */
+
 #include "mex.h"
 #include <stdio.h>
 #include <math.h>
-#include <omp.h>
 #include "blas.h"
 #include <string.h>
 #define INVJAC(i,j,k) invjac[i+(j+k*dim)*noe]
 #define GRADREFPHI(i,j,k) gradrefphi[i+(j+k*NumQuadPoints)*nln]
+#ifdef _OPENMP
+    #include <omp.h>
+#else
+    #warning "OpenMP not enabled. Compile with mex ADR_assembler_C_omp.c CFLAGS="\$CFLAGS -fopenmp" LDFLAGS="\$LDFLAGS -fopenmp""
+#endif
 
 void mexFunction(int nlhs,mxArray* plhs[], int nrhs, const mxArray* prhs[])
 {
@@ -44,41 +53,43 @@ void mexFunction(int nlhs,mxArray* plhs[], int nrhs, const mxArray* prhs[])
     /* copy the string data from prhs[0] into a C string input_ buf.    */
     char *OP_string = mxArrayToString(prhs[1]);
     int OP[4] = {0, 0, 0, 0};
-    if (strcmp(OP_string, "diffusion"))
+    if (strcmp(OP_string, "diffusion")==0)
     {
         OP[0] = 1;
     }
     
-    if (strcmp(OP_string, "transport"))
+    if (strcmp(OP_string, "transport")==0)
     {
         OP[1] = 1;
     }
     
-    if (strcmp(OP_string, "reaction"))
+    if (strcmp(OP_string, "reaction")==0)
     {
         OP[2] = 1;
     }
     
-    if (strcmp(OP_string, "source"))
+    if (strcmp(OP_string, "source")==0)
     {
         OP[3] = 1;
     }
     
-    if (strcmp(OP_string, "all"))
+    if (strcmp(OP_string, "all")==0)
     {
         OP[0] = 1;
         OP[1] = 1;
         OP[2] = 1;
         OP[3] = 1;
     }
+    mxFree(OP_string);
     
     double C_t[dim];
     double C_d[dim][dim];
     
     double* TC_d   = mxGetPr(prhs[2]);
     double* TC_t   = mxGetPr(prhs[3]);
-
+    
     int k,l;
+
     for (k = 0; k < dim; k = k + 1 )
     {
         for (l = 0; l < dim; l = l + 1 )
@@ -88,7 +99,7 @@ void mexFunction(int nlhs,mxArray* plhs[], int nrhs, const mxArray* prhs[])
         C_t[k] = 0;
     }
     
-    if (TC_d[0]==10 && TC_d[1]==10)
+    if ((int)(TC_d[0])==10 && (int)(TC_d[1])==10)
     {
         for (l = 0; l < dim; l = l + 1 )
         {
@@ -97,10 +108,10 @@ void mexFunction(int nlhs,mxArray* plhs[], int nrhs, const mxArray* prhs[])
     }
     else
     {
-        C_d[(int)(TC_d[0])][(int)(TC_d[1])] = 1;
+        C_d[(int)(TC_d[0]-1)][(int)(TC_d[1]-1)] = 1;
     }
     
-    if (TC_t[0]==10)
+    if ((int)(TC_t[0])==10)
     {
         for (l = 0; l < dim; l = l + 1 )
         {
@@ -109,9 +120,8 @@ void mexFunction(int nlhs,mxArray* plhs[], int nrhs, const mxArray* prhs[])
     }
     else
     {
-        C_t[(int)(TC_t[0])] = 1;
+        C_t[(int)(TC_t[0]-1)] = 1;
     }
-    
     
     /* Local mass matrix (computed only once) with quadrature nodes */
     double LocalMass[nln][nln];
@@ -147,20 +157,12 @@ void mexFunction(int nlhs,mxArray* plhs[], int nrhs, const mxArray* prhs[])
 
     /* Assembly: loop over the elements */
     int ie;
-    int a, b;
-    int d1, d2;
-    int iii = 0;
-    int ii = 0;
-    double aloc = 0;
-    double floc = 0;
-    double diffusion;
-    double transport;
-    double reaction;
             
-    #pragma omp parallel for shared(invjac,mu,conv_field,si,f,detjac,elements, myRrows, myRcoef,myAcols, myArows, myAcoef, myMcoef) private(gradphi,ie,ii,iii,a,b,k,d1,d2,l,q,aloc,floc,diffusion,transport,reaction) firstprivate(phi,gradrefphi, w, numRowsElements, nln2, nln, OP, C_t, C_d, LocalMass)
+    #pragma omp parallel for shared(invjac,mu,conv_field,si,f,detjac,elements, myRrows, myRcoef,myAcols, myArows, myAcoef, myMcoef) private(gradphi,ie,k,l,q) firstprivate(phi,gradrefphi, w, numRowsElements, nln2, nln, OP, C_t, C_d, LocalMass)
     
     for (ie = 0; ie < noe; ie = ie + 1 )
     {
+        int d1, d2;
         for (k = 0; k < nln; k = k + 1 )
         {
             for (q = 0; q < NumQuadPoints; q = q + 1 )
@@ -175,19 +177,20 @@ void mexFunction(int nlhs,mxArray* plhs[], int nrhs, const mxArray* prhs[])
                 }
             }
         }
-
-        iii = 0;
-        ii = 0;
         
+        int iii = 0;
+        int ii = 0;
+        int a, b;
+    
         /* a tes, b trial */
         for (a = 0; a < nln; a = a + 1 )
         {
             for (b = 0; b < nln; b = b + 1 )
             {
-                aloc = 0;                
+                double aloc = 0;                
                 for (q = 0; q < NumQuadPoints; q = q + 1 )
                 {
-                    diffusion = 0;
+                    double diffusion = 0;
                     for (d1 = 0; d1 < dim; d1 = d1 + 1 )
                     {
                         for (d2 = 0; d2 < dim; d2 = d2 + 1 )
@@ -195,13 +198,13 @@ void mexFunction(int nlhs,mxArray* plhs[], int nrhs, const mxArray* prhs[])
                             diffusion = diffusion + C_d[d1][d2] * mu[ie+q*noe] * gradphi[d1][b][q] * gradphi[d2][a][q];
                         }
                     }
-                    transport = 0;
+                    double transport = 0;
                     for (d1 = 0; d1 < dim; d1 = d1 + 1 )
                     {
-                        transport = transport + C_t[d1] * conv_field[ie+(q*noe+d1*dim)] * gradphi[d1][b][q] * phi[a+q*nln];
+                        transport = transport + C_t[d1] * conv_field[ie+(q+d1*NumQuadPoints)*noe] * gradphi[d1][b][q] * phi[a+q*nln];
                     }
                     
-                    reaction  = si[ie+q*noe] * phi[b+q*nln] * phi[a+q*nln];
+                    double reaction  = si[ie+q*noe] * phi[b+q*nln] * phi[a+q*nln];
                     
                     aloc = aloc + (OP[0] * diffusion + OP[1] * transport + OP[2] * reaction) * w[q];
                 }
@@ -214,7 +217,7 @@ void mexFunction(int nlhs,mxArray* plhs[], int nrhs, const mxArray* prhs[])
                 iii = iii + 1;
             }
             
-            floc = 0;
+            double floc = 0;
             for (q = 0; q < NumQuadPoints; q = q + 1 )
             {
                 floc = floc + ( OP[3] * phi[a+q*nln] * f[ie+q*noe] ) * w[q];
