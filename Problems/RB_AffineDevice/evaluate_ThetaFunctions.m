@@ -1,4 +1,4 @@
-function [ theta_a, theta_f ] = evaluate_ThetaFunctions( mu )
+function [ theta_a, theta_f ] = evaluate_ThetaFunctions( mu, varargin )
 
 Qa = 6;
 Qf = 1;

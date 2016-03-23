@@ -1,8 +1,9 @@
 function [ A, node_to_element, node_to_boundaries ] = compute_adjacency_elements(vertices, elements, dim, boundaries)
 %COMPUTE_ADJACENCY compute adjacency matrix for 2d or 3d TRI/TET P1 mesh
 
-%   Author: F. Negri (federico.negri@epfl.ch) 2013-2014
-%   Copyright (C) Federico Negri, CMCS, EPFL
+%   This file is part of redbKIT.
+%   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
+%   Author: Federico Negri <federico.negri at epfl.ch> 
 
 noe = size(elements,2);
 nov = size(vertices,2);
