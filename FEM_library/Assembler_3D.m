@@ -98,25 +98,10 @@ bx  = DATA.transport{1}(x,y,z,t,DATA.param);
 by  = DATA.transport{2}(x,y,z,t,DATA.param);
 bz  = DATA.transport{3}(x,y,z,t,DATA.param);
 
-one = ones(MESH.numElem,FE_SPACE.numQuadNodes);
-
-mu  = mu.*one;
-bx  = bx.*one;
-by  = by.*one;
-bz  = bz.*one;
-si  = si.*one;
-f   = f.*one;
-
 
 %% Vectorized assemly, returns matrices in sparse vector format
-[Arows, Acols, Acoef, Mcoef, Rrows, Rcoef] = ADR_assembler3D_C_omp(OPERATOR, TC_d, TC_t, MESH.elements, FE_SPACE.numElemDof, ...
-                        mu, bx, by, bz, si, f, ...
-                        FE_SPACE.quad_weights, ...
-                        MESH.invjac(index_subd,1,1)',MESH.invjac(index_subd,2,1)',MESH.invjac(index_subd,3,1)',...
-                        MESH.invjac(index_subd,1,2)',MESH.invjac(index_subd,2,2)',MESH.invjac(index_subd,3,2)',...
-                        MESH.invjac(index_subd,1,3)',MESH.invjac(index_subd,2,3)',MESH.invjac(index_subd,3,3)',...
-                        FE_SPACE.phi,FE_SPACE.dphi_ref(:,:,1),FE_SPACE.dphi_ref(:,:,2),FE_SPACE.dphi_ref(:,:,3),...
-                        MESH.jac(index_subd));
+[Arows, Acols, Acoef, Mcoef, Rrows, Rcoef] = ADR_assembler_C_omp(MESH.dim, OPERATOR, TC_d, TC_t, MESH.elements, FE_SPACE.numElemDof, mu, [bx by bz], si, f,...
+    FE_SPACE.quad_weights, MESH.invjac(index_subd,:,:), MESH.jac(index_subd), FE_SPACE.phi, FE_SPACE.dphi_ref);
 
 
 %% Build sparse matrices and rhs
