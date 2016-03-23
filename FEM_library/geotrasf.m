@@ -1,7 +1,12 @@
-function [detjac, invjac, h] = geotrasf(dim, vertices,elements)
+function [detjac, invjac, h] = geotrasf(dim, vertices, elements)
 %GEOTRASF2D linear two dimensional transformation
 %
 %   F. Saleri 24-08-01, F. Negri 18.11.2014
+
+noe    = size(elements,2);
+detjac = zeros(1,noe);
+invjac = zeros(noe, dim, dim);
+h      = zeros(1,noe);
 
 switch dim
     

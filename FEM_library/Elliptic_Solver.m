@@ -1,5 +1,5 @@
 function [u, FE_SPACE, MESH, DATA, errorL2, errorH1] = Elliptic_Solver(dim, elements, vertices, boundaries, fem, data_file, param)
-%ELLIPTIC2D_SOLVER 2D diffusion-transport-reaction finite element solver
+%ELLIPTIC_SOLVER diffusion-transport-reaction finite element solver
 %
 %   [U, FE_SPACE, MESH, DATA, ERRORL2, ERRORH1] = ...
 %    ELLIPTIC2D_SOLVER(ELEMENTS, VERTICES, BOUNDARIES, FEM, DATA_FILE, PARAM)
@@ -43,66 +43,18 @@ else
 end
 t      = [];
 
-%% Fill MESH data structure
-MESH.dim         = dim;
-MESH.vertices    = vertices;
-MESH.boundaries  = boundaries;
-MESH.elements    = elements;
-MESH.numVertices = size(vertices,2);
-
-%% Build higher order (P2 or P3) mesh if required
-if ~strcmp(fem,'P1')
-    fprintf('\n Generate P2 mesh\n')
-    [MESH.elements, MESH.nodes, MESH.boundaries] = ...
-        feval(['P1to',fem,'mesh',num2str(dim),'D'],elements, vertices, boundaries);
-    fprintf('\n Done\n')
-else
-    MESH.nodes = vertices;
-end
-
-
-%% Update Mesh data with BC information and geometrical maps
-[numElemDof,numBoundaryDof]  = select(fem, dim);
-MESH.numNodes                = size(MESH.nodes,2);
-MESH.numElem                 = size(MESH.elements,2);
-MESH.numBoundaryDof          = numBoundaryDof;
-
-% Update MESH with BC information
-[MESH]         = BC_info(MESH, DATA);
-
-% Compute geometrical map (ref to physical elements) information
-[MESH.jac, MESH.invjac, MESH.h] = geotrasf(dim, MESH.vertices, MESH.elements);   
-
-% Compute quadrature nodes and weights on the reference element
+%% Set quad_order
 if dim == 2
     quad_order       = 4;
 elseif dim == 3
     quad_order       = 5;
 end
-[quad_nodes, quad_weights]  = quadrature(dim, quad_order);
 
-% Evaluate P1 geometrical mapping basis functions in the quad points
-[MESH.chi]                  =  fem_basis(dim, 'P1', quad_nodes);
+%% Create and fill the MESH data structure
+[ MESH ] = buildMESH( dim, elements, vertices, boundaries, fem, quad_order, DATA );
 
 %% Create and fill the FE_SPACE data structure
-FE_SPACE.fem              = fem;
-FE_SPACE.numDof           = length(MESH.internal_dof);
-FE_SPACE.numElemDof       = numElemDof;
-FE_SPACE.numBoundaryDof   = numBoundaryDof;
-
-% Store quadrature nodes and weights on the reference element
-FE_SPACE.quad_order    = quad_order;
-FE_SPACE.quad_nodes    = quad_nodes;
-FE_SPACE.quad_weights  = quad_weights;
-FE_SPACE.numQuadNodes  = length(FE_SPACE.quad_nodes);
-
-% Evaluate basis functions in the quad points on the reference element
-% [FE_SPACE.phi, FE_SPACE.dcsiphi, FE_SPACE.detaphi]  =  ...
-%     fem_basis(FE_SPACE.fem, FE_SPACE.quad_nodes);
-
-[FE_SPACE.phi, FE_SPACE.dphi_ref]  =  ...
-    fem_basis(dim, FE_SPACE.fem, FE_SPACE.quad_nodes);
-
+[ FE_SPACE ] = buildFESpace( MESH, fem, 1, quad_order );
 
 fprintf('\n **** PROBLEM''S SIZE INFO ****\n');
 fprintf(' * Number of Vertices  = %d \n',MESH.numVertices);
@@ -114,12 +66,7 @@ fprintf('-------------------------------------------\n');
 %% Assemble matrix and right-hand side
 fprintf('\n Assembling ... ');
 t_assembly = tic;
-switch dim
-    case 2
-        [A, F]  =  Assembler_2D(MESH, DATA, FE_SPACE);
-    case 3
-        [A, F]  =  Assembler_3D(MESH, DATA, FE_SPACE);     
-end
+[A, F]  =  ADR_Assembler(MESH, DATA, FE_SPACE);
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s', t_assembly);
 
@@ -127,7 +74,6 @@ fprintf('done in %3.3f s', t_assembly);
 %% Apply boundary conditions
 fprintf('\n Apply boundary conditions ');
 [A_in, F_in, u_D]   =  ApplyBC(A, F, FE_SPACE, MESH, DATA);
-
 
 %% Solve
 fprintf('\n Solve Au = f ... ');
