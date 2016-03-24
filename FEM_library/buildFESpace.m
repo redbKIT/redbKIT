@@ -2,7 +2,7 @@ function [ FE_SPACE ] = buildFESpace( MESH, fem, numComponents, quad_order )
 %BUILDFESPACE generates FE_SPACE struct
 
 %   This file is part of redbKIT.
-%   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
+%   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch> 
 
 [numElemDof,numBoundaryDof]  = select(fem, MESH.dim);

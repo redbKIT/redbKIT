@@ -2,7 +2,7 @@ function [ MESH ] = buildMESH( dim, elements, vertices, boundaries, fem, quad_or
 %BUILDMESH generates FE_SPACE struct
 
 %   This file is part of redbKIT.
-%   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
+%   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch> 
 
 %% Fill MESH data structure
