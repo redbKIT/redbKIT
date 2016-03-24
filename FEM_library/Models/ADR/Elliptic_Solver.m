@@ -73,7 +73,7 @@ fprintf('done in %3.3f s', t_assembly);
 
 %% Apply boundary conditions
 fprintf('\n Apply boundary conditions ');
-[A_in, F_in, u_D]   =  ApplyBC(A, F, FE_SPACE, MESH, DATA);
+[A_in, F_in, u_D]   =  ADR_ApplyBC(A, F, FE_SPACE, MESH, DATA);
 
 %% Solve
 fprintf('\n Solve Au = f ... ');

@@ -59,33 +59,33 @@ for i = 1 : FOM.Qf
 end
 
 % A_1: diffusion
-A_1       =  Assembler_2D(MESH, DATA, FE_SPACE, 'diffusion', [1 1], [], 1);
+A_1       =  ADR_Assembler(MESH, DATA, FE_SPACE, 'diffusion', [1 1], [], 1);
 FOM.Aq{1} =  A_1(FOM.MESH.internal_dof,FOM.MESH.internal_dof);
 
 % A_2: diffusion
-A_2       =  Assembler_2D(MESH, DATA, FE_SPACE, 'diffusion', [2 2], [], 1);
+A_2       =  ADR_Assembler(MESH, DATA, FE_SPACE, 'diffusion', [2 2], [], 1);
 FOM.Aq{2} =  A_2(FOM.MESH.internal_dof,FOM.MESH.internal_dof);
 
 
 % A_3: transport
-A_3       =  Assembler_2D(MESH, DATA, FE_SPACE, 'transport', [], 2, 1);
+A_3       =  ADR_Assembler(MESH, DATA, FE_SPACE, 'transport', [], 2, 1);
 FOM.Aq{3} =  A_3(FOM.MESH.internal_dof,FOM.MESH.internal_dof);
 
 % A_4: diffusion
-A_4       =  Assembler_2D(MESH, DATA, FE_SPACE, 'diffusion', [], [], 2);
+A_4       =  ADR_Assembler(MESH, DATA, FE_SPACE, 'diffusion', [], [], 2);
 FOM.Aq{4} =  A_4(FOM.MESH.internal_dof,FOM.MESH.internal_dof);
 
 % A_5: diffusion
-A_5       =  Assembler_2D(MESH, DATA, FE_SPACE, 'diffusion', [], [], 3);
+A_5       =  ADR_Assembler(MESH, DATA, FE_SPACE, 'diffusion', [], [], 3);
 FOM.Aq{5} =  A_5(FOM.MESH.internal_dof,FOM.MESH.internal_dof);
 
 % A_6: diffusion
-A_6       =  Assembler_2D(MESH, DATA, FE_SPACE, 'diffusion', [], [], 4);
+A_6       =  ADR_Assembler(MESH, DATA, FE_SPACE, 'diffusion', [], [], 4);
 FOM.Aq{6} =  A_6(FOM.MESH.internal_dof,FOM.MESH.internal_dof);
 
 % F_1: diffusion
-[~, F_1]       =  Assembler_2D(MESH, DATA, FE_SPACE, 'source', [], [], 2);
-[~, F_1, u_D]  =  ApplyBC([], F_1, FE_SPACE, MESH, DATA);
+[~, F_1]       =  ADR_Assembler(MESH, DATA, FE_SPACE, 'source', [], [], 2);
+[~, F_1, u_D]  =  ADR_ApplyBC([], F_1, FE_SPACE, MESH, DATA);
 FOM.Fq{1}      =  F_1;
 
 FOM.u_D        =  @(x,mu)(FOM.DATA.bcDir(x(1,:),x(2,:),[],mu));
@@ -93,9 +93,9 @@ FOM.u_D        =  @(x,mu)(FOM.DATA.bcDir(x(1,:),x(2,:),[],mu));
 
 %% Compute Xnorm
 DATA.diffusion =  @(x,y,t,param)(1+0.*x.*y);
-X              =  Assembler_2D(MESH, DATA, FE_SPACE, 'diffusion', [], [], []);
+X              =  ADR_Assembler(MESH, DATA, FE_SPACE, 'diffusion', [], [], []);
 DATA.reaction  =  @(x,y,t,param)(1+0.*x.*y);
-M              =  Assembler_2D(MESH, DATA, FE_SPACE, 'reaction');
+M              =  ADR_Assembler(MESH, DATA, FE_SPACE, 'reaction');
 
 FOM.Xnorm =  X(FOM.MESH.internal_dof,FOM.MESH.internal_dof);
 end

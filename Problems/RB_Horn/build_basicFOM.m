@@ -83,9 +83,9 @@ FOM.DATA     = DATA;
 
 %% Compute Xnorm
 DATA.diffusion =  @(x,y,t,param)(1+0.*x.*y);
-X              =  Assembler_2D(MESH, DATA, FE_SPACE, 'diffusion', [], [], []);
+X              =  ADR_Assembler(MESH, DATA, FE_SPACE, 'diffusion', [], [], []);
 DATA.reaction  =  @(x,y,t,param)(1+0.*x.*y);
-M              =  Assembler_2D(MESH, DATA, FE_SPACE, 'reaction');
+M              =  ADR_Assembler(MESH, DATA, FE_SPACE, 'reaction');
 
 FOM.Xnorm =  X(FOM.MESH.internal_dof,FOM.MESH.internal_dof) +...
              M(FOM.MESH.internal_dof,FOM.MESH.internal_dof);

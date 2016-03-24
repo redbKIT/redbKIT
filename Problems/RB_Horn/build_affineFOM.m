@@ -104,8 +104,8 @@ parfor i = 1 : size(mu_train,1)
     DATA_tmp            =  DATA;
     DATA_tmp.param      =  mu_train(i,:);
     
-    [A, F]              =  Assembler_2D(MESH_tmp, DATA_tmp, FE_SPACE);
-    [A_in, F_in]        =  ApplyBC(A, F, FE_SPACE, MESH_tmp, DATA_tmp);
+    [A, F]              =  ADR_Assembler(MESH_tmp, DATA_tmp, FE_SPACE);
+    [A_in, F_in]        =  ADR_ApplyBC(A, F, FE_SPACE, MESH_tmp, DATA_tmp);
 
     S_matrix(:,i)       = A_in(:);
     S_rhs(:,i)          = F_in;
@@ -130,9 +130,9 @@ end
 
 %% Compute Xnorm
 DATA.diffusion =  @(x,y,t,param)(1+0.*x.*y);
-X              =  Assembler_2D(MESH, DATA, FE_SPACE, 'diffusion', [], [], []);
+X              =  ADR_Assembler(MESH, DATA, FE_SPACE, 'diffusion', [], [], []);
 DATA.reaction  =  @(x,y,t,param)(1+0.*x.*y);
-M              =  Assembler_2D(MESH, DATA, FE_SPACE, 'reaction');
+M              =  ADR_Assembler(MESH, DATA, FE_SPACE, 'reaction');
 
 FOM.Xnorm =  X(FOM.MESH.internal_dof,FOM.MESH.internal_dof) +...
              M(FOM.MESH.internal_dof,FOM.MESH.internal_dof);

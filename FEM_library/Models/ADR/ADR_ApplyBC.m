@@ -1,7 +1,7 @@
-function [A_in, F_in, u_Dirichlet] =  ApplyBC(A, F, FE_SPACE, MESH, DATA, t)
-%APPLYBC_2D apply boundary conditions for Advc-Diff-React problem in 2D/3D
+function [A_in, F_in, u_Dirichlet] =  ADR_ApplyBC(A, F, FE_SPACE, MESH, DATA, t)
+%ADR_APPLYBC_2D apply boundary conditions for Advc-Diff-React problem in 2D/3D
 %
-%   [A_IN, F_IN, U_DIRICHLET] = APPLYBC(A, F, MESH, DATA) given an
+%   [A_IN, F_IN, U_DIRICHLET] = ADR_APPLYBC(A, F, MESH, DATA) given an
 %   assembled matrix A, righ-hand side vector F, a MESH data structure and
 %   a DATA structure, applies Neumann, Robin and Dirichlet boundary
 %   conditions. It returns the matrix A_IN (matrix A + BCs then restricted
