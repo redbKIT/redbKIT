@@ -32,7 +32,10 @@ end
 
 %% initialize ROM struct
 ROM.MESH   = FOM.MESH;
-ROM.DATA   = FOM.DATA;
+if isfield(FOM, 'DATA')
+    ROM.DATA   = FOM.DATA;
+end
+
 if isfield(FOM, 'HyRED')
     ROM.HyRED  = FOM.HyRED;
 end
