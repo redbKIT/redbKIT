@@ -24,59 +24,15 @@ else
 end
 t      = [];
 
-
-%% Fill MESH data structure
-dim              = 2;
-MESH.dim         = dim;
-MESH.vertices    = vertices;
-MESH.boundaries  = boundaries;
-MESH.elements    = elements;
-MESH.numVertices = size(vertices,2);
-
-%% Build higher order (P2 or P3) mesh if required
-if ~strcmp(fem,'P1')
-    [MESH.elements, MESH.nodes, MESH.boundaries] = ...
-        feval(strcat('P1to',fem,'mesh','2D'),elements,vertices, boundaries);
-else
-    MESH.nodes = vertices;
-end
-
-
-%% Update Mesh data with BC information and geometrical maps
-[numElemDof,numBoundaryDof]  = select(fem, dim);
-MESH.numNodes                = size(MESH.nodes,2);
-MESH.numElem                 = size(MESH.elements,2);
-MESH.numBoundaryDof          = numBoundaryDof;
-
-% Update MESH with BC information
-[MESH]         = BC_info(MESH, DATA);
-
-% Compute geometrical map (ref to physical elements) information
-[MESH.jac, MESH.invjac, MESH.h] = geotrasf(MESH.dim, MESH.vertices, MESH.elements);   
-
-% Compute quadrature nodes and weights on the reference element
+%% Set quad_order
 quad_order                  = 4;  
-[quad_nodes, quad_weights]  = quadrature(dim, quad_order);
 
-% Evaluate P1 geometrical mapping basis functions in the quad points
-[MESH.chi]                  =  fem_basis(dim, 'P1', quad_nodes);
+%% Create and fill the MESH data structure
+dim              = 2;
+[ MESH ] = buildMESH( dim, elements, vertices, boundaries, fem, quad_order, DATA );
 
 %% Create and fill the FE_SPACE data structure
-FE_SPACE.fem              = fem;
-FE_SPACE.numDof           = length(MESH.internal_dof);
-FE_SPACE.numElemDof       = numElemDof;
-FE_SPACE.numBoundaryDof   = numBoundaryDof;
-
-% Store quadrature nodes and weights on the reference element
-FE_SPACE.quad_order    = quad_order;
-FE_SPACE.quad_nodes    = quad_nodes;
-FE_SPACE.quad_weights  = quad_weights;
-FE_SPACE.numQuadNodes  = length(FE_SPACE.quad_nodes);
-
-% Evaluate basis functions in the quad points on the reference element
-[FE_SPACE.phi, FE_SPACE.dphi_ref]  =  ...
-    fem_basis(dim, FE_SPACE.fem, FE_SPACE.quad_nodes);
-
+[ FE_SPACE ] = buildFESpace( MESH, fem, 1, quad_order );
 
 fprintf('\n **** PROBLEM''S SIZE INFO ****\n');
 fprintf(' * Number of Vertices  = %d \n',MESH.numVertices);
@@ -84,6 +40,7 @@ fprintf(' * Number of Elements  = %d \n',MESH.numElem);
 fprintf(' * Number of Nodes     = %d \n',MESH.numNodes);
 fprintf(' * Number of Dofs      = %d \n',FE_SPACE.numDof);
 fprintf('-------------------------------------------\n');
+
 
 %% Fill FOM structures
 FOM.MESH     = MESH;
