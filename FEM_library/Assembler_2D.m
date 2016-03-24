@@ -96,11 +96,7 @@ end
 bx  = DATA.transport{1}(x,y,t,DATA.param);
 by  = DATA.transport{2}(x,y,t,DATA.param);
 
-%% Vectorized assemly, returns matrices in sparse vector format
-% [Arows, Acols, Acoef, Mcoef, Rrows, Rcoef] = ADR_assembler2D_C_omp(OPERATOR, TC_d, TC_t, MESH.elements, FE_SPACE.numElemDof, mu, bx, by, si, f,...
-%     FE_SPACE.quad_weights,MESH.invjac(index_subd,1,1)',MESH.invjac(index_subd,2,1)',MESH.invjac(index_subd,1,2)',MESH.invjac(index_subd,2,2)',...
-%     FE_SPACE.phi,FE_SPACE.dphi_ref(:,:,1),FE_SPACE.dphi_ref(:,:,2), MESH.jac(index_subd));
-
+%% Vectorized assembly, returns matrices in sparse vector format
 [Arows, Acols, Acoef, Mcoef, Rrows, Rcoef] = ADR_assembler_C_omp(MESH.dim, OPERATOR, TC_d, TC_t, MESH.elements, FE_SPACE.numElemDof, mu, [bx by], si, f,...
     FE_SPACE.quad_weights, MESH.invjac(index_subd,:,:), MESH.jac(index_subd), FE_SPACE.phi, FE_SPACE.dphi_ref);
 
