@@ -49,7 +49,8 @@ if nargin >= 7 && ~isempty(DATA)
 end
 
 if strcmp( model, 'CSM')
-    
+    fprintf('\n Generating mesh normals ... ')
+    time_mesh = tic;
     switch dim
         case 2
             [nx, ny, tx, ty, MESH.Normal_Faces] = norm_tang_2D(MESH.boundaries(1:2,:),MESH.vertices(1:2,:),MESH.elements(1:3,:));
@@ -60,6 +61,8 @@ if strcmp( model, 'CSM')
             [MESH.Normal_Vert, MESH.Normal_Faces] = ...
                 norm_tang_3D(MESH.boundaries(1:3,:),MESH.vertices(1:3,:), MESH.elements(1:4,:));
     end
+    time_mesh = toc(time_mesh);
+    fprintf('done in %f s\n', time_mesh)
 end
     
 

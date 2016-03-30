@@ -65,7 +65,7 @@ fprintf('-------------------------------------------\n');
 
 
 %% Assemble matrix and right-hand side
-fprintf('\n Assembling ... ');
+fprintf('\n >> Assembling ... ');
 t_assembly = tic;
 [F, A]  =  CSM_Assembler('all', MESH, DATA, FE_SPACE);
 t_assembly = toc(t_assembly);
@@ -73,18 +73,21 @@ fprintf('done in %3.3f s', t_assembly);
 
 
 %% Apply boundary conditions
-fprintf('\n Apply boundary conditions ');
+fprintf('\n >> Apply boundary conditions ... ');
+t_assembly = tic;
 [A_in, F_in, u_D]   =  CSM_ApplyBC(A, -F, FE_SPACE, MESH, DATA);
+t_assembly = toc(t_assembly);
+fprintf('done in %3.3f s', t_assembly);
 
 %% Solve
-fprintf('\n Solve Au = f ... ');
+fprintf('\n >> Solve Au = f ... ');
 t_solve = tic;
 u                         = zeros(MESH.numNodes*MESH.dim,1);
 u(MESH.internal_dof)      = A_in \ F_in;
 u(MESH.Dirichlet_dof)     = u_D;
 t_solve = toc(t_solve);
 fprintf('done in %3.3f s \n', t_solve);
-
+keyboard
 STR_export_solution(MESH.dim, u, MESH.vertices, MESH.elements, MESH.numVertices, 'SOL_ELA');
 
 %% Store matrix and rhs into FE_SPACE struct

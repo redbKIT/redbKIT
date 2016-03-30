@@ -41,50 +41,50 @@ switch MESH.dim
     case 2
         %% Pressure condition
         for k = 1 : MESH.dim
-        if ~isempty(MESH.Pressure_side{k})
-            
-            [csi,wi]       =  xwgl(FE_SPACE.quad_order, 0, 1);
-            [phi]          =  fem_basis(MESH.dim, FE_SPACE.fem, [csi; 0*csi], 1);
-            eta            =  1 - csi;
-            nqn            =  length(csi);
-            
-            nof         = length(MESH.Pressure_side{k});
-            nbn         = MESH.numBoundaryDof;
-            
-            Rrows       = zeros(nbn*nof,1);
-            Rcoef       = Rrows;
-            
-            xlt = zeros(nof,nqn); ylt = xlt;
-            coord_ref = [eta; csi];
-            for j = 1 : 2
-                dof = MESH.boundaries(j,MESH.Pressure_side{k});
-                vtemp = MESH.vertices(1,dof);
-                xlt = xlt + vtemp'*coord_ref(j,:);
-                vtemp = MESH.vertices(2,dof);
-                ylt = ylt + vtemp'*coord_ref(j,:);
-            end
-            
-            pressure = DATA.bcPrex(xlt,ylt,t,param);
-            one       = ones(nof,nqn);
-            pressure = pressure.*one;
-            
-            x    =  MESH.vertices(1,MESH.boundaries(1:2, MESH.Pressure_side{k}));
-            y    =  MESH.vertices(2,MESH.boundaries(1:2, MESH.Pressure_side{k}));
-            
-            side_length = sqrt((x(2:2:end)-x(1:2:end-1)).^2+(y(2:2:end)-y(1:2:end-1)).^2);
-            
-            for l = 1 : nof
-                face = MESH.Pressure_side{k}(l);
+            if ~isempty(MESH.Pressure_side{k})
                 
-                pressure_loc  = pressure(l,:).*wi;
-                pressure_loc  = pressure_loc(1,:)';
+                [csi,wi]       =  xwgl(FE_SPACE.quad_order, 0, 1);
+                [phi]          =  fem_basis(MESH.dim, FE_SPACE.fem, [csi; 0*csi], 1);
+                eta            =  1 - csi;
+                nqn            =  length(csi);
                 
-                Rrows(1+(l-1)*nbn:l*nbn)    = MESH.boundaries(1:nbn,face);
-                Rcoef(1+(l-1)*nbn:l*nbn)    = MESH.Normal_Faces(k,face)*side_length(l)*phi*pressure_loc;
+                nof         = length(MESH.Pressure_side{k});
+                nbn         = MESH.numBoundaryDof;
+                
+                Rrows       = zeros(nbn*nof,1);
+                Rcoef       = Rrows;
+                
+                xlt = zeros(nof,nqn); ylt = xlt;
+                coord_ref = [eta; csi];
+                for j = 1 : 2
+                    dof = MESH.boundaries(j,MESH.Pressure_side{k});
+                    vtemp = MESH.vertices(1,dof);
+                    xlt = xlt + vtemp'*coord_ref(j,:);
+                    vtemp = MESH.vertices(2,dof);
+                    ylt = ylt + vtemp'*coord_ref(j,:);
+                end
+                
+                pressure = DATA.bcPrex(xlt,ylt,t,param);
+                one       = ones(nof,nqn);
+                pressure = pressure.*one;
+                
+                x    =  MESH.vertices(1,MESH.boundaries(1:2, MESH.Pressure_side{k}));
+                y    =  MESH.vertices(2,MESH.boundaries(1:2, MESH.Pressure_side{k}));
+                
+                side_length = sqrt((x(2:2:end)-x(1:2:end-1)).^2+(y(2:2:end)-y(1:2:end-1)).^2);
+                
+                for l = 1 : nof
+                    face = MESH.Pressure_side{k}(l);
+                    
+                    pressure_loc  = pressure(l,:).*wi;
+                    pressure_loc  = pressure_loc(1,:)';
+                    
+                    Rrows(1+(l-1)*nbn:l*nbn)    = MESH.boundaries(1:nbn,face);
+                    Rcoef(1+(l-1)*nbn:l*nbn)    = MESH.Normal_Faces(k,face)*side_length(l)*phi*pressure_loc;
+                end
+                F = F + sparse(Rrows+(k-1)*MESH.numNodes,1,Rcoef,2*MESH.numNodes,1);
+                
             end
-            F = F + sparse(Rrows+(k-1)*MESH.numNodes,1,Rcoef,2*MESH.numNodes,1);
-            
-        end
         end
         
         %% Dirichlet condition
@@ -103,15 +103,18 @@ switch MESH.dim
     case 3
         
         %% Neumann condition
-        if ~isempty(MESH.Neumann_side)
-            error('3D neumann BC to be implemented')
+        for k = 1 : MESH.dim
+            if ~isempty(MESH.Neumann_side{k})
+                error('3D neumann BC to be implemented')
+            end
         end
         
         %% Pressure condition
-        if ~isempty(MESH.Pressure_side)
-            error('3D pressure BC to be implemented')
+        for k = 1 : MESH.dim
+            if ~isempty(MESH.Pressure_side{k})
+                error('3D pressure BC to be implemented')
+            end
         end
-        
         
         %% Dirichlet condition
         for k = 1 : 3

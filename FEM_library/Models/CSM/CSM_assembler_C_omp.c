@@ -93,7 +93,7 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     
     double GradV[dim][dim];
     double GradU[dim][dim];
-    
+    double GradUh[dim][dim];
     
     double Id[dim][dim];
     int d1,d2;
@@ -101,12 +101,18 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     {
         for (d2 = 0; d2 < dim; d2 = d2 + 1 )
         {
-            Id[d1][d2] = 1;
+            Id[d1][d2] = 0;
+            if (d1==d2)
+            {
+                Id[d1][d2] = 1;
+            }
         }
     }
+    
     double F[dim][dim];
     double EPS[dim][dim];
     double dP[dim][dim];
+    double P_Uh[dim][dim];
     
     double* material_param = mxGetPr(prhs[2]);
     double Young = material_param[0];
@@ -114,12 +120,12 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     double mu = Young / (2 + 2 * Poisson);
     double lambda =  Young * Poisson /( (1+Poisson) * (1-2*Poisson) );
     
-    
+    mxFree(Material_Model);
+
     /* Assembly: loop over the elements */
     int ie;
-    int a, b, i_c, j_c;
     
-#pragma omp parallel for shared(invjac,detjac,elements,myRrows,myRcoef,myAcols,myArows,myAcoef) private(gradphi,F,EPS,dP,GradV,GradU,ie,a,b,i_c,j_c,k,l,q,d1,d2) firstprivate(phi,gradrefphi,w,numRowsElements,nln2,nln,Id,Material_Model)
+#pragma omp parallel for shared(invjac,detjac,elements,myRrows,myRcoef,myAcols,myArows,myAcoef,U_h) private(gradphi,F,EPS,dP,P_Uh,GradV,GradU,GradUh,ie,k,l,q,d1,d2) firstprivate(phi,gradrefphi,w,numRowsElements,nln2,nln,NumNodes,Id,mu,lambda)
     
     for (ie = 0; ie < noe; ie = ie + 1 )
     {
@@ -137,9 +143,10 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
                 }
             }
         }
-        
+                
         int iii = 0;
         int ii = 0;
+        int a, b, i_c, j_c;
         
         /* loop over test functions --> a */
         for (a = 0; a < nln; a = a + 1 )
@@ -153,7 +160,6 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
                     for (d2 = 0; d2 < dim; d2 = d2 + 1 )
                     {
                         GradV[d1][d2] = 0;
-                        GradU[d1][d2] = 0;
                     }
                 }
                 
@@ -181,13 +187,12 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
                                 GradU[j_c][d2] = gradphi[d2][b][q];
                             }
                             
+                            
                             for (d1 = 0; d1 < dim; d1 = d1 + 1 )
                             {
                                 for (d2 = 0; d2 < dim; d2 = d2 + 1 )
                                 {
                                     F[d1][d2] = Id[d1][d2] + GradU[d1][d2];
-                                    EPS[d1][d2] = 0.5 * ( F[d1][d2] + F[d2][d1]) - Id[d1][d2];
-                                    dP[d1][d2] = 2 * mu * EPS[d1][d2] + lambda * Trace(dim, EPS) * Id[d1][d2];
                                 }
                             }
                             
@@ -195,20 +200,23 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
                             {
                                 for (d2 = 0; d2 < dim; d2 = d2 + 1 )
                                 {
-                                    EPS[d1][d2] = 0.5 * ( F[d1][d2] + F[d2][d1]) - Id[d1][d2];
+                                    EPS[d1][d2] = 0.5 * ( F[d1][d2] + F[d2][d1] ) - Id[d1][d2];
                                 }
                             }
+                            
+                            
                             double trace = Trace(dim, EPS);
                             for (d1 = 0; d1 < dim; d1 = d1 + 1 )
                             {
                                 for (d2 = 0; d2 < dim; d2 = d2 + 1 )
                                 {
                                     dP[d1][d2] = 2 * mu * EPS[d1][d2] + lambda * trace * Id[d1][d2];
+                                    /*dP[d1][d2] = 2 * mu * 0.5 * ( GradU[d1][d2] + GradU[d2][d1]) + lambda * trace * Id[d1][d2];*/
                                 }
                             }
                             aloc  = aloc + Mdot( dim, GradV, dP) * w[q];
                         }
-                        myArows[ie*nln2*dim*dim+iii] = elements[a+ie*numRowsElements] + i_c * NumNodes ;
+                        myArows[ie*nln2*dim*dim+iii] = elements[a+ie*numRowsElements] + i_c * NumNodes;
                         myAcols[ie*nln2*dim*dim+iii] = elements[b+ie*numRowsElements] + j_c * NumNodes;
                         myAcoef[ie*nln2*dim*dim+iii] = aloc*detjac[ie];
                         
@@ -216,21 +224,70 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
                     }
                 }
                 
-                double floc = 0;
-                /*
-                 * for (q = 0; q < NumQuadPoints; q = q + 1 )
-                 * {
-                 * floc = floc + ( OP[3] * phi[a+q*nln] * f[ie+q*noe] ) * w[q];
-                 * }
-                 */
-                myRrows[ie*nln*dim+ii] = elements[a+ie*numRowsElements];
-                myRcoef[ie*nln+dim+ii] = floc*detjac[ie];
+                double rloc = 0;
+                for (q = 0; q < NumQuadPoints; q = q + 1 )
+                {
+                    for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+                    {
+                        for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+                        {
+                            GradUh[d1][d2] = 0;
+                            for (k = 0; k < nln; k = k + 1 )
+                            {
+                                int e_k; 
+                                e_k = (int)(elements[ie*numRowsElements + k] + d1*NumNodes);
+                                GradUh[d1][d2] = GradUh[d1][d2] + U_h[e_k] * gradphi[d2][k][q];
+                            }
+                        }
+                    }
+                    
+                    /* set gradV to zero*/
+                    for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+                    {
+                        for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+                        {
+                            GradV[d1][d2] = 0;
+                        }
+                    }
+                    
+                    for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+                    {
+                        GradV[i_c][d2] = gradphi[d2][a][q];
+                    }
+                    
+                    for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+                    {
+                        for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+                        {
+                            F[d1][d2] = Id[d1][d2] + GradUh[d1][d2];
+                        }
+                    }
+                    
+                    for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+                    {
+                        for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+                        {
+                            EPS[d1][d2] = 0.5 * ( F[d1][d2] + F[d2][d1] ) - Id[d1][d2];
+                        }
+                    }
+                    
+                    double trace = Trace(dim, EPS);
+                    for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+                    {
+                        for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+                        {
+                            P_Uh[d1][d2] = 2 * mu * EPS[d1][d2] + lambda * trace * Id[d1][d2];
+                        }
+                    }
+                    rloc  = rloc + Mdot( dim, GradV, P_Uh) * w[q];
+                }
+                myRrows[ie*nln*dim+ii] = elements[a+ie*numRowsElements] + i_c * NumNodes;
+                myRcoef[ie*nln+dim+ii] = rloc*detjac[ie];
                 ii = ii + 1;
             }
         }
     }
-    mxFree(Material_Model);
-    
+        
 }
 
 
