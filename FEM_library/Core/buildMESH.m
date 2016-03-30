@@ -1,4 +1,4 @@
-function [ MESH ] = buildMESH( dim, elements, vertices, boundaries, fem, quad_order, DATA )
+function [ MESH ] = buildMESH( dim, elements, vertices, boundaries, fem, quad_order, DATA, model )
 %BUILDMESH generates FE_SPACE struct
 
 %   This file is part of redbKIT.
@@ -31,9 +31,6 @@ MESH.numNodes                = size(MESH.nodes,2);
 MESH.numElem                 = size(MESH.elements,2);
 MESH.numBoundaryDof          = numBoundaryDof;
 
-% Update MESH with BC information
-[MESH]         = BC_info(MESH, DATA);
-
 % Compute geometrical map (ref to physical elements) information
 [MESH.jac, MESH.invjac, MESH.h] = geotrasf(dim, MESH.vertices, MESH.elements);   
     
@@ -42,6 +39,29 @@ MESH.numBoundaryDof          = numBoundaryDof;
 
 % Evaluate P1 geometrical mapping basis functions in the quad points
 [MESH.chi]                  =  fem_basis(dim, 'P1', quad_nodes);
+
+if nargin >= 7 && ~isempty(DATA)
+    if nargin < 8
+        model = [];
+    end
+    % Update MESH with BC information
+    [MESH]         = BC_info(MESH, DATA, model);
+end
+
+if strcmp( model, 'CSM')
+    
+    switch dim
+        case 2
+            [nx, ny, tx, ty, MESH.Normal_Faces] = norm_tang_2D(MESH.boundaries(1:2,:),MESH.vertices(1:2,:),MESH.elements(1:3,:));
+            MESH.Normal_Vert = [nx ny];
+            MESH.Tang_Vert   = [tx ty];
+            
+        case 3
+            [MESH.Normal_Vert, MESH.Normal_Faces] = ...
+                norm_tang_3D(MESH.boundaries(1:3,:),MESH.vertices(1:3,:), MESH.elements(1:4,:));
+    end
+end
+    
 
 end
 
