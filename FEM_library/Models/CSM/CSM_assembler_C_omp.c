@@ -17,7 +17,7 @@
 #endif
 
 
-double Mdot(const int dim, const double X[dim][dim], const double Y[dim][dim])
+double Mdot(int dim, double X[dim][dim], double Y[dim][dim])
 {
     int d1, d2;
     double Z = 0;
@@ -31,7 +31,7 @@ double Mdot(const int dim, const double X[dim][dim], const double Y[dim][dim])
     return Z;
 }
 
-double Trace(const int dim, const double X[dim][dim])
+double Trace(int dim, double X[dim][dim])
 {
     double T = 0;
     int d1;
@@ -235,7 +235,7 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
                             for (k = 0; k < nln; k = k + 1 )
                             {
                                 int e_k; 
-                                e_k = (int)(elements[ie*numRowsElements + k] + d1*NumNodes);
+                                e_k = (int)(elements[ie*numRowsElements + k] + d1*NumNodes - 1);
                                 GradUh[d1][d2] = GradUh[d1][d2] + U_h[e_k] * gradphi[d2][k][q];
                             }
                         }
@@ -281,6 +281,7 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
                     }
                     rloc  = rloc + Mdot( dim, GradV, P_Uh) * w[q];
                 }
+                                            
                 myRrows[ie*nln*dim+ii] = elements[a+ie*numRowsElements] + i_c * NumNodes;
                 myRcoef[ie*nln+dim+ii] = rloc*detjac[ie];
                 ii = ii + 1;

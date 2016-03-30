@@ -96,6 +96,7 @@ switch MESH.dim
         end
         
     case 3
+        
         x = zeros(MESH.numElem,FE_SPACE.numQuadNodes); y = x; z = x;
         
         for j = 1 : 4

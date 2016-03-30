@@ -87,7 +87,7 @@ u(MESH.internal_dof)      = A_in \ F_in;
 u(MESH.Dirichlet_dof)     = u_D;
 t_solve = toc(t_solve);
 fprintf('done in %3.3f s \n', t_solve);
-keyboard
+
 STR_export_solution(MESH.dim, u, MESH.vertices, MESH.elements, MESH.numVertices, 'SOL_ELA');
 
 %% Store matrix and rhs into FE_SPACE struct
