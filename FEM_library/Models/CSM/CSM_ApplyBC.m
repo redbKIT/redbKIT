@@ -86,7 +86,7 @@ switch MESH.dim
                     Rrows(1+(l-1)*nbn:l*nbn)    = MESH.boundaries(1:nbn,face);
                     Rcoef(1+(l-1)*nbn:l*nbn)    = MESH.Normal_Faces(k,face)*side_length(l)*phi*pressure_loc;
                 end
-                F = F + sparse(Rrows+(k-1)*MESH.numNodes,1,Rcoef,2*MESH.numNodes,1);
+                F = F + sparse(Rrows+(k-1)*MESH.numNodes,1,Rcoef,MESH.dim*MESH.numNodes,1);
                 
             end
         end
@@ -109,14 +109,116 @@ switch MESH.dim
         %% Neumann condition
         for k = 1 : MESH.dim
             if ~isempty(MESH.Neumann_side{k})
-                error('3D neumann BC to be implemented')
+                
+                [quad_points, wi] = quadrature(MESH.dim-1, FE_SPACE.quad_order);
+                csi = quad_points(1,:);
+                eta = quad_points(2,:);
+                [phi]          =  fem_basis(MESH.dim, FE_SPACE.fem, [csi; eta; 0*eta], 1);
+                eta1           =  1-csi-eta;
+                nqn            =  length(wi);
+                
+                nof         = length(MESH.Neumann_side{k});
+                nbn         = MESH.numBoundaryDof;
+                
+                Rrows       = zeros(nbn*nof,1);
+                Rcoef       = Rrows;
+                
+                xlt = zeros(nof,nqn); ylt = xlt; zlt = xlt;
+                coord_ref = [eta1; csi; eta];
+                for j = 1 : 2
+                    dof = MESH.boundaries(j,MESH.Neumann_side{k});
+                    vtemp = MESH.vertices(1,dof);
+                    xlt = xlt + vtemp'*coord_ref(j,:);
+                    vtemp = MESH.vertices(2,dof);
+                    ylt = ylt + vtemp'*coord_ref(j,:);
+                    vtemp = MESH.vertices(3,dof);
+                    zlt = zlt + vtemp'*coord_ref(j,:);
+                end
+                
+                u_Neumann = DATA.bcNeu{k}(xlt,ylt,zlt,t,param);
+                one       = ones(nof,nqn);
+                u_Neumann = u_Neumann.*one;
+                
+                x    =  MESH.vertices(1,MESH.boundaries(1:3, MESH.Neumann_side{k}));
+                y    =  MESH.vertices(2,MESH.boundaries(1:3, MESH.Neumann_side{k}));
+                z    =  MESH.vertices(3,MESH.boundaries(1:3, MESH.Neumann_side{k}));
+                
+                areav = cross(  [x(2:3:end)-x(1:3:end);  y(2:3:end)-y(1:3:end);  z(2:3:end)-z(1:3:end)], ...
+                  [x(3:3:end)-x(1:3:end);  y(3:3:end)-y(1:3:end);  z(3:3:end)-z(1:3:end)]);
+                
+                for l = 1 : nof
+                    
+                    area   = 0.5*norm(areav(:,l));
+                    detjac = 2*area;
+                    
+                    face = MESH.Neumann_side{k}(l);
+                    
+                    u_Neumann_loc  = u_Neumann(l,:).*wi;
+                    u_Neumann_loc  = u_Neumann_loc(1,:)';
+                    
+                    Rrows(1+(l-1)*nbn:l*nbn)    = MESH.boundaries(1:nbn,face);
+                    Rcoef(1+(l-1)*nbn:l*nbn)    = detjac*phi*u_Neumann_loc;
+                end
+                F = F + sparse(Rrows+(k-1)*MESH.numNodes,1,Rcoef,MESH.dim*MESH.numNodes,1);
+                
             end
         end
+        
         
         %% Pressure condition
         for k = 1 : MESH.dim
             if ~isempty(MESH.Pressure_side{k})
-                error('3D pressure BC to be implemented')
+                [quad_points, wi] = quadrature(MESH.dim-1, FE_SPACE.quad_order);
+                csi = quad_points(1,:);
+                eta = quad_points(2,:);
+                [phi]          =  fem_basis(MESH.dim, FE_SPACE.fem, [csi; eta; 0*eta], 1);
+                eta1           =  1-csi-eta;
+                nqn            =  length(wi);
+                
+                nof         = length(MESH.Pressure_side{k});
+                nbn         = MESH.numBoundaryDof;
+                
+                Rrows       = zeros(nbn*nof,1);
+                Rcoef       = Rrows;
+                
+                xlt = zeros(nof,nqn); ylt = xlt; zlt = xlt;
+                coord_ref = [eta1; csi; eta];
+                for j = 1 : 2
+                    dof = MESH.boundaries(j,MESH.Pressure_side{k});
+                    vtemp = MESH.vertices(1,dof);
+                    xlt = xlt + vtemp'*coord_ref(j,:);
+                    vtemp = MESH.vertices(2,dof);
+                    ylt = ylt + vtemp'*coord_ref(j,:);
+                    vtemp = MESH.vertices(3,dof);
+                    zlt = zlt + vtemp'*coord_ref(j,:);
+                end
+                
+                pressure = DATA.bcPrex(xlt,ylt,zlt,t,param);
+                one       = ones(nof,nqn);
+                pressure = pressure.*one;
+                
+                x    =  MESH.vertices(1,MESH.boundaries(1:3, MESH.Pressure_side{k}));
+                y    =  MESH.vertices(2,MESH.boundaries(1:3, MESH.Pressure_side{k}));
+                z    =  MESH.vertices(3,MESH.boundaries(1:3, MESH.Pressure_side{k}));
+                
+                areav = cross(  [x(2:3:end)-x(1:3:end);  y(2:3:end)-y(1:3:end);  z(2:3:end)-z(1:3:end)], ...
+                  [x(3:3:end)-x(1:3:end);  y(3:3:end)-y(1:3:end);  z(3:3:end)-z(1:3:end)]);
+                
+                for l = 1 : nof
+                    
+                    area   = 0.5*norm(areav(:,l));
+                    detjac = 2*area;
+                    
+                    face = MESH.Pressure_side{k}(l);
+                    
+                    pressure_loc  = pressure(l,:).*wi;
+                    pressure_loc  = pressure_loc(1,:)';
+                    
+                    Rrows(1+(l-1)*nbn:l*nbn)    = MESH.boundaries(1:nbn,face);
+                    Rcoef(1+(l-1)*nbn:l*nbn)    = MESH.Normal_Faces(k,face)*detjac*phi*pressure_loc;
+                end
+                F = F + sparse(Rrows+(k-1)*MESH.numNodes,1,Rcoef,MESH.dim*MESH.numNodes,1);
+                
             end
         end
         

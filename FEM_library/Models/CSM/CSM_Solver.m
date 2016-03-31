@@ -91,18 +91,18 @@ t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s\n', t_assembly);
 
 Residual = F_in - F_ext;
-res0Norm = norm(Residual(MESH.internal_dof));
+% Apply boundary conditions
+fprintf('\n -- Apply boundary conditions ... ');
+t_assembly = tic;
+[A, b]   =  CSM_ApplyBC(dF_in, -Residual, FE_SPACE, MESH, DATA, [], 1);
+t_assembly = toc(t_assembly);
+fprintf('done in %3.3f s\n', t_assembly);
+
+res0Norm = norm(b);
 
 fprintf('\n============ Start Newton Iterations ============\n\n');
 while (k <= maxIter && incrNorm > tol && resRelNorm > tol)
-        
-    % Apply boundary conditions
-    fprintf('\n   -- Apply boundary conditions ... ');
-    t_assembly = tic;
-    [A, b]   =  CSM_ApplyBC(dF_in, -Residual, FE_SPACE, MESH, DATA, [], 1);
-    t_assembly = toc(t_assembly);
-    fprintf('done in %3.3f s\n', t_assembly);
-    
+            
     % Solve
     fprintf('\n   -- Solve Au = f ... ');
     t_solve = tic;
@@ -121,7 +121,15 @@ while (k <= maxIter && incrNorm > tol && resRelNorm > tol)
     fprintf('done in %3.3f s\n', t_assembly);
     
     Residual   = F_in - F_ext;
-    resRelNorm = norm(Residual(MESH.internal_dof)) / res0Norm;
+    
+    % Apply boundary conditions
+    fprintf('\n   -- Apply boundary conditions ... ');
+    t_assembly = tic;
+    [A, b]   =  CSM_ApplyBC(dF_in, -Residual, FE_SPACE, MESH, DATA, [], 1);
+    t_assembly = toc(t_assembly);
+    fprintf('done in %3.3f s\n', t_assembly);
+    
+    resRelNorm = norm(b) / res0Norm;
     
     fprintf('\n **** Iteration  k = %d:  norm(dU)/norm(Uk) = %1.2e, Residual Rel Norm = %1.2e \n\n',k,full(incrNorm), full(norm(resRelNorm)));
     k = k + 1;
