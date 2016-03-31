@@ -10,8 +10,10 @@ cd Core
 geotrasf_prj;
 cd ../
 
-%% ADR Models
-cd Models/ADR/
+cd Models/
+
+%% ADR Model
+cd ADR/
 % Generate C-Mex assemblers from matlab code and compile
 ADR_assembly2D_prj;
 ADR_assembly3D_prj;
@@ -24,8 +26,8 @@ mex ADR_assembler_C_omp.c CFLAGS="\$CFLAGS -fopenmp" LDFLAGS="\$LDFLAGS -fopenmp
 
 cd ../
 
-%% ADR Models
-cd Models/CSM/
+%% CSM Model
+cd CSM/
 
 % Compile C assembler
 mex CSM_assembler_C_omp.c CFLAGS="\$CFLAGS -fopenmp" LDFLAGS="\$LDFLAGS -fopenmp"

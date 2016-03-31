@@ -63,30 +63,95 @@ fprintf(' * Number of Nodes     = %d \n',MESH.numNodes);
 fprintf(' * Number of Dofs      = %d \n',length(MESH.internal_dof));
 fprintf('-------------------------------------------\n');
 
+%% Newton Method
 
-%% Assemble matrix and right-hand side
-fprintf('\n >> Assembling ... ');
+tol        = 1e-5;
+resRelNorm = tol + 1;
+res0Norm   = tol + 1;
+incrNorm   = tol + 1;
+maxIter    = 15;
+k          = 1;
+
+[~, ~, u_D]   =  CSM_ApplyBC([], [], FE_SPACE, MESH, DATA);
+dU             = zeros(MESH.numNodes*MESH.dim,1);
+U_k            = zeros(MESH.numNodes*MESH.dim,1);
+U_k(MESH.Dirichlet_dof) = u_D;
+
+% Assemble matrix and right-hand side
+fprintf('\n -- Assembling external Forces... ');
 t_assembly = tic;
-[F, A]  =  CSM_Assembler('all', MESH, DATA, FE_SPACE);
+F_ext      = CSM_Assembler('external_forces', MESH, DATA, FE_SPACE);
 t_assembly = toc(t_assembly);
-fprintf('done in %3.3f s', t_assembly);
+fprintf('done in %3.3f s\n', t_assembly);
 
-
-%% Apply boundary conditions
-fprintf('\n >> Apply boundary conditions ... ');
+fprintf('\n -- Assembling internal Forces... ');
 t_assembly = tic;
-[A_in, F_in, u_D]   =  CSM_ApplyBC(A, -F, FE_SPACE, MESH, DATA);
+[F_in, dF_in]  =  CSM_Assembler('internal_forces', MESH, DATA, FE_SPACE, U_k);
 t_assembly = toc(t_assembly);
-fprintf('done in %3.3f s', t_assembly);
+fprintf('done in %3.3f s\n', t_assembly);
 
-%% Solve
-fprintf('\n >> Solve Au = f ... ');
-t_solve = tic;
-u                         = zeros(MESH.numNodes*MESH.dim,1);
-u(MESH.internal_dof)      = A_in \ F_in;
-u(MESH.Dirichlet_dof)     = u_D;
-t_solve = toc(t_solve);
-fprintf('done in %3.3f s \n', t_solve);
+Residual = F_in - F_ext;
+res0Norm = norm(Residual(MESH.internal_dof));
+keyboard
+fprintf('\n============ Start Newton Iterations ============\n\n');
+while (k <= maxIter && incrNorm > tol && resRelNorm > tol)
+        
+    % Apply boundary conditions
+    fprintf('\n   -- Apply boundary conditions ... ');
+    t_assembly = tic;
+    [A, b]   =  CSM_ApplyBC(dF_in, -Residual, FE_SPACE, MESH, DATA, [], 1);
+    t_assembly = toc(t_assembly);
+    fprintf('done in %3.3f s\n', t_assembly);
+    
+    % Solve
+    fprintf('\n   -- Solve Au = f ... ');
+    t_solve = tic;
+    dU(MESH.internal_dof)      = A \ b;
+    t_solve = toc(t_solve);
+    fprintf('done in %3.3f s \n', t_solve);
+    
+    U_k        = U_k + dU;
+    incrNorm   = norm(dU)/norm(U_k);
+    
+    % Assemble matrix and right-hand side
+    fprintf('\n   -- Assembling internal forces... ');
+    t_assembly = tic;
+    [F_in, dF_in]  =  CSM_Assembler('internal_forces', MESH, DATA, FE_SPACE, full(U_k));
+    t_assembly = toc(t_assembly);
+    fprintf('done in %3.3f s\n', t_assembly);
+    
+    Residual   = F_in - F_ext;
+    resRelNorm = norm(Residual(MESH.internal_dof)) / res0Norm;
+    
+    fprintf('\n **** Iteration  k = %d:  norm(dU)/norm(Uk) = %1.2e, Residual Rel Norm = %1.2e \n\n',k,full(incrNorm), full(norm(resRelNorm)));
+    k = k + 1;
+    
+end
+
+u = U_k;
+% %% Assemble matrix and right-hand side
+% fprintf('\n >> Assembling ... ');
+% t_assembly = tic;
+% [F, A]  =  CSM_Assembler('all', MESH, DATA, FE_SPACE);
+% t_assembly = toc(t_assembly);
+% fprintf('done in %3.3f s', t_assembly);
+% 
+% 
+% %% Apply boundary conditions
+% fprintf('\n >> Apply boundary conditions ... ');
+% t_assembly = tic;
+% [A_in, F_in, u_D]   =  CSM_ApplyBC(A, -F, FE_SPACE, MESH, DATA);
+% t_assembly = toc(t_assembly);
+% fprintf('done in %3.3f s', t_assembly);
+% 
+% %% Solve
+% fprintf('\n >> Solve Au = f ... ');
+% t_solve = tic;
+% u                         = zeros(MESH.numNodes*MESH.dim,1);
+% u(MESH.internal_dof)      = A_in \ F_in;
+% u(MESH.Dirichlet_dof)     = u_D;
+% t_solve = toc(t_solve);
+% fprintf('done in %3.3f s \n', t_solve);
 
 STR_export_solution(MESH.dim, u, MESH.vertices, MESH.elements, MESH.numVertices, 'SOL_ELA');
 

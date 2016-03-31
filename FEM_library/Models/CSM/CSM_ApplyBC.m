@@ -1,4 +1,4 @@
-function [A_in, F_in, u_D] =  CSM_ApplyBC(A, F, FE_SPACE, MESH, DATA, t)
+function [A_in, F_in, u_D] =  CSM_ApplyBC(A, F, FE_SPACE, MESH, DATA, t, zero_Dirichlet)
 %ADR_APPLYBC_2D apply boundary conditions for Advc-Diff-React problem in 2D/3D
 %
 %   [A_IN, F_IN, U_DIRICHLET] = ADR_APPLYBC(A, F, MESH, DATA) given an
@@ -31,6 +31,10 @@ end
 
 if isempty(F)
     F = sparse(MESH.numNodes*MESH.dim, 1);
+end
+
+if nargin < 7
+    zero_Dirichlet = 0;
 end
 
 param = DATA.param;
@@ -133,6 +137,7 @@ switch MESH.dim
         
 end
 
+u_D  = u_D * (1 - zero_Dirichlet);
 
 F_in = F(MESH.internal_dof)...
     -A(MESH.internal_dof,MESH.Dirichlet_dof)*u_D;
