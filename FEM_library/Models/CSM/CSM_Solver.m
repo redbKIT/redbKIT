@@ -65,7 +65,7 @@ fprintf('-------------------------------------------\n');
 
 %% Newton Method
 
-tol        = 1e-5;
+tol        = 1e-6;
 resRelNorm = tol + 1;
 res0Norm   = tol + 1;
 incrNorm   = tol + 1;
@@ -92,7 +92,7 @@ fprintf('done in %3.3f s\n', t_assembly);
 
 Residual = F_in - F_ext;
 res0Norm = norm(Residual(MESH.internal_dof));
-keyboard
+
 fprintf('\n============ Start Newton Iterations ============\n\n');
 while (k <= maxIter && incrNorm > tol && resRelNorm > tol)
         

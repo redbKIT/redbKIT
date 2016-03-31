@@ -33,18 +33,48 @@ double Mdot(int dim, double X[dim][dim], double Y[dim][dim])
 }
 
 /*************************************************************************/
-double MatrixMultiply(int dim, double X[dim][dim], double Y[dim][dim], int i, int j, bool )
+void MatrixSum(int dim, double X[dim][dim], double Y[dim][dim] )
 {
     int d1, d2;
-    double Z = 0;
     for (d1 = 0; d1 < dim; d1 = d1 + 1 )
     {
         for (d2 = 0; d2 < dim; d2 = d2 + 1 )
         {
-            Z = Z + X[d1][d2] * Y[d1][d2];
+            X[d1][d2] = X[d1][d2] + Y[d1][d2];
         }
     }
-    return Z;
+}
+/*************************************************************************/
+void MatrixProduct(int dim, double X[dim][dim], double Y[dim][dim], double result[dim][dim] )
+{
+    int d1, d2, d3;
+    for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+    {
+        for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+        {
+            result[d1][d2] = 0;
+            for (d3 = 0; d3 < dim; d3 = d3 + 1 )
+            {
+                result[d1][d2] = result[d1][d2] + X[d1][d3]*Y[d3][d2];
+            }
+        }
+    }
+}
+/*************************************************************************/
+void MatrixProductQ1(int dim, int numQuadPoints, double X[dim][dim][numQuadPoints], double Y[dim][dim], double result[dim][dim], int q )
+{
+    int d1, d2, d3;
+    for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+    {
+        for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+        {
+            result[d1][d2] = 0;
+            for (d3 = 0; d3 < dim; d3 = d3 + 1 )
+            {
+                result[d1][d2] = result[d1][d2] + X[d1][d3][q]*Y[d3][d2];
+            }
+        }
+    }
 }
 /*************************************************************************/
 
@@ -57,6 +87,56 @@ double Trace(int dim, double X[dim][dim])
         T = T + X[d1][d1];
     }
     return T;
+}
+/*************************************************************************/
+
+double TraceQ(int dim, int numQuadPoints, double X[dim][dim][numQuadPoints], int q)
+{
+    double T = 0;
+    int d1;
+    for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+    {
+        T = T + X[d1][d1][q];
+    }
+    return T;
+}
+/*************************************************************************/
+void compute_GreenStrainTensor(int dim, int numQuadPoints, double F[dim][dim][numQuadPoints], double Id[dim][dim], double E[dim][dim][numQuadPoints], int q )
+{
+    
+    int d1, d2, d3;
+    for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+    {
+        for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+        {
+            double tmp = 0;
+            for (d3 = 0; d3 < dim; d3 = d3 + 1 )
+            {
+                tmp = tmp + F[d3][d1][q] * F[d3][d2][q];
+            }
+            E[d1][d2][q] = 0.5 * ( tmp - Id[d1][d2] );
+        }
+    }
+}
+/*************************************************************************/
+void compute_DerGreenStrainTensor(int dim, int numQuadPoints, double F[dim][dim][numQuadPoints], double dF[dim][dim], double dE[dim][dim], int q )
+{
+    
+    int d1, d2, d3;
+    for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+    {
+        for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+        {
+            double tmp1 = 0;
+            double tmp2 = 0;
+            for (d3 = 0; d3 < dim; d3 = d3 + 1 )
+            {
+                tmp1 = tmp1 + dF[d3][d1] * F[d3][d2][q];
+                tmp2 = tmp2 + F[d3][d1][q]  * dF[d3][d2];
+            }
+            dE[d1][d2] = 0.5 * ( tmp1 + tmp2 );
+        }
+    }
 }
 /*************************************************************************/
 
@@ -233,11 +313,9 @@ void LinearElasticMaterial(mxArray* plhs[], const mxArray* prhs[])
                                 for (d2 = 0; d2 < dim; d2 = d2 + 1 )
                                 {
                                     dP[d1][d2] = 2 * mu * EPS[d1][d2] + lambda * trace * Id[d1][d2];
-                                    /*dP[d1][d2] = 2 * mu * 0.5 * ( GradU[d1][d2] + GradU[d2][d1]) + lambda * trace * Id[d1][d2];*/
                                 }
                             }
                             aloc  = aloc + Mdot( dim, GradV, dP) * w[q];
-                            printf("\nie = %d, q = %d, aloc = %f", ie, q, aloc);
                         }
                         myArows[ie*nln2*dim*dim+iii] = elements[a+ie*numRowsElements] + i_c * NumNodes;
                         myAcols[ie*nln2*dim*dim+iii] = elements[b+ie*numRowsElements] + j_c * NumNodes;
@@ -250,14 +328,6 @@ void LinearElasticMaterial(mxArray* plhs[], const mxArray* prhs[])
                 double rloc = 0;
                 for (q = 0; q < NumQuadPoints; q = q + 1 )
                 {
-                    /* set gradV to zero*/
-                    for (d1 = 0; d1 < dim; d1 = d1 + 1 )
-                    {
-                        for (d2 = 0; d2 < dim; d2 = d2 + 1 )
-                        {
-                            GradV[d1][d2] = 0;
-                        }
-                    }
                     
                     for (d2 = 0; d2 < dim; d2 = d2 + 1 )
                     {
@@ -357,13 +427,13 @@ void StVenantKirchhoffMaterial(mxArray* plhs[], const mxArray* prhs[])
         }
     }
     
-    double F[dim][dim];
-    double EPS[dim][dim];
+    double F[dim][dim][NumQuadPoints];
+    double E[dim][dim][NumQuadPoints];
     double dP[dim][dim];
     double P_Uh[dim][dim];
     
     double dF[dim][dim];
-    double dEPS[dim][dim];
+    double dE[dim][dim];
     
     double* material_param = mxGetPr(prhs[2]);
     double Young = material_param[0];
@@ -374,7 +444,7 @@ void StVenantKirchhoffMaterial(mxArray* plhs[], const mxArray* prhs[])
     /* Assembly: loop over the elements */
     int ie;
     
-#pragma omp parallel for shared(invjac,detjac,elements,myRrows,myRcoef,myAcols,myArows,myAcoef,U_h) private(gradphi,F,EPS,dP,P_Uh,dF,dEPS,GradV,GradU,GradUh,ie,k,l,q,d1,d2) firstprivate(phi,gradrefphi,w,numRowsElements,nln2,nln,NumNodes,Id,mu,lambda)
+#pragma omp parallel for shared(invjac,detjac,elements,myRrows,myRcoef,myAcols,myArows,myAcoef,U_h) private(gradphi,F,E,dP,P_Uh,dF,dE,GradV,GradU,GradUh,ie,k,l,q,d1,d2) firstprivate(phi,gradrefphi,w,numRowsElements,nln2,nln,NumNodes,Id,mu,lambda)
     
     for (ie = 0; ie < noe; ie = ie + 1 )
     {
@@ -394,6 +464,7 @@ void StVenantKirchhoffMaterial(mxArray* plhs[], const mxArray* prhs[])
             }
         }
         
+        double traceE[NumQuadPoints];
         for (q = 0; q < NumQuadPoints; q = q + 1 )
         {
             for (d1 = 0; d1 < dim; d1 = d1 + 1 )
@@ -407,8 +478,11 @@ void StVenantKirchhoffMaterial(mxArray* plhs[], const mxArray* prhs[])
                         e_k = (int)(elements[ie*numRowsElements + k] + d1*NumNodes - 1);
                         GradUh[d1][d2][q] = GradUh[d1][d2][q] + U_h[e_k] * gradphi[d2][k][q];
                     }
+                    F[d1][d2][q]  = Id[d1][d2] + GradUh[d1][d2][q];
                 }
             }
+            compute_GreenStrainTensor(dim, NumQuadPoints, F, Id, E, q );
+            traceE[q] = TraceQ(dim, NumQuadPoints, E, q);
         }
 
         int iii = 0;
@@ -460,50 +534,31 @@ void StVenantKirchhoffMaterial(mxArray* plhs[], const mxArray* prhs[])
                             {
                                 for (d2 = 0; d2 < dim; d2 = d2 + 1 )
                                 {
-                                    F[d1][d2]  = Id[d1][d2] + GradUh[d1][d2][q];
+                                    /*F[d1][d2]  = Id[d1][d2] + GradUh[d1][d2][q];*/
                                     dF[d1][d2] = GradU[d1][d2];
                                 }
                             }
                             
-                            /*
-                            for (d1 = 0; d1 < dim; d1 = d1 + 1 )
-                            {
-                                for (d2 = 0; d2 < dim; d2 = d2 + 1 )
-                                {
-                                    EPS[d1][d2]  = 0.5 * ( F[d2][d1] * F[d1][d2] ) - Id[d1][d2];
-                                    dEPS[d1][d2] = 0.5 * ( dF[d2][d1] * F[d1][d2] + F[d2][d1] * dF[d1][d2]);
-                                }
-                            }
-                            */
+                            /*compute_GreenStrainTensor(dim, F, Id, E );*/
+                            compute_DerGreenStrainTensor(dim, NumQuadPoints, F, dF, dE, q );
+                            
+                            double trace_dE = Trace(dim, dE);
+                            double P1[dim][dim];
+                            double P2[dim][dim];
+                            double P_tmp[dim][dim];
                             
                             for (d1 = 0; d1 < dim; d1 = d1 + 1 )
                             {
                                 for (d2 = 0; d2 < dim; d2 = d2 + 1 )
                                 {
-                                    int d3;
-                                    EPS[d1][d2] = 0;
-                                    for (d3 = 0; d3 < dim; d3 = d3 + 1 )
-                                    {
-                                        EPS[d1][d2]  = EPS[d1][d2] +   F[d3][d1] * F[d3][d2]   ;
-                                    }
-                                    EPS[d1][d2]  = 0.5 * ( EPS[d1][d2] - Id[d1][d2]);
-                                    dEPS[d1][d2] = 0.5 * ( dF[d2][d1] * F[d1][d2] + F[d2][d1] * dF[d1][d2]);
+                                    P1[d1][d2] =  2 * mu * E[d1][d2][q]  + lambda * traceE[q]  * Id[d1][d2] ;
+                                    P2[d1][d2] =  2 * mu * dE[d1][d2] + lambda * trace_dE * Id[d1][d2] ;                                    
                                 }
                             }
-                            
-                            
-                            double trace = Trace(dim, EPS);
-                            double dtrace = Trace(dim, dEPS);
-                            for (d1 = 0; d1 < dim; d1 = d1 + 1 )
-                            {
-                                for (d2 = 0; d2 < dim; d2 = d2 + 1 )
-                                {
-                                    dP[d1][d2] =   dF[d1][d2] * ( 2 * mu * EPS[d1][d2] + lambda * trace * Id[d1][d2] )
-                                                 + F[d1][d2]  * ( 2 * mu * dEPS[d1][d2] + lambda * dtrace * Id[d1][d2] );
-                                }
-                            }
+                            MatrixProduct(dim, dF, P1, dP);
+                            MatrixProductQ1(dim, NumQuadPoints, F, P2,  P_tmp, q);
+                            MatrixSum(dim, dP, P_tmp);
                             aloc  = aloc + Mdot( dim, GradV, dP) * w[q];
-                            printf("\n ie = %d, q = %d, aloc = %f", ie, q, aloc);
                         }
                         myArows[ie*nln2*dim*dim+iii] = elements[a+ie*numRowsElements] + i_c * NumNodes;
                         myAcols[ie*nln2*dim*dim+iii] = elements[b+ie*numRowsElements] + j_c * NumNodes;
@@ -517,46 +572,21 @@ void StVenantKirchhoffMaterial(mxArray* plhs[], const mxArray* prhs[])
                 for (q = 0; q < NumQuadPoints; q = q + 1 )
                 {
                     
-                    /* set gradV to zero*/
-                    for (d1 = 0; d1 < dim; d1 = d1 + 1 )
-                    {
-                        for (d2 = 0; d2 < dim; d2 = d2 + 1 )
-                        {
-                            GradV[d1][d2] = 0;
-                        }
-                    }
-
                     for (d2 = 0; d2 < dim; d2 = d2 + 1 )
                     {
                         GradV[i_c][d2] = gradphi[d2][a][q];
                     }
                     
-                    /*
+                    double P1[dim][dim];
                     for (d1 = 0; d1 < dim; d1 = d1 + 1 )
                     {
                         for (d2 = 0; d2 < dim; d2 = d2 + 1 )
                         {
-                            F[d1][d2] = Id[d1][d2] + GradUh[d1][d2][q];
+                            P1[d1][d2] =  ( 2 * mu * E[d1][d2][q] + lambda * traceE[q] * Id[d1][d2] );
                         }
                     }
                     
-                    for (d1 = 0; d1 < dim; d1 = d1 + 1 )
-                    {
-                        for (d2 = 0; d2 < dim; d2 = d2 + 1 )
-                        {
-                            EPS[d1][d2] = 0.5 * ( F[d1][d2] + F[d2][d1] ) - Id[d1][d2];
-                        }
-                    }
-                    */
-                    
-                    double trace = Trace(dim, EPS);
-                    for (d1 = 0; d1 < dim; d1 = d1 + 1 )
-                    {
-                        for (d2 = 0; d2 < dim; d2 = d2 + 1 )
-                        {
-                            P_Uh[d1][d2] = F[d1][d2] * ( 2 * mu * EPS[d1][d2] + lambda * trace * Id[d1][d2] );
-                        }
-                    }
+                    MatrixProductQ1(dim, NumQuadPoints, F, P1, P_Uh, q);  
                     rloc  = rloc + Mdot( dim, GradV, P_Uh) * w[q];
                 }
                                             
