@@ -48,7 +48,7 @@ if nargin >= 7 && ~isempty(DATA)
     [MESH]         = BC_info(MESH, DATA, model);
 end
 
-if strcmp( model, 'CSM')
+if strcmp( model, 'CSM2')
     fprintf('\n Generating mesh normals ... ')
     time_mesh = tic;
     switch dim
