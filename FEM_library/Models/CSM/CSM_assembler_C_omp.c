@@ -77,7 +77,6 @@ void MatrixProductQ1(int dim, int numQuadPoints, double X[dim][dim][numQuadPoint
     }
 }
 /*************************************************************************/
-
 double Trace(int dim, double X[dim][dim])
 {
     double T = 0;
@@ -89,7 +88,6 @@ double Trace(int dim, double X[dim][dim])
     return T;
 }
 /*************************************************************************/
-
 double TraceQ(int dim, int numQuadPoints, double X[dim][dim][numQuadPoints], int q)
 {
     double T = 0;
@@ -447,11 +445,12 @@ void StVenantKirchhoffMaterial(mxArray* plhs[], const mxArray* prhs[])
 #pragma omp parallel for shared(invjac,detjac,elements,myRrows,myRcoef,myAcols,myArows,myAcoef,U_h) private(gradphi,F,E,dP,P_Uh,dF,dE,GradV,GradU,GradUh,ie,k,l,q,d1,d2) firstprivate(phi,gradrefphi,w,numRowsElements,nln2,nln,NumNodes,Id,mu,lambda)
     
     for (ie = 0; ie < noe; ie = ie + 1 )
-    {
-                
-        for (k = 0; k < nln; k = k + 1 )
+    {             
+        double traceE[NumQuadPoints];
+        for (q = 0; q < NumQuadPoints; q = q + 1 )
         {
-            for (q = 0; q < NumQuadPoints; q = q + 1 )
+            /* Compute Gradient of Basis functions*/
+            for (k = 0; k < nln; k = k + 1 )
             {
                 for (d1 = 0; d1 < dim; d1 = d1 + 1 )
                 {
@@ -462,11 +461,7 @@ void StVenantKirchhoffMaterial(mxArray* plhs[], const mxArray* prhs[])
                     }
                 }
             }
-        }
-        
-        double traceE[NumQuadPoints];
-        for (q = 0; q < NumQuadPoints; q = q + 1 )
-        {
+            
             for (d1 = 0; d1 < dim; d1 = d1 + 1 )
             {
                 for (d2 = 0; d2 < dim; d2 = d2 + 1 )
@@ -534,12 +529,10 @@ void StVenantKirchhoffMaterial(mxArray* plhs[], const mxArray* prhs[])
                             {
                                 for (d2 = 0; d2 < dim; d2 = d2 + 1 )
                                 {
-                                    /*F[d1][d2]  = Id[d1][d2] + GradUh[d1][d2][q];*/
                                     dF[d1][d2] = GradU[d1][d2];
                                 }
                             }
                             
-                            /*compute_GreenStrainTensor(dim, F, Id, E );*/
                             compute_DerGreenStrainTensor(dim, NumQuadPoints, F, dF, dE, q );
                             
                             double trace_dE = Trace(dim, dE);

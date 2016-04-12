@@ -1,4 +1,4 @@
-function [u, FE_SPACE, MESH, DATA] = CSM_Solver(dim, elements, vertices, boundaries, fem, data_file, param)
+function [u, FE_SPACE, MESH, DATA] = CSM_Solver(dim, elements, vertices, boundaries, fem, data_file, param, vtk_filename)
 %CSM_SOLVER Static Structural Finite Element Solver
 %
 %   [U, FE_SPACE, MESH, DATA, ERRORL2, ERRORH1] = ...
@@ -33,6 +33,11 @@ end
 if isempty(data_file)
     error('Missing data_file')
 end
+
+if nargin < 8
+    vtk_filename = [];
+end
+
 
 %% Read problem parameters and BCs from data_file
 DATA   = CSM_read_DataFile(data_file);
@@ -137,34 +142,10 @@ while (k <= maxIter && incrNorm > tol && resRelNorm > tol)
 end
 
 u = U_k;
-% %% Assemble matrix and right-hand side
-% fprintf('\n >> Assembling ... ');
-% t_assembly = tic;
-% [F, A]  =  CSM_Assembler('all', MESH, DATA, FE_SPACE);
-% t_assembly = toc(t_assembly);
-% fprintf('done in %3.3f s', t_assembly);
-% 
-% 
-% %% Apply boundary conditions
-% fprintf('\n >> Apply boundary conditions ... ');
-% t_assembly = tic;
-% [A_in, F_in, u_D]   =  CSM_ApplyBC(A, -F, FE_SPACE, MESH, DATA);
-% t_assembly = toc(t_assembly);
-% fprintf('done in %3.3f s', t_assembly);
-% 
-% %% Solve
-% fprintf('\n >> Solve Au = f ... ');
-% t_solve = tic;
-% u                         = zeros(MESH.numNodes*MESH.dim,1);
-% u(MESH.internal_dof)      = A_in \ F_in;
-% u(MESH.Dirichlet_dof)     = u_D;
-% t_solve = toc(t_solve);
-% fprintf('done in %3.3f s \n', t_solve);
 
-STR_export_solution(MESH.dim, u, MESH.vertices, MESH.elements, MESH.numVertices, 'SOL_ELA');
-
-%% Store matrix and rhs into FE_SPACE struct
-%FE_SPACE.A_in = A_in;
-%FE_SPACE.F_in = F_in;
-
+%% Export to VTK
+if ~isempty(vtk_filename)
+    STR_export_solution(MESH.dim, u, MESH.vertices, MESH.elements, MESH.numVertices, vtk_filename);
+end
+ 
 return
