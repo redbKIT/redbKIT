@@ -53,9 +53,7 @@ if strcmp( model, 'CSM')
     time_mesh = tic;
     switch dim
         case 2
-            [MESH.Normal_Faces] = ComputeSurfaceNormals3D(MESH.boundaries(1:2,:),MESH.vertices(1:2,:),MESH.elements(1:3,:));
-            MESH.Normal_Vert = [nx ny];
-            MESH.Tang_Vert   = [tx ty];
+            [MESH.Normal_Faces] = ComputeSurfaceNormals2D(MESH.boundaries(1:2,:),MESH.vertices(1:2,:),MESH.elements(1:3,:));
             
         case 3
             [MESH.Normal_Faces] = ...

@@ -22,7 +22,7 @@ fprintf(fid, 'Platform: %s\n\n', s );
 
 %% Start Testing
 
-% Test 1a
+% Test
 cd FEM_Test_2DLaplacian/
 try
     testname = 'FEM_Test_2DLaplacian_P1';
@@ -49,7 +49,7 @@ catch err
 end
 cd(TestFolder)
 
-% Test 1b
+% Test
 cd FEM_Test_3DLaplacian/
 try
     testname = 'FEM_Test_3DLaplacian_P1';
@@ -72,7 +72,53 @@ catch err
 end
 cd(TestFolder)
 
-% Test 2
+% Test
+cd FEM_CSM_Test2D/
+try
+    testname = 'FEM_CSM_Test2D_P1';
+    test('P1');    
+    close all;
+    
+    print_test_passed(fid,testname);
+    
+catch err
+    print_error_toFile(fid,err,testname);
+end
+try
+    testname = 'FEM_CSM_Test2D_P2';
+    test('P2');    
+    close all;
+    print_test_passed(fid,testname);
+    
+catch err
+    print_error_toFile(fid,err,testname);
+end
+cd(TestFolder)
+
+% Test
+cd FEM_CSM_Test3D/
+try
+    testname = 'FEM_CSM_Test3D_P1';
+    test('P1');    
+    close all;
+    
+    print_test_passed(fid,testname);
+    
+catch err
+    print_error_toFile(fid,err,testname);
+end
+try
+    testname = 'FEM_CSM_Test3D_P2';
+    test('P2');    
+    close all;
+    print_test_passed(fid,testname);
+    
+catch err
+    print_error_toFile(fid,err,testname);
+end
+cd(TestFolder)
+
+% Test
 cd Test_EIM_DEIM/
 try
     testname = 'Test_EIM_DEIM';
@@ -85,7 +131,7 @@ catch err
 end
 cd(TestFolder)
 
-% Test 3
+% Test
 cd RB_AffineDevice/
 try
     testname = 'RB_AffineDevice';
@@ -98,7 +144,7 @@ catch err
 end
 cd(TestFolder)
 
-% Test 4
+% Test
 cd RB_EIM_Gaussian/
 try
     testname = 'RB_EIM_Gaussian';

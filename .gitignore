@@ -9,7 +9,7 @@
 *.mexa64
 *.mexmaci64
 *.vtk
-FEM_library/codegen/
+codegen/
 Problems/test_log.txt
 Problems/RB_AffineDevice/Figures/
 Problems/RB_Cookies/Figures/
