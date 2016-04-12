@@ -1,7 +1,7 @@
 function DATA = CSM_read_DataFile(data_file, dim)
-%READ_DATAFILE data_file parser
+%CSM_READ_DATAFILE data_file parser
 %
-%   DATA = READ_DATAFILE(DATA_FILE) read the file specified by the string
+%   DATA = CSM_READ_DATAFILE(DATA_FILE) read the file specified by the string
 %   DATA_FILE and put the fields values into the struct DATA
 
 %   This file is part of redbKIT.

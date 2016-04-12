@@ -1,25 +1,8 @@
 function [A_in, F_in, u_D] =  CSM_ApplyBC(A, F, FE_SPACE, MESH, DATA, t, zero_Dirichlet)
-%ADR_APPLYBC_2D apply boundary conditions for Advc-Diff-React problem in 2D/3D
-%
-%   [A_IN, F_IN, U_DIRICHLET] = ADR_APPLYBC(A, F, MESH, DATA) given an
-%   assembled matrix A, righ-hand side vector F, a MESH data structure and
-%   a DATA structure, applies Neumann, Robin and Dirichlet boundary
-%   conditions. It returns the matrix A_IN (matrix A + BCs then restricted
-%   to internal dofs), the vector F_IN (vector F + BCs then restricted
-%   to internal dofs) and the vector U_DIRICHLET containing the
-%   Dirichlet datum evaluated in the Dirichlet dofs.
-%
-%   Warning: in case of assembling two vectors corresponding to Neumann and
-%   Dirichlet data, respectively, it is preferable to process first Neumann
-%   data and then set Data.bcNeu to zero before processing Dirichlet data.
-%
-%   [A_IN, F_IN, U_DIRICHLET] = APPLYBC(A, F, MESH, DATA, T) as
-%   before, but with the additional input T (time) for time-dependent
-%   problems.
 
 %   This file is part of redbKIT.
-%   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
-%   Author: Federico Negri <federico.negri at epfl.ch>
+%   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
+%   Author: Federico Negri <federico.negri at epfl.ch> 
 
 if nargin < 6
     t = [];
