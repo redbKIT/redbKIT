@@ -6,7 +6,7 @@ addpath([pwd,'/gmsh'])
 
 %% Set FE Space and load mesh
 fem          =  'P1';
-[vertices, boundaries, elements] = msh_to_Mmesh( 'AcousticHorn_Fine2', 2);
+[vertices, boundaries, elements] = msh_to_Mmesh( 'AcousticHorn_Coarse', 2);
 
 %% Solve nonaffine FOM for a given configuration
 % param_test = [900  0.02       0.01      0.02     0.03];
@@ -15,7 +15,7 @@ fem          =  'P1';
 % ADR_export_solution(2, real(U(1:MESH.numVertices)), MESH.vertices, MESH.elements(1:3,:), 'TestSolution');
 
 %% Generate Affine FOM by (M)DEIM
-tolPOD_MDEIM = [4 20];
+tolPOD_MDEIM = [1e-5 1e-5];
 [ FOM ]      = build_affineFOM(elements, vertices, boundaries, fem, 'horn_data', tolPOD_MDEIM);
 FOM.u_D      = @(x,mu) [];
 save FOM FOM;

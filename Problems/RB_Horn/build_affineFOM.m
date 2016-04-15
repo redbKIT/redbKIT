@@ -23,57 +23,15 @@ DATA.param = zeros(1,5);
 DATA.shape_param = [2:5];
 t          = [];
 
+%% Set quad_order
+quad_order                  = 4;  
+
 %% Fill MESH data structure
 dim              = 2;
-MESH.dim         = 2;
-MESH.vertices    = vertices;
-MESH.boundaries  = boundaries;
-MESH.elements    = elements;
-MESH.numVertices = size(vertices,2);
-
-%% Build higher order (P2 or P3) mesh if required
-if ~strcmp(fem,'P1')
-    [MESH.elements, MESH.nodes, MESH.boundaries] = ...
-        feval(strcat('P1to',fem,'mesh','2D'),elements,vertices, boundaries);
-else
-    MESH.nodes = vertices;
-end
-
-%% Update Mesh data with BC information and geometrical maps
-[numElemDof,numBoundaryDof]  = select(fem, dim);
-MESH.numNodes                = size(MESH.nodes,2);
-MESH.numElem                 = size(MESH.elements,2);
-MESH.numBoundaryDof          = numBoundaryDof;
-
-% Update MESH with BC information
-[MESH]         = BC_info(MESH, DATA);
-
-% Compute geometrical map (ref to physical elements) information
-[MESH.jac, MESH.invjac, MESH.h] = geotrasf(MESH.dim, MESH.vertices, MESH.elements);   
-
-% Compute quadrature nodes and weights on the reference element
-quad_order                  = 4;  
-[quad_nodes, quad_weights]  = quadrature(dim, quad_order);
-
-% Evaluate P1 geometrical mapping basis functions in the quad points
-[MESH.chi]                  =  fem_basis(dim, 'P1', quad_nodes);
+[ MESH ] = buildMESH( dim, elements, vertices, boundaries, fem, quad_order, DATA );
 
 %% Create and fill the FE_SPACE data structure
-FE_SPACE.fem              = fem;
-FE_SPACE.numDof           = length(MESH.internal_dof);
-FE_SPACE.numElemDof       = numElemDof;
-FE_SPACE.numBoundaryDof   = numBoundaryDof;
-
-% Store quadrature nodes and weights on the reference element
-FE_SPACE.quad_order    = quad_order;
-FE_SPACE.quad_nodes    = quad_nodes;
-FE_SPACE.quad_weights  = quad_weights;
-FE_SPACE.numQuadNodes  = length(FE_SPACE.quad_nodes);
-
-% Evaluate basis functions in the quad points on the reference element
-[FE_SPACE.phi, FE_SPACE.dphi_ref]  =  ...
-    fem_basis(dim, FE_SPACE.fem, FE_SPACE.quad_nodes);
-
+[ FE_SPACE ] = buildFESpace( MESH, fem, 1, quad_order );
 
 fprintf('\n **** PROBLEM''S SIZE INFO ****\n');
 fprintf(' * Number of Vertices  = %d \n',MESH.numVertices);
@@ -92,7 +50,7 @@ FOM.DATA     = DATA;
 % mu_train           = [mu_ref; mu_train];
 % mu_train_Dimension = size(mu_train,1);
 
-mu_train_Dimension = 10; % number of samples
+mu_train_Dimension = 30; % number of samples
 mu_cube            = lhsdesign(mu_train_Dimension,FOM.P); % generate normalized design
 mu_train           = bsxfun(@plus,FOM.mu_min,bsxfun(@times,mu_cube,(FOM.mu_max-FOM.mu_min)));
 
@@ -121,6 +79,7 @@ end
 
 %% Generate Approximate Affine Model by (M)DEIM
 [FOM.HyRED, U_matrix, U_rhs]  = HyperReduction_offline(FOM, S_rhs, S_matrix, tolPOD);
+clear S_matrix S_rhs;
 
 FOM.Qa    = size(U_matrix,2);
 FOM.Qf    = size(U_rhs,2);
@@ -132,7 +91,6 @@ end
 for q = 1 : FOM.Qf
       FOM.Fq{q} = U_rhs(:,q);
 end
-%clear U_matrix U_rhs S_matrix S_rhs;
 
 %% Compute Xnorm
 DATA.diffusion =  @(x,y,t,param)(1+0.*x.*y);
@@ -142,8 +100,5 @@ M              =  ADR_Assembler(MESH, DATA, FE_SPACE, 'reaction');
 
 FOM.Xnorm =  X(FOM.MESH.internal_dof,FOM.MESH.internal_dof) +...
              M(FOM.MESH.internal_dof,FOM.MESH.internal_dof);
-
-%clear MESH DATA FE_SPACE elements vertices boundaries;       
-%FOM.u_D = @(x,mu) [];
 
 end
