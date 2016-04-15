@@ -13,7 +13,7 @@ clc
 %% Set FE Space and load mesh 
 fem      =  'P1';
 [vertices, boundaries, elements] = initmesh('mesh_square','Jiggle','minimum','Hgrad',1.01,'Hmax', 0.1);
-for i = 1 : 3
+for i = 1 : 1
     [vertices, boundaries, elements] = refinemesh('mesh_square',vertices, boundaries, elements);
 end
 
