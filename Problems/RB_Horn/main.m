@@ -6,7 +6,7 @@ addpath([pwd,'/gmsh'])
 
 %% Set FE Space and load mesh
 fem          =  'P1';
-[vertices, boundaries, elements] = msh_to_Mmesh( 'AcousticHorn_Coarse', 2);
+[vertices, boundaries, elements] = msh_to_Mmesh( 'AcousticHorn_Fine2', 2);
 
 %% Solve nonaffine FOM for a given configuration
 % param_test = [900  0.02       0.01      0.02     0.03];
@@ -52,7 +52,3 @@ lighting phong
 % export solution to vtk for visualization in paraview
 [~,~,~] = mkdir('Figures');
 ADR_export_solution(2, real(uNh(1:ROM.MESH.numVertices)), def_vertices, ROM.MESH.elements(1:3,:), 'Figures/Horn_RBsol');
-
-%% Perform Error analysis with respect to Affine FOM
-Ntest_sample  = 10;
-[ Error ]     = error_analysis(FOM, ROM, Ntest_sample);

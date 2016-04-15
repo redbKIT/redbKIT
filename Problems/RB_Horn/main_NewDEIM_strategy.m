@@ -7,7 +7,7 @@ addpath([pwd,'/gmsh'])
 
 %% Set FE Space and load mesh
 fem          =  'P1';
-[vertices, boundaries, elements] = msh_to_Mmesh( 'AcousticHornFine', 2);
+[vertices, boundaries, elements] = msh_to_Mmesh( 'AcousticHorn_Fine2', 2);
 
 %% Solve nonaffine FOM for a given configuration
 % param_test = [900  0.02       0.01      0.02     0.03];
@@ -21,6 +21,7 @@ FOM.u_D      = @(x,mu) [];
 save FOM FOM;
 
 %% Build POD-based ROM
+reset_randomSeed;
 mu_train_Dimension = 250; 
 mu_cube            = lhsdesign(mu_train_Dimension, FOM.P); % normalized design
 mu_train           = bsxfun(@plus,FOM.mu_min,bsxfun(@times,mu_cube,(FOM.mu_max-FOM.mu_min)));
@@ -41,7 +42,7 @@ DATA_tmp.param      =  FOM.mu_bar;
 [A, F]    =  ADR_Assembler(MESH_tmp, DATA_tmp, FOM.FE_SPACE);
 [A_0]     =  ApplyBC(A, F, FOM.FE_SPACE, MESH_tmp, DATA_tmp);
 
-for i = 1 : mu_train_Dimension
+parfor i = 1 : mu_train_Dimension
    
       MESH_tmp            =  FOM.MESH;
       MESH_tmp.vertices   =  RBF_DeformGeometry(mu_train(i,FOM.DATA.shape_param),FOM.MESH.vertices);
@@ -119,6 +120,7 @@ ADR_export_solution(FOM.MESH.dim, ones(FOM.MESH.numVertices,1), FOM.MESH.vertice
 %% ONLINE
 
 % build testing set
+reset_randomSeed;
 mu_test_Dimension = 40;% [1];
 mu_cube           = lhsdesign(mu_test_Dimension, FOM.P); % normalized design
 mu_test           = bsxfun(@plus,FOM.mu_min,bsxfun(@times,mu_cube,(FOM.mu_max-FOM.mu_min)));%mu_train;%FOM.mu_bar;%%bsxfun(@plus,FOM.mu_min,bsxfun(@times,mu_cube,(FOM.mu_max-FOM.mu_min)));
@@ -128,7 +130,7 @@ error_sol = zeros(mu_test_Dimension,1);
 I = FOM.MESH.internal_dof;
 % solve the Reduced and Full Order Model on the testing set to evaluate the
 % error
-for i = 1 : size(mu_test,1)
+parfor i = 1 : size(mu_test,1)
     
     MESH_tmp            =  FOM.MESH;
     MESH_tmp.vertices   =  RBF_DeformGeometry(mu_test(i,FOM.DATA.shape_param),FOM.MESH.vertices);

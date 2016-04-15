@@ -7,8 +7,14 @@ function [ FOM ] = build_affineFOM(elements, vertices, boundaries, fem, data_fil
 
 %% Parameters
 FOM.P  = 5;
-FOM.mu_min = [ 50    -0.03     -0.03     -0.03    -0.03];
-FOM.mu_max = [ 1000  0.03       0.03      0.03     0.03];
+% Full variations
+% FOM.mu_min = [ 50    -0.03     -0.03     -0.03    -0.03];
+% FOM.mu_max = [ 1000  0.03       0.03      0.03     0.03];
+% FOM.mu_bar = [ 500    0          0         0        0]; 
+
+% Only frequency
+FOM.mu_min = [ 10     0          0         0        0];
+FOM.mu_max = [ 1800   0          0         0        0];
 FOM.mu_bar = [ 500    0          0         0        0]; 
 
 %% Read problem parameters and BCs from data_file
@@ -86,7 +92,7 @@ FOM.DATA     = DATA;
 % mu_train           = [mu_ref; mu_train];
 % mu_train_Dimension = size(mu_train,1);
 
-mu_train_Dimension = 100; % number of samples
+mu_train_Dimension = 10; % number of samples
 mu_cube            = lhsdesign(mu_train_Dimension,FOM.P); % generate normalized design
 mu_train           = bsxfun(@plus,FOM.mu_min,bsxfun(@times,mu_cube,(FOM.mu_max-FOM.mu_min)));
 
