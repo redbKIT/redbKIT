@@ -1,9 +1,6 @@
 clear all
 clc
 
-addpath([pwd,'/RBF'])
-addpath([pwd,'/gmsh'])
-
 %% Set FE Space and load mesh
 fem          =  'P1';
 [vertices, boundaries, elements] = msh_to_Mmesh( 'AcousticHorn_Coarse', 2);
@@ -15,7 +12,7 @@ fem          =  'P1';
 % ADR_export_solution(2, real(U(1:MESH.numVertices)), MESH.vertices, MESH.elements(1:3,:), 'TestSolution');
 
 %% Generate Affine FOM by (M)DEIM
-tolPOD_MDEIM = [1e-5 1e-5];
+tolPOD_MDEIM = [1e-3 1e-3];
 [ FOM ]      = build_affineFOM(elements, vertices, boundaries, fem, 'horn_data', tolPOD_MDEIM);
 FOM.u_D      = @(x,mu) [];
 save FOM FOM;
@@ -26,7 +23,7 @@ mu_cube            = lhsdesign(mu_train_Dimension, FOM.P); % normalized design
 mu_train           = bsxfun(@plus,FOM.mu_min,bsxfun(@times,mu_cube,(FOM.mu_max-FOM.mu_min)));
 %[mu_train]        = FullFactorial_ParameterSpace(FOM.P, FOM.mu_min, FOM.mu_max, FOM.mu_ref, [12 2 2 2 2]);
 
-tolPOD             = 50;
+tolPOD             = 1e-3;
 method             = 'Galerkin';%'LeastSquares'
 [ ROM ]            = build_PODbased_ROM(FOM, mu_train, tolPOD, method);
 
