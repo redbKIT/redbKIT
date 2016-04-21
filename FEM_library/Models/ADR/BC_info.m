@@ -186,6 +186,64 @@ switch model
             end
         end
         
+        
+    case 'CFD'
+        
+        MESH.Dirichlet_dof = [];
+        MESH.internal_dof  = [];
+        
+        for d = 1 : MESH.dim
+            
+            type_Dirichlet = DATA.flag_dirichlet{d};
+            type_Neumann   = DATA.flag_neumann{d};
+            
+            if isempty(type_Dirichlet) && isempty(type_Neumann) && isempty(type_Pressure)
+                error(['No boundary conditions are imposed on component ', num2str(d)]);
+            end
+            
+            %% Find Dirichlet dofs (if any)
+            if ~isempty(type_Dirichlet)
+                
+                % Computes the Dirichlet dof of the domain
+                nDir                    = length(type_Dirichlet);
+                Dirichlet_side          = [];
+                flag_Dirichlet_vertices = [];
+                for kk = 1 : nDir
+                    Dirichlet_side          = [Dirichlet_side,find(MESH.boundaries(bc_flag_row,:) == type_Dirichlet(kk))];
+                    flag_Dirichlet_vertices = [flag_Dirichlet_vertices,type_Dirichlet(kk)];
+                end
+                Dirichlet_side             = unique(Dirichlet_side);
+                Dirichlet_dof              = MESH.boundaries(1:MESH.numBoundaryDof,Dirichlet_side);
+                MESH.Dirichlet_dof_c{d}    = unique(Dirichlet_dof(:));
+                MESH.internal_dof_c{d}     = setdiff([1:MESH.numNodes]',MESH.Dirichlet_dof_c{d});
+                
+            else
+                MESH.internal_dof_c{d}  = 1:MESH.numNodes;
+                MESH.Dirichlet_dof_c{d} = [];
+            end
+            
+            
+            MESH.Dirichlet_dof = [MESH.Dirichlet_dof;  (d-1)*MESH.numNodes+MESH.Dirichlet_dof_c{d}];
+            MESH.internal_dof  = [MESH.internal_dof; (d-1)*MESH.numNodes+MESH.internal_dof_c{d}];
+            
+            %% Find Neumann boundaries (if any)
+            if ~isempty(type_Neumann)
+                % Computes the Neumann dof of the domain
+                nNeu         = length(type_Neumann);
+                Neumann_side = [];
+                for k = 1 : nNeu
+                    Neumann_side = [Neumann_side,find(MESH.boundaries(bc_flag_row,:) == type_Neumann(k))];
+                end
+                MESH.Neumann_side{d} = unique(Neumann_side);
+            else
+                MESH.Neumann_side{d} = [];
+            end
+            
+        end
+        
+        MESH.internal_dof  = [MESH.internal_dof; d*MESH.numNodes+[1:MESH.numVertices]' ];
+        
+        
     otherwise
         error('BC_info: unknown model')
         
