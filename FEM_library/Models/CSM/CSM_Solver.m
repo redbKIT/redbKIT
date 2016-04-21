@@ -19,7 +19,7 @@ end
 
 
 %% Read problem parameters and BCs from data_file
-DATA   = CSM_read_DataFile(data_file);
+DATA   = CSM_read_DataFile(data_file, dim, param);
 if nargin < 7
     DATA.param = [];
 else
