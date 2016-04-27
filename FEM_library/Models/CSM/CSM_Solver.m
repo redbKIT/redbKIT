@@ -51,6 +51,15 @@ fprintf(' * Number of Nodes     = %d \n',MESH.numNodes);
 fprintf(' * Number of Dofs      = %d \n',length(MESH.internal_dof));
 fprintf('-------------------------------------------\n');
 
+%% Generate Domain Decomposition (if required)
+PreconFactory = PreconditionerFactory( );
+Precon        = PreconFactory.CreatePrecon(DATA.Preconditioner.type, DATA);
+
+if isfield(DATA.Preconditioner, 'type') && strcmp( DATA.Preconditioner.type, 'AdditiveSchwarz')
+    R      = CSM_overlapping_DD(MESH, DATA.Preconditioner.num_subdomains,  DATA.Preconditioner.overlap_level);
+    Precon.SetRestrictions( R );
+end
+
 %% Newton Method
 
 tol        = 1e-6;
@@ -88,13 +97,17 @@ fprintf('done in %3.3f s\n', t_assembly);
 
 res0Norm = norm(b);
 
+LinSolver = LinearSolver( DATA.LinearSolver );
+
 fprintf('\n============ Start Newton Iterations ============\n\n');
 while (k <= maxIter && incrNorm > tol && resRelNorm > tol)
             
     % Solve
-    fprintf('\n   -- Solve Au = f ... ');
+    fprintf('\n   -- Solve J x = -R ... ');
     t_solve = tic;
-    dU(MESH.internal_dof)      = A \ b;
+    Precon.Build( A );
+    LinSolver.SetPreconditioner( Precon );
+    dU(MESH.internal_dof) = LinSolver.Solve( A, b );
     t_solve = toc(t_solve);
     fprintf('done in %3.3f s \n', t_solve);
     

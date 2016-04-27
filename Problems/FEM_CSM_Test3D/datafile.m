@@ -36,3 +36,22 @@ data.Material_Model = 'StVenantKirchhoff';%'StVenantKirchhoff', 'Linear'
 data.Young   = 21.5;
 data.Poisson = 0.29;
 data.Density = 1;
+
+
+% Linear Solver
+data.LinearSolver.type              = 'backslash'; 
+data.LinearSolver.tol               = 1e-8; 
+data.LinearSolver.maxit             = 500; 
+data.LinearSolver.gmres_verbosity   = 10;
+
+% Preconditioner
+data.Preconditioner.type         = 'AdditiveSchwarz'; % AdditiveSchwarz, None, ILU
+data.Preconditioner.local_solver = 'matlab_lu'; % solver used on each subdomain
+poolobj = gcp('nocreate');
+if isempty(poolobj)
+    poolsize = 0;
+else
+    poolsize = poolobj.NumWorkers;
+end
+data.Preconditioner.num_subdomains    = 2; % number of subdomains
+data.Preconditioner.overlap_level     = 2;
