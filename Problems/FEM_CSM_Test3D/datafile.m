@@ -39,10 +39,10 @@ data.Density = 1;
 
 
 % Linear Solver
-data.LinearSolver.type              = 'backslash'; 
+data.LinearSolver.type              = 'gmres'; 
 data.LinearSolver.tol               = 1e-8; 
 data.LinearSolver.maxit             = 500; 
-data.LinearSolver.gmres_verbosity   = 10;
+data.LinearSolver.gmres_verbosity   = 1;
 
 % Preconditioner
 data.Preconditioner.type         = 'AdditiveSchwarz'; % AdditiveSchwarz, None, ILU
