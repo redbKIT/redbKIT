@@ -13,6 +13,10 @@ if isempty(data_file)
     error('Missing data_file')
 end
 
+if nargin < 7
+    param = [];
+end
+
 if nargin < 8
     vtk_filename = [];
 end
