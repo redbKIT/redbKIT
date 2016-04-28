@@ -9,6 +9,7 @@ classdef Preconditioner < handle
         M_reuse;
         M_isBuilt;
         M_type;
+        M_BuildTime;
     end
     
     methods
@@ -26,7 +27,13 @@ classdef Preconditioner < handle
             end      
             
             obj.M_type = obj.M_options.type;
+            obj.M_BuildTime = 0;
             
+        end
+        
+        %% GetBuildTime
+        function t = GetBuildTime( obj )
+            t = obj.M_BuildTime;
         end
         
         %% Build preconditioner

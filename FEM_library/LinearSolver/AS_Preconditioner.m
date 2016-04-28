@@ -82,8 +82,7 @@ classdef AS_Preconditioner < Preconditioner & handle
                     end
                     
             end
-            time_build = toc(time_build);
-            fprintf('-- AS-LU Prec built in %3.3f s ',time_build);
+            obj.M_BuildTime = toc(time_build);
             
         end
         

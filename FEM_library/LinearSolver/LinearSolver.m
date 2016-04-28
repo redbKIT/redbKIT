@@ -1,52 +1,70 @@
 classdef LinearSolver < handle
-
-%   This file is part of redbKIT.
-%   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
-%   Author: Federico Negri <federico.negri at epfl.ch>
-
+    
+    %   This file is part of redbKIT.
+    %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
+    %   Author: Federico Negri <federico.negri at epfl.ch>
+    
     properties (GetAccess = public, SetAccess = protected)
         M_type;
         M_options;
         M_precon;
         M_verbose;
+        M_solveTime;
     end
-   
+    
     methods
         
         %% Constructor
         function obj = LinearSolver( Options )
             
-            obj.M_options = Options;
-            obj.M_type    = Options.type;
-            obj.M_verbose = true;
+            obj.M_options   = Options;
+            obj.M_type      = Options.type;
+            obj.M_verbose   = false;
+            obj.M_solveTime = 0;
             
         end
         
-        %%
+        %% Option Parser
+        function obj = OptionParser( obj )
+            
+            obj.M_options   = Options;
+            obj.M_type      = Options.type;
+            obj.M_verbose   = false;
+            obj.M_solveTime = 0;
+            
+        end
+        
+        %% SetPreconditioner
         function obj = SetPreconditioner( obj, Precon )
             obj.M_precon = Precon;
         end
         
-        %%
+        %% GetSolveTime
+        function t = GetSolveTime( obj )
+            t = obj.M_solveTime;
+        end
+        
+        %% Solve
         function x = Solve( obj, A, b, x0 )
             
             if nargin < 4 || isempty(x0)
                 x0 = zeros(length(b),1);
             end
-
-            %if obj.M_verbose
-            %    fprintf('\n         Solving Linear System ...\n')
-            %end
-
-            time_solve = tic;
+            
+            if obj.M_verbose
+                fprintf('\n         Solving Linear System ...\n')
+            end
             
             switch obj.M_type
                 
                 case 'backslash'
+                    time_solve = tic;
                     
                     x = A \ b;
+                    obj.M_solveTime = toc(time_solve);
                     
                 case 'MUMPS'
+                    time_solve = tic;
                     
                     % initialization of a matlab MUMPS structure
                     id     = initmumps;
@@ -63,25 +81,33 @@ classdef LinearSolver < handle
                     id.RHS = b;
                     
                     % Call Mumps
-                    time_solve = tic;
                     [id] = dmumps(id,A);
                     x = id.SOL;
-                    time_solve = toc(time_solve);
                     
                     id.JOB = -2;
                     id = dmumps(id);
+                    obj.M_solveTime = toc(time_solve);
                     
                 case 'gmres'
-   
+                    
+                    time_solve = tic;
+                    
                     [x,flagITER,~,~,resvec] = my_gmres(A, b, [], obj.M_options.tol, obj.M_options.maxit,...
-                        @(r)obj.M_precon.Apply(r), [], x0, [obj.M_verbose obj.M_options.gmres_verbosity]);
+                        @(r)obj.M_precon.Apply(r), [], x0, [1 obj.M_options.gmres_verbosity]);
+                    
+                    obj.M_solveTime = toc(time_solve);
+                    
+                    if flagITER == 0
+                        fprintf('\nGmres converged in %d iterations\n',length(resvec));
+                    else
+                        fprintf('\n***Problems with the linear solver***\n');
+                    end
                     
             end
             
-            time_solve = toc(time_solve);
-            %if obj.M_verbose
-            %    fprintf('    Done in: %2.2e s  ', time_solve);
-            %end
+            if obj.M_verbose
+                fprintf('    Done in: %2.2e s  ', obj.M_solveTime);
+            end
             
         end
         

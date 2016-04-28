@@ -62,11 +62,10 @@ end
 
 %% Newton Method
 
-tol        = 1e-6;
+tol        = DATA.NonLinearSolver.tol;
 resRelNorm = tol + 1;
-res0Norm   = tol + 1;
 incrNorm   = tol + 1;
-maxIter    = 15;
+maxIter    = DATA.NonLinearSolver.maxit;
 k          = 1;
 
 [~, ~, u_D]   =  CSM_ApplyBC([], [], FE_SPACE, MESH, DATA);
@@ -103,14 +102,14 @@ fprintf('\n============ Start Newton Iterations ============\n\n');
 while (k <= maxIter && incrNorm > tol && resRelNorm > tol)
             
     % Solve
-    fprintf('\n   -- Solve J x = -R ... ');
-    t_solve = tic;
+    fprintf('\n   -- Solve J x = -R ... ');    
     Precon.Build( A );
+    fprintf('\n        time to build the preconditioner %3.3f s \n', Precon.GetBuildTime());
     LinSolver.SetPreconditioner( Precon );
     dU(MESH.internal_dof) = LinSolver.Solve( A, b );
-    t_solve = toc(t_solve);
-    fprintf('done in %3.3f s \n', t_solve);
+    fprintf('\n        time to solve the linear system in %3.3f s \n', LinSolver.GetSolveTime());
     
+    % update solution
     U_k        = U_k + dU;
     incrNorm   = norm(dU)/norm(U_k);
     

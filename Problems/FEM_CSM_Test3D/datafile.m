@@ -37,12 +37,11 @@ data.Young   = 21.5;
 data.Poisson = 0.29;
 data.Density = 1;
 
-
 % Linear Solver
 data.LinearSolver.type              = 'gmres'; 
 data.LinearSolver.tol               = 1e-8; 
 data.LinearSolver.maxit             = 500; 
-data.LinearSolver.gmres_verbosity   = 1;
+data.LinearSolver.gmres_verbosity   = 5;
 
 % Preconditioner
 data.Preconditioner.type         = 'AdditiveSchwarz'; % AdditiveSchwarz, None, ILU
@@ -55,3 +54,7 @@ else
 end
 data.Preconditioner.num_subdomains    = 2; % number of subdomains
 data.Preconditioner.overlap_level     = 2;
+
+% NonLinear Solver
+data.NonLinearSolver.tol               = 1e-6; 
+data.NonLinearSolver.maxit             = 15; 
