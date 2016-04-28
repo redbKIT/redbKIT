@@ -123,15 +123,15 @@ classdef AS_Preconditioner < Preconditioner & handle
                     spmd(0,length(Restrictions))
                         zi = 0*r;
                         
-                        obj.M_mumps_ID.JOB    = 3;
-                        obj.M_mumps_ID.RHS    = r(Restrictions{labindex});
-                        obj.M_mumps_ID        = dmumps(mumps_ID, A_DD);
+                        mumps_ID.JOB    = 3;
+                        mumps_ID.RHS    = r(Restrictions{labindex});
+                        mumps_ID        = dmumps(mumps_ID, A_DD);
                         
                         zi(Restrictions{labindex}) = mumps_ID.SOL;
                     end
                     
                     z     = 0 *r;
-                    for i = 1 : length(obj.M_Restrictions)-1
+                    for i = 1 : length(obj.M_Restrictions)
                         z = z + zi{i};
                     end
                     

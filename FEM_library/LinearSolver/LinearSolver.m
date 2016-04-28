@@ -26,12 +26,7 @@ classdef LinearSolver < handle
         
         %% Option Parser
         function obj = OptionParser( obj )
-            
-            obj.M_options   = Options;
-            obj.M_type      = Options.type;
-            obj.M_verbose   = false;
-            obj.M_solveTime = 0;
-            
+           % to be coded 
         end
         
         %% SetPreconditioner
