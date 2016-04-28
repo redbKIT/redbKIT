@@ -16,8 +16,9 @@ classdef PreconditionerFactory < handle
             factory = factory@handle();
             
             % Pre-register some well-known precon
-            factory.RegisterPrecon('AdditiveSchwarz', @(x) AS_Preconditioner(x));
             factory.RegisterPrecon('None', @(x) Preconditioner(x));
+            factory.RegisterPrecon('ILU', @(x) ILU_Preconditioner(x));
+            factory.RegisterPrecon('AdditiveSchwarz', @(x) AS_Preconditioner(x));
             
         end
         
