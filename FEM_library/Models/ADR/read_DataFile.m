@@ -74,4 +74,6 @@ for i = 1 : length(data_fields_name)
     
 end
 
+[ DATA ] = dataParser( DATA );
+
 end

@@ -15,12 +15,12 @@ dim      = MESH.dim;
 I        = MESH.internal_dof_c;
 I_all    = MESH.internal_dof;
 nln      = MESH.numElemDof;
-vertices_fem = MESH.nodes;
+nodes    = MESH.nodes;
 elements_fem = MESH.elements(1:nln,:);% P1 elements
 
 [subdom] = geometric_domain_decomposition(vertices, elements, dim, n_subdom, overlap, 1, 'Figures', elements_fem);
 
-%% restrict subdomains to internal vertices for each component of velocity and pressure
+%% restrict subdomains to internal vertices for each displacement component
 n_component = dim;
 for k = 1 : n_component
       for i = 1 : n_subdom
@@ -32,7 +32,7 @@ for k = 1 : n_component
 end
 
 %% build subdomains restriction/prolongation operators
-nov     = size(vertices_fem,2);
+nov     = size(nodes,2);
 nov_tot = dim*nov;
 
 parfor i = 1 : n_subdom

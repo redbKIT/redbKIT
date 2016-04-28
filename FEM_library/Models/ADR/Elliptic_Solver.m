@@ -62,6 +62,14 @@ fprintf(' * Number of Elements  = %d \n',MESH.numElem);
 fprintf(' * Number of Nodes     = %d \n',MESH.numNodes);
 fprintf('-------------------------------------------\n');
 
+%% Generate Domain Decomposition (if required)
+PreconFactory = PreconditionerFactory( );
+Precon        = PreconFactory.CreatePrecon(DATA.Preconditioner.type, DATA);
+
+if isfield(DATA.Preconditioner, 'type') && strcmp( DATA.Preconditioner.type, 'AdditiveSchwarz')
+    R      = ADR_overlapping_DD(MESH, DATA.Preconditioner.num_subdomains,  DATA.Preconditioner.overlap_level);
+    Precon.SetRestrictions( R );
+end
 
 %% Assemble matrix and right-hand side
 fprintf('\n Assembling ... ');
@@ -76,12 +84,17 @@ fprintf('\n Apply boundary conditions ');
 [A_in, F_in, u_D]   =  ADR_ApplyBC(A, F, FE_SPACE, MESH, DATA);
 
 %% Solve
-fprintf('\n Solve Au = f ... ');
-t_solve = tic;
+LinSolver = LinearSolver( DATA.LinearSolver );
 u                         = zeros(MESH.numNodes,1);
-u(MESH.internal_dof)      = A_in \ F_in;
-u(MESH.Dirichlet_dof)     = u_D;t_solve = toc(t_solve);
-fprintf('done in %3.3f s \n', t_solve);
+
+fprintf('\n Solve Au = f ... ');
+Precon.Build( A_in );
+fprintf('\n       **  time to build the preconditioner %3.3f s \n', Precon.GetBuildTime());
+LinSolver.SetPreconditioner( Precon );
+u(MESH.internal_dof)      = LinSolver.Solve( A_in, F_in );
+fprintf('\n       ** time to solve the linear system in %3.3f s \n\n', LinSolver.GetSolveTime());
+
+u(MESH.Dirichlet_dof)     = u_D;
 
 
 %% Compute L2 and H1 errors
@@ -90,10 +103,10 @@ errorH1 = [];
 
 if nargout == 5
     [errorL2] = FEM_error(u, MESH, DATA, FE_SPACE);
-    fprintf(' L2-error : %e\n', errorL2);
+    fprintf(' L2-error : %1.3e\n', errorL2);
 elseif nargout == 6
     [errorL2,errorH1] = FEM_error(u, MESH, DATA, FE_SPACE);
-    fprintf(' L2-error : %e H1-error : %e\n',errorL2, errorH1);
+    fprintf(' L2-error : %1.3e H1-error : %1.3e\n',errorL2, errorH1);
 end
 
 %% Store matrix and rhs into FE_SPACE struct

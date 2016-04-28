@@ -87,7 +87,7 @@ classdef LinearSolver < handle
                     
                     time_solve = tic;
                     
-                    [x,flagITER,~,~,resvec] = my_gmres(A, b, [], obj.M_options.tol, obj.M_options.maxit,...
+                    [x,flagITER,~,~,resvec] = my_gmres(A, b, 100, obj.M_options.tol, obj.M_options.maxit,...
                         @(r)obj.M_precon.Apply(r), [], x0, [1 obj.M_options.gmres_verbosity]);
                     
                     obj.M_solveTime = toc(time_solve);
