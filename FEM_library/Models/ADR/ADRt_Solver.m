@@ -96,6 +96,7 @@ t_assembly = tic;
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s', t_assembly);
 
+%% Time Loop
 while (t < tf)
     
     iter_time = tic;

@@ -33,7 +33,12 @@ if hasOpenMP
 else
     mex ADR_assembler_C_omp.c
 end
-    
+
+if hasOpenMP
+    mex Mass_assembler_C_omp.c CFLAGS="\$CFLAGS -fopenmp" LDFLAGS="\$LDFLAGS -fopenmp"
+else
+    mex Mass_assembler_C_omp.c
+end
 
 cd ../
 
