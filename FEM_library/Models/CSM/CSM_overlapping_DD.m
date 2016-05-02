@@ -1,9 +1,15 @@
 function [ R ] = CSM_overlapping_DD( MESH, n_subdom, overlap )
-%CSM_OVERLAPPING_DD builds subdomains with overlap 
+%CSM_OVERLAPPING_DD builds restriction operators associated to mesh decompositions
+%for CSM problems
 %
-%   INPUT: dim: 2 for 2D, 3 for 3D
-%        n_subdom: number of subdomains
-%        overlap: number of overlap layers, 1 is suggested
+%   [ R ] = CSM_OVERLAPPING_DD( MESH, N_SUBDOM, OVERLAP )
+%   given a MESH data structure (see also buildMESH.m), the number of
+%   subdomains N_SUBDOM and the overlap level OVERLAP (>= 1), returns a cell
+%   array R of length N_SUBDOM. Each element of R (say R{i}) contains a
+%   vector with the indices of the DOFs pertaining to the i-th subdomain.
+%
+%   see also geometric_domain_decomposition, metis_to_matlab,
+%   AS_Preconditioner
 
 %   This file is part of redbKIT.
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)

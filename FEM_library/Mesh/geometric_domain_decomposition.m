@@ -1,9 +1,14 @@
 function [subdom, subdom_noOverlap] = geometric_domain_decomposition(vertices, elements, dim, n_subdom, overlap, visual, folder, elements_fem)
-%GEOMETRIC_DOMAIN_DECOMPOSITION builds subdomains with and without overlap 
-
-%   Author: F. Negri (federico.negri@epfl.ch) 2013-2014
-%   Copyright (C) Federico Negri, CMCS, EPFL
+%GEOMETRIC_DOMAIN_DECOMPOSITION builds mesh subdomains with and without overlap 
+%using Metis Library
 %
+%   [subdom, subdom_noOverlap] = GEOMETRIC_DOMAIN_DECOMPOSITION(vertices, elements, dim, n_subdom, overlap, visual, folder, elements_fem)
+%
+%   see also metis_to_matlab.m
+
+%   This file is part of redbKIT.
+%   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
+%   Author: Federico Negri <federico.negri at epfl.ch> 
 
 if nargin < 6
       visual = 1;

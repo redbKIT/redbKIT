@@ -1,10 +1,8 @@
 function [normalf] = ComputeSurfaceNormals3D(boundaries, vertices, elements)
-%NORM_TANG_3DP1 computes normal vectors on the boundary vertices of a P1 mesh
+%ComputeSurfaceNormals3D computes normal vectors on the boundary vertices 
+%of a P1 TET mesh
 %
-%   [NX,NY] = NORM_TANG_3DP1(BOUNDARIES,VERTICES,ELEMENTS) 
-%   on the vertices of the boundaries of a P1 mesh compute the outward unit normal vectors 
-%   NX, NY are arrrays of lenght NOV, where NOV Is the total number of mesh vertices.
-%
+%   [normalf] = ComputeSurfaceNormals3D(boundaries, vertices, elements)
 
 %   This file is part of redbKIT.
 %   Author: Federico Negri <federico.negri at epfl.ch>

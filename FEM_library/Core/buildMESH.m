@@ -1,5 +1,5 @@
 function [ MESH ] = buildMESH( dim, elements, vertices, boundaries, fem, quad_order, DATA, model )
-%BUILDMESH generates FE_SPACE struct
+%BUILDMESH generates MESH struct
 
 %   This file is part of redbKIT.
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)

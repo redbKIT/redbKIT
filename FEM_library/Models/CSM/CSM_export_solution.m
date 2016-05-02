@@ -1,16 +1,16 @@
 function CSM_export_solution(dim, u, vertices, elements, nov, outputFileName, iter, variableName)
-%STR_EXPORT_SOLUTION export a (P1) vectorial finite element solution to vtk (binary) file
+%CSM_EXPORT_SOLUTION export a (P1) vectorial finite element solution to vtk (binary) file
 %
-%   STR_EXPORT_SOLUTION(DIM, U, VERTICES, ELEMENTS, NOV, OUTPUTFILENAME)
+%   CSM_EXPORT_SOLUTION(DIM, U, VERTICES, ELEMENTS, NOV, OUTPUTFILENAME)
 %   export the solution U to the vtk file OUTPUTFILENAME.vtk; DIM can be either
 %   2 or 3, VERTICES is a DIM x numVertices matrix with the vertices
 %   coordinates, ELEMENTS is the connectivity matrix. The default name of
 %   the variable in the vtk file is 'StructureDisplacement'
 %
-%   STR_EXPORT_SOLUTION(DIM, U, VERTICES, ELEMENTS, NOV, OUTPUTFILENAME, ITER)
+%   CSM_EXPORT_SOLUTION(DIM, U, VERTICES, ELEMENTS, NOV, OUTPUTFILENAME, ITER)
 %   export the solution U to the vtk file OUTPUTFILENAME%04ITER
 %
-%   STR_EXPORT_SOLUTION(DIM, U, VERTICES, ELEMENTS, NOV, OUTPUTFILENAME, ITER, VARIABLENAME)
+%   CSM_EXPORT_SOLUTION(DIM, U, VERTICES, ELEMENTS, NOV, OUTPUTFILENAME, ITER, VARIABLENAME)
 %   the name of the variable in the vtk file is VARIABLENAME
 
 %   This file is part of redbKIT.

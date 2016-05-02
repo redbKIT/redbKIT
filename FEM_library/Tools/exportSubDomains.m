@@ -1,9 +1,9 @@
-function exportSubDomains(dim, Subdivision, Overlap, Interior, vertices,elements,outputFileName)
-% Export to vtk cell data
-%
-% Author: Federico Negri, 2013-2014
-% -----------------------------------
+function exportSubDomains(dim, Subdivision, Overlap, Interior, vertices, elements, outputFileName)
+%EXPORTSUBDOMAINS export to vtk a mesh decomposition
 
+%   This file is part of redbKIT.
+%   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
+%   Author: Federico Negri <federico.negri at epfl.ch> 
 
 titleData    = 'Domain Decomposition';
 iter         = -1;

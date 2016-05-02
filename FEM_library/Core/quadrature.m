@@ -1,5 +1,9 @@
 function [quad_points, w] = quadrature(dim, degree)
-
+%QUADRATURE compute gradature nodes and weights
+%
+%   [QUAD_POINTS, W] = QUADRATURE(DIM, DEGREE) given a dimension DIM=1,2,3,
+%   and the quadrature degree DEGREE, returns the corresponding quadrature
+%   points QUAD_POINTS and weights W.
 
 switch dim
     case 2

@@ -1,5 +1,5 @@
 function install_metismex()
-%INSTALL_METISMEX install METIS and METISMEX interface for graph partitioning.
+%INSTALL_METISMEX installs METIS and METISMEX interface for graph partitioning.
 %
 %   Requires: CMAKE and GIT
 %

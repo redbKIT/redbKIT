@@ -1,5 +1,5 @@
 function [A_in, F_in, u_Dirichlet] =  ADR_ApplyBC(A, F, FE_SPACE, MESH, DATA, t)
-%ADR_APPLYBC_2D apply boundary conditions for Advc-Diff-React problem in 2D/3D
+%ADR_APPLYBC apply boundary conditions for Advc-Diff-React problem in 2D/3D
 %
 %   [A_IN, F_IN, U_DIRICHLET] = ADR_APPLYBC(A, F, MESH, DATA) given an
 %   assembled matrix A, righ-hand side vector F, a MESH data structure and
@@ -13,7 +13,7 @@ function [A_in, F_in, u_Dirichlet] =  ADR_ApplyBC(A, F, FE_SPACE, MESH, DATA, t)
 %   Dirichlet data, respectively, it is preferable to process first Neumann
 %   data and then set Data.bcNeu to zero before processing Dirichlet data.
 %
-%   [A_IN, F_IN, U_DIRICHLET] = APPLYBC(A, F, MESH, DATA, T) as
+%   [A_IN, F_IN, U_DIRICHLET] = ADR_ApplyBC(A, F, MESH, DATA, T) as
 %   before, but with the additional input T (time) for time-dependent
 %   problems.
 

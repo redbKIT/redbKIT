@@ -1,4 +1,22 @@
 function [A_in, F_in, u_D] =  CSM_ApplyBC(A, F, FE_SPACE, MESH, DATA, t, zero_Dirichlet)
+%CSM_APPLYBC apply boundary conditions for CSM problem in 2D/3D
+%
+%   [A_IN, F_IN, U_DIRICHLET] = CSM_APPLYBC(A, F, FE_SPACE, MESH, DATA) given an
+%   assembled matrix A, righ-hand side vector F, a FE_SPACE, a MESH data structure and
+%   a DATA structure, applies Neumann, Normal Pressure and Dirichlet boundary
+%   conditions. It returns the matrix A_IN (matrix A + BCs then restricted
+%   to internal dofs), the vector F_IN (vector F + BCs then restricted
+%   to internal dofs) and the vector U_DIRICHLET containing the
+%   Dirichlet datum evaluated in the Dirichlet dofs.
+%
+%   [A_IN, F_IN, U_DIRICHLET] = CSM_APPLYBC(A, F, FE_SPACE, MESH, DATA, T) as
+%   before, but with the additional input T (time) for time-dependent
+%   problems.
+%
+%   [A_IN, F_IN, U_DIRICHLET] = CSM_APPLYBC(A, F, FE_SPACE, MESH, DATA, T, ZERO_DIRICHLET)
+%   If ZERO_DIRICHLET = 1, applies homogeneous Dirichlet boundary
+%   conditions (useful for Newton iterations). ZERO_DIRICHLET = 0 by
+%   default.
 
 %   This file is part of redbKIT.
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
@@ -224,8 +242,7 @@ end
 
 u_D  = u_D * (1 - zero_Dirichlet);
 
-F_in = F(MESH.internal_dof)...
-    -A(MESH.internal_dof,MESH.Dirichlet_dof)*u_D;
+F_in = F(MESH.internal_dof) - A(MESH.internal_dof,MESH.Dirichlet_dof)*u_D;
 
 A_in = A(MESH.internal_dof,MESH.internal_dof);
 

@@ -1,8 +1,43 @@
+%LinearSolver solves linear systems Ax=b using direct and iterative solvers
+% LinearSolver methods:
+%    LinearSolver       - constructor
+%    SetPreconditioner  - set preconditioner object
+%    Solve              - solve linear system Ax = b
+%
+% LinearSolver properties:
+%    M_options          - struct containing linear solver options
+%    M_type             - linear solver type (automatically set by constructor)
+%                         see M_options.type
+%    M_precon           - Preconditioner object (only used in combination 
+%                         with iterative methods)
+
+%   This file is part of redbKIT.
+%   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
+%   Author: Federico Negri <federico.negri at epfl.ch>
+
+%{
+properties
+    %M_precon - see also Preconditioner.m
+    M_precon;
+
+    %M_options - 
+    %    type (mandatory): 'backslash', 'MUMPS', 'gmres'
+    %    mumps_reordering (only for type = 'MUMPS'): 
+    %               0 - Approximate Minimum Degree is used
+    %               3 - SCOTCH (if available)
+    %               4 - PORD (if available)
+    %               5 - METIS (if available)
+    %               7 - Automatic choice by MUMPS
+    %    tol (only for type = 'gmres'): iterative solver tolerance
+    %    maxit (only for type = 'gmres'): max number of iterations
+    %    gmres_verbosity (only for type = 'gmres'): print convergence
+    %               history each gmres_verbosity iterations
+    M_options;
+
+end
+%}
+
 classdef LinearSolver < handle
-    
-    %   This file is part of redbKIT.
-    %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
-    %   Author: Federico Negri <federico.negri at epfl.ch>
     
     properties (GetAccess = public, SetAccess = protected)
         M_type;
@@ -26,11 +61,14 @@ classdef LinearSolver < handle
         
         %% Option Parser
         function obj = OptionParser( obj )
-           % to be coded 
+            % to be coded
         end
         
         %% SetPreconditioner
         function obj = SetPreconditioner( obj, Precon )
+            %SetPreconditioner method
+            %   LinearSolver.SetPreconditioner( Precon )
+            
             obj.M_precon = Precon;
         end
         
@@ -41,6 +79,8 @@ classdef LinearSolver < handle
         
         %% Solve
         function x = Solve( obj, A, b, x0 )
+            %Solve method
+            %   x = LinearSolver.Solve( A, b, x0 )
             
             if nargin < 4 || isempty(x0)
                 x0 = zeros(length(b),1);
