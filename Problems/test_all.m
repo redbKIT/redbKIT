@@ -73,6 +73,27 @@ end
 cd(TestFolder)
 
 % Test
+cd FEM_Test_ADRt_2D/
+try
+    testname = 'FEM_Test_ADRt_2D_P1';
+    Solve('P1');    
+    
+    print_test_passed(fid,testname);
+    
+catch err
+    print_error_toFile(fid,err,testname);
+end
+try
+    testname = 'FEM_Test_ADRt_2D_P2';
+    Solve('P2');    
+    print_test_passed(fid,testname);
+    
+catch err
+    print_error_toFile(fid,err,testname);
+end
+cd(TestFolder)
+
+% Test
 cd FEM_CSM_Test2D/
 try
     testname = 'FEM_CSM_Test2D_P1';
