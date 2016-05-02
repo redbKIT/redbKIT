@@ -1,3 +1,10 @@
+%BDF_TimeAdvance class to Handle the time advancing scheme based on BDF
+%schemes
+
+%   This file is part of redbKIT.
+%   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
+%   Author: Federico Negri <federico.negri at epfl.ch> 
+
 classdef BDF_TimeAdvance < handle
     
     properties (GetAccess = public, SetAccess = protected)
