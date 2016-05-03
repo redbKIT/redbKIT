@@ -92,8 +92,10 @@ M    =  M * DATA.Density;
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s', t_assembly);
 
+LinSolver = LinearSolver( DATA.LinearSolver );
+
 %% Time Loop
-while (t < tf)
+while ( t < tf )
     
     iter_time = tic;
     
@@ -142,9 +144,7 @@ while (t < tf)
     fprintf('done in %3.3f s\n', t_assembly);
     
     res0Norm = norm(b);
-    
-    LinSolver = LinearSolver( DATA.LinearSolver );
-    
+        
     fprintf('\n============ Start Newton Iterations ============\n\n');
     while (k <= maxIter && incrNorm > tol && resRelNorm > tol)
         
