@@ -1,4 +1,4 @@
-function DATA = CSM_read_DataFile(data_file, dim)
+function DATA = CSM_read_DataFile(data_file, dim, param)
 %CSM_READ_DATAFILE data_file parser
 %
 %   DATA = CSM_READ_DATAFILE(DATA_FILE) read the file specified by the string
@@ -48,5 +48,7 @@ for i = 1 : length(data_fields_name)
     eval(['DATA.',data_fields_name{i}, '=', 'data.',data_fields_name{i},';']);
     
 end
+
+[ DATA ] = dataParser( DATA );
 
 end

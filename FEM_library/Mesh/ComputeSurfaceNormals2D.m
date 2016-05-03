@@ -1,15 +1,11 @@
 function [normalf] = ComputeSurfaceNormals2D(boundaries,vertices,elements)
-%NORM_TANG_2DP1 computes normal and tangential vectors on the boundary vertices of a P1 mesh
-%
-%   [NX,NY, TX,TY] = NORM_TANG_2DP1(BOUNDARIES,VERTICES,ELEMENTS) 
-%   on the vertices of the boundaries of a P1 mesh compute the outward unit normal vectors 
-%   and the corresponding tangential vectors. 
-%   NX, NY, TX, TY are arrrays of lenght NOV, where NOV Is the total number of mesh vertices.
-%
+%ComputeSurfaceNormals2D computes normal vectors on the boundary vertices 
+%of a P1 triangular mesh
+
+%   This file is part of redbKIT.
 %   Author: F.Saleri, 12.04.04
 %           F.Negri,  28.02.13
 
-[~,nov]      = size(vertices);
 [~,nside]    = size(boundaries);
 
 normalf      = zeros(2,nside);

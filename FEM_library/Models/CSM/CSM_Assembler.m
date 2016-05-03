@@ -23,6 +23,9 @@ switch DATA.Material_Model
         
     case 'Neohookean'
         material_param = [DATA.Shear DATA.Poisson];
+        
+    case 'SEMMT'
+        material_param = [DATA.Young DATA.Poisson DATA.Stiffening_power];     
 end
 
 if nargin < 6

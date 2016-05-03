@@ -118,6 +118,22 @@ catch err
 end
 cd(TestFolder)
 
+
+% Test
+cd FEM_TestMetis/
+try
+    testname = 'FEM_TestMetis';
+    test(2);
+    test(6);
+    test(12);
+    close all;
+    print_test_passed(fid,testname);
+    
+catch err
+    print_error_toFile(fid,err,testname);
+end
+cd(TestFolder)
+
 % Test
 cd Test_EIM_DEIM/
 try

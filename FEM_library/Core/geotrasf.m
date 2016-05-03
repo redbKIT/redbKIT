@@ -1,5 +1,5 @@
 function [detjac, invjac, h] = geotrasf(dim, vertices, elements)
-%GEOTRASF2D linear two dimensional transformation
+%GEOTRASF linear 2\3 dimensional geometrical transformation
 %
 %   F. Saleri 24-08-01, F. Negri 18.11.2014
 

@@ -1,14 +1,11 @@
-function [normalf] = ComputeBoundaryNormals3D(boundaries, vertices, elements)
-%NORM_TANG_3DP1 computes normal vectors on the boundary vertices of a P1 mesh
+function [normalf] = ComputeSurfaceNormals3D(boundaries, vertices, elements)
+%ComputeSurfaceNormals3D computes normal vectors on the boundary vertices 
+%of a P1 TET mesh
 %
-%   [NX,NY] = NORM_TANG_3DP1(BOUNDARIES,VERTICES,ELEMENTS) 
-%   on the vertices of the boundaries of a P1 mesh compute the outward unit normal vectors 
-%   NX, NY are arrrays of lenght NOV, where NOV Is the total number of mesh vertices.
-%
+%   [normalf] = ComputeSurfaceNormals3D(boundaries, vertices, elements)
 
-%   Author: F. Negri (federico.negri@epfl.ch) 2013-2014
-%   Copyright (C) Federico Negri, CMCS, EPFL
-%
+%   This file is part of redbKIT.
+%   Author: Federico Negri <federico.negri at epfl.ch>
 
 normalf  = faceNormal(vertices', boundaries', elements');
 normalf  = normalf';
@@ -63,7 +60,7 @@ nodes = nodes';
 elements_row = [elements(1,:) elements(2,:) elements(3,:) elements(4,:)];
 
 id_e = zeros(size(faces,2),1);
-for i = 1 : size(faces, 2)
+parfor i = 1 : size(faces, 2)
     id_e(i)        = FaceToElement(faces(:,i), elements, elements_row);
     centroid_el    = mean(nodes(:,elements(:,id_e(i))),2) ;
     centroid_face  = mean(nodes(:,faces(:,i)),2) ;

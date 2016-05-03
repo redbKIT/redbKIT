@@ -13,13 +13,17 @@ if isempty(data_file)
     error('Missing data_file')
 end
 
+if nargin < 7
+    param = [];
+end
+
 if nargin < 8
     vtk_filename = [];
 end
 
 
 %% Read problem parameters and BCs from data_file
-DATA   = CSM_read_DataFile(data_file);
+DATA   = CSM_read_DataFile(data_file, dim, param);
 if nargin < 7
     DATA.param = [];
 else
@@ -47,13 +51,21 @@ fprintf(' * Number of Nodes     = %d \n',MESH.numNodes);
 fprintf(' * Number of Dofs      = %d \n',length(MESH.internal_dof));
 fprintf('-------------------------------------------\n');
 
+%% Generate Domain Decomposition (if required)
+PreconFactory = PreconditionerFactory( );
+Precon        = PreconFactory.CreatePrecon(DATA.Preconditioner.type, DATA);
+
+if isfield(DATA.Preconditioner, 'type') && strcmp( DATA.Preconditioner.type, 'AdditiveSchwarz')
+    R      = CSM_overlapping_DD(MESH, DATA.Preconditioner.num_subdomains,  DATA.Preconditioner.overlap_level);
+    Precon.SetRestrictions( R );
+end
+
 %% Newton Method
 
-tol        = 1e-6;
+tol        = DATA.NonLinearSolver.tol;
 resRelNorm = tol + 1;
-res0Norm   = tol + 1;
 incrNorm   = tol + 1;
-maxIter    = 15;
+maxIter    = DATA.NonLinearSolver.maxit;
 k          = 1;
 
 [~, ~, u_D]   =  CSM_ApplyBC([], [], FE_SPACE, MESH, DATA);
@@ -84,16 +96,20 @@ fprintf('done in %3.3f s\n', t_assembly);
 
 res0Norm = norm(b);
 
+LinSolver = LinearSolver( DATA.LinearSolver );
+
 fprintf('\n============ Start Newton Iterations ============\n\n');
 while (k <= maxIter && incrNorm > tol && resRelNorm > tol)
             
     % Solve
-    fprintf('\n   -- Solve Au = f ... ');
-    t_solve = tic;
-    dU(MESH.internal_dof)      = A \ b;
-    t_solve = toc(t_solve);
-    fprintf('done in %3.3f s \n', t_solve);
+    fprintf('\n   -- Solve J x = -R ... ');    
+    Precon.Build( A );
+    fprintf('\n        time to build the preconditioner %3.3f s \n', Precon.GetBuildTime());
+    LinSolver.SetPreconditioner( Precon );
+    dU(MESH.internal_dof) = LinSolver.Solve( A, b );
+    fprintf('\n        time to solve the linear system in %3.3f s \n', LinSolver.GetSolveTime());
     
+    % update solution
     U_k        = U_k + dU;
     incrNorm   = norm(dU)/norm(U_k);
     
@@ -124,7 +140,7 @@ u = U_k;
 
 %% Export to VTK
 if ~isempty(vtk_filename)
-    STR_export_solution(MESH.dim, u, MESH.vertices, MESH.elements, MESH.numVertices, vtk_filename);
+    CSM_export_solution(MESH.dim, u, MESH.vertices, MESH.elements, MESH.numVertices, vtk_filename);
 end
  
 return

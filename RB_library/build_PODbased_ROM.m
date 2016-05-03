@@ -31,6 +31,10 @@ if nargin < 5
 end
 
 %% initialize ROM struct
+if isfield(FOM, 'model')
+    ROM.model   = FOM.model;
+end
+
 ROM.MESH   = FOM.MESH;
 if isfield(FOM, 'DATA')
     ROM.DATA   = FOM.DATA;

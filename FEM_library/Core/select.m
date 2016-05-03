@@ -1,8 +1,9 @@
 function [nln,nbn] = select(fem, dim)
-%SELECT2D number of local dof of a finite element 2D-space
+%SELECT returns the number of local DOFS of a finite element type
 %
-% NLN is the number of local dofs on the reference triangle
-% NBN is the number of local boundary dofs
+%   [NLN,NBN] = SELECT(FEM, DIM) given a type of finite elements FEM (string)
+%   and the spatial dimension DIM, returns the number of local dofs on the 
+%   reference element NLN and  the number of local boundary dofs NBN
 
 if nargin < 2 || isempty(dim)
     dim = 2;

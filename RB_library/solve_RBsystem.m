@@ -65,7 +65,16 @@ uN   = AN \ FN;
 if nargout > 1
     uNh                            = zeros(ROM.MESH.numNodes,1);
     uNh(ROM.MESH.internal_dof)     = ROM.V(:,INDX)*uN;
-    uNh(ROM.MESH.Dirichlet_dof)    = ROM.u_D(ROM.MESH.nodes(:,ROM.MESH.Dirichlet_dof), mu);
+    
+    switch ROM.model
+        case 'ADR'
+            uNh(ROM.MESH.Dirichlet_dof)    = ROM.u_D(ROM.MESH.nodes(:,ROM.MESH.Dirichlet_dof), mu);
+            
+        case 'CSM'
+            for k = 1 : ROM.MESH.dim
+                uNh(ROM.MESH.Dirichlet_dof_c{k}+(k-1)*ROM.MESH.numNodes)    = ROM.u_D{k}(ROM.MESH.nodes(:,ROM.MESH.Dirichlet_dof_c{k}), mu);
+            end
+    end
 end
 
 %% Compute stability factor of the RB problem

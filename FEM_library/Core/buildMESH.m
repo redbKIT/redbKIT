@@ -1,5 +1,5 @@
 function [ MESH ] = buildMESH( dim, elements, vertices, boundaries, fem, quad_order, DATA, model )
-%BUILDMESH generates FE_SPACE struct
+%BUILDMESH generates MESH struct
 
 %   This file is part of redbKIT.
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
@@ -7,6 +7,7 @@ function [ MESH ] = buildMESH( dim, elements, vertices, boundaries, fem, quad_or
 
 %% Fill MESH data structure
 MESH.dim         = dim;
+MESH.fem         = fem;
 MESH.vertices    = vertices;
 MESH.boundaries  = boundaries;
 MESH.elements    = elements;
@@ -26,10 +27,9 @@ end
 
 
 %% Update Mesh data with BC information and geometrical maps
-[~,numBoundaryDof]           = select(fem, dim);
+[MESH.numElemDof,MESH.numBoundaryDof]    = select(fem, dim);
 MESH.numNodes                = size(MESH.nodes,2);
 MESH.numElem                 = size(MESH.elements,2);
-MESH.numBoundaryDof          = numBoundaryDof;
 
 % Compute geometrical map (ref to physical elements) information
 [MESH.jac, MESH.invjac, MESH.h] = geotrasf(dim, MESH.vertices, MESH.elements);   
