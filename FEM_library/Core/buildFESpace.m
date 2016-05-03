@@ -11,9 +11,16 @@ function [ FE_SPACE ] = buildFESpace( MESH, fem, numComponents, quad_order )
 FE_SPACE.dim              = MESH.dim;
 FE_SPACE.fem              = fem;
 FE_SPACE.numComponents    = numComponents;
-FE_SPACE.numDof           = length(MESH.internal_dof);
 FE_SPACE.numElemDof       = numElemDof;
 FE_SPACE.numBoundaryDof   = numBoundaryDof;
+
+if strcmp( fem , 'P1')
+    FE_SPACE.numDof           = numComponents * MESH.numVertices;
+    FE_SPACE.numDofScalar     = MESH.numVertices;
+else
+    FE_SPACE.numDof           = numComponents * MESH.numNodes;
+    FE_SPACE.numDofScalar     = MESH.numNodes;
+end
 
 % Store quadrature nodes and weights on the reference element
 FE_SPACE.quad_order    = quad_order;

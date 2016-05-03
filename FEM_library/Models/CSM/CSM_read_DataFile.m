@@ -13,9 +13,11 @@ if nargin < 2 || isempty(dim)
 end
 
 %% Set Default values
-DATA.flag_dirichlet = [];
-DATA.flag_neumann   = [];
-DATA.flag_pressure     = [];
+for d = 1 : dim
+    DATA.flag_dirichlet{d} = [];
+    DATA.flag_neumann{d}   = [];
+    DATA.flag_pressure{d}     = [];
+end
         
 switch dim
     

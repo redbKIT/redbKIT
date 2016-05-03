@@ -1,4 +1,4 @@
-function [u, FE_SPACE, MESH, DATA] = NSsteadySolver(dim, elements, vertices, boundaries, fem, data_file, param, vtk_filename)
+function [u, MESH, DATA] = NSsteadySolver(dim, elements, vertices, boundaries, fem, data_file, param, vtk_filename)
 %CSM_SOLVER Static Structural Finite Element Solver
 
 %   This file is part of redbKIT.
@@ -19,7 +19,7 @@ end
 
 
 %% Read problem parameters and BCs from data_file
-DATA   = CFD_read_DataFile(data_file);
+DATA   = CFD_read_DataFile(data_file, dim);
 if nargin < 7
     DATA.param = [];
 else
@@ -39,7 +39,9 @@ end
 
 %% Create and fill the FE_SPACE data structure
 [ FE_SPACE_v ] = buildFESpace( MESH, fem{1}, dim, quad_order );
-[ FE_SPACE_p ] = buildFESpace( MESH, fem{2}, dim, quad_order );
+[ FE_SPACE_p ] = buildFESpace( MESH, fem{2}, 1, quad_order );
+
+totSize = FE_SPACE_v.numDof + FE_SPACE_p.numDof;
 
 fprintf('\n **** PROBLEM''S SIZE INFO ****\n');
 fprintf(' * Number of Vertices  = %d \n',MESH.numVertices);
@@ -48,71 +50,87 @@ fprintf(' * Number of Nodes     = %d \n',MESH.numNodes);
 fprintf(' * Number of Dofs      = %d \n',length(MESH.internal_dof));
 fprintf('-------------------------------------------\n');
 
+%% Generate Domain Decomposition (if required)
+PreconFactory = PreconditionerFactory( );
+Precon        = PreconFactory.CreatePrecon(DATA.Preconditioner.type, DATA);
+
+if isfield(DATA.Preconditioner, 'type') && strcmp( DATA.Preconditioner.type, 'AdditiveSchwarz')
+    R      = CSM_overlapping_DD(MESH, DATA.Preconditioner.num_subdomains,  DATA.Preconditioner.overlap_level);
+    Precon.SetRestrictions( R );
+end
+
+% [Mv] = CFD_Assembler('mass_velocity', MESH, DATA, FE_SPACE_v, FE_SPACE_p);
+% [Mp] = CFD_Assembler('mass_pressure', MESH, DATA, FE_SPACE_v, FE_SPACE_p);
+
+fprintf('\n   -- Assembling Stokes terms... ');
+t_assembly = tic;
+[A_Stokes] = CFD_Assembler('Stokes', MESH, DATA, FE_SPACE_v, FE_SPACE_p);
+t_assembly = toc(t_assembly);
+fprintf('done in %3.3f s\n', t_assembly);
 
 
 %% Nonlinear Iterations
 
-tol        = 1e-6;
+tol        = DATA.NonLinearSolver.tol;
 resRelNorm = tol + 1;
-res0Norm   = tol + 1;
 incrNorm   = tol + 1;
-maxIter    = 15;
+maxIter    = DATA.NonLinearSolver.maxit;
 k          = 1;
 
-[~, ~, u_D]   =  CSM_ApplyBC([], [], FE_SPACE, MESH, DATA);
-dU             = zeros(MESH.numNodes*MESH.dim,1);
-U_k            = zeros(MESH.numNodes*MESH.dim,1);
+[~, ~, u_D]   =  CFD_ApplyBC([], [], FE_SPACE_v, FE_SPACE_p, MESH, DATA);
+dU             = zeros(totSize,1);
+U_k            = zeros(totSize,1);
 U_k(MESH.Dirichlet_dof) = u_D;
 
 % Assemble matrix and right-hand side
-fprintf('\n -- Assembling external Forces... ');
+fprintf('\n   -- Assembling Convective terms... ');
 t_assembly = tic;
-F_ext      = CSM_Assembler('external_forces', MESH, DATA, FE_SPACE);
+[C1, C2] = CFD_Assembler('convective', MESH, DATA, FE_SPACE_v, FE_SPACE_p, U_k);
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s\n', t_assembly);
 
-fprintf('\n -- Assembling internal Forces... ');
-t_assembly = tic;
-[F_in, dF_in]  =  CSM_Assembler('internal_forces', MESH, DATA, FE_SPACE, U_k);
-t_assembly = toc(t_assembly);
-fprintf('done in %3.3f s\n', t_assembly);
+Residual = A_Stokes * U_k + C1 * U_k;
+Jacobian = A_Stokes + C1 + C2;
 
-Residual = F_in - F_ext;
 % Apply boundary conditions
 fprintf('\n -- Apply boundary conditions ... ');
 t_assembly = tic;
-[A, b]   =  CSM_ApplyBC(dF_in, -Residual, FE_SPACE, MESH, DATA, [], 1);
+[A, b]   =  CFD_ApplyBC(Jacobian, -Residual, FE_SPACE_v, FE_SPACE_p, MESH, DATA, [], 1);
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s\n', t_assembly);
 
 res0Norm = norm(b);
 
+LinSolver = LinearSolver( DATA.LinearSolver );
+
 fprintf('\n============ Start Newton Iterations ============\n\n');
 while (k <= maxIter && incrNorm > tol && resRelNorm > tol)
             
     % Solve
-    fprintf('\n   -- Solve Au = f ... ');
-    t_solve = tic;
-    dU(MESH.internal_dof)      = A \ b;
-    t_solve = toc(t_solve);
-    fprintf('done in %3.3f s \n', t_solve);
-    
+    fprintf('\n   -- Solve J x = -R ... ');    
+    Precon.Build( A );
+    fprintf('\n        time to build the preconditioner %3.3f s \n', Precon.GetBuildTime());
+    LinSolver.SetPreconditioner( Precon );
+    dU(MESH.internal_dof) = LinSolver.Solve( A, b );
+    fprintf('\n        time to solve the linear system in %3.3f s \n', LinSolver.GetSolveTime());
+
     U_k        = U_k + dU;
     incrNorm   = norm(dU)/norm(U_k);
     
     % Assemble matrix and right-hand side
-    fprintf('\n   -- Assembling internal forces... ');
+    fprintf('\n   -- Assembling Convective terms... ');
     t_assembly = tic;
-    [F_in, dF_in]  =  CSM_Assembler('internal_forces', MESH, DATA, FE_SPACE, full(U_k));
+    [C1, C2] = CFD_Assembler('convective', MESH, DATA, FE_SPACE_v, FE_SPACE_p, U_k);
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);
     
-    Residual   = F_in - F_ext;
+    Residual = A_Stokes * U_k + C1 * U_k;
+    Jacobian = A_Stokes + C1 + C2;
     
     % Apply boundary conditions
     fprintf('\n   -- Apply boundary conditions ... ');
     t_assembly = tic;
-    [A, b]   =  CSM_ApplyBC(dF_in, -Residual, FE_SPACE, MESH, DATA, [], 1);
+    [A, b]   =  CFD_ApplyBC(Jacobian, -Residual, FE_SPACE_v, FE_SPACE_p, MESH, DATA, [], 1);
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);
     
@@ -127,7 +145,7 @@ u = U_k;
 
 %% Export to VTK
 if ~isempty(vtk_filename)
-    STR_export_solution(MESH.dim, u, MESH.vertices, MESH.elements, MESH.numVertices, vtk_filename);
+    CFD_export_solution(MESH.dim, u(1:FE_SPACE_v.numDof), u(1+FE_SPACE_v.numDof:end), MESH.vertices, MESH.elements, MESH.numNodes, vtk_filename);
 end
  
 return

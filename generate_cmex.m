@@ -55,6 +55,21 @@ else
     mex CSM_assembler_ExtForces.c
 end
 
+cd ../
+
+%% CFD Model
+cd CFD/
+
+% Compile C assembler
+if hasOpenMP
+    mex CFD_assembler_C_omp.c CFLAGS="\$CFLAGS -fopenmp" LDFLAGS="\$LDFLAGS -fopenmp"
+    mex CFD_assembler_ExtForces.c CFLAGS="\$CFLAGS -fopenmp" LDFLAGS="\$LDFLAGS -fopenmp"
+    
+else
+    mex CFD_assembler_C_omp.c
+    mex CFD_assembler_ExtForces.c
+end
+
 cd(this_path)
 
 end

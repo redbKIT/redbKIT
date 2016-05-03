@@ -172,9 +172,9 @@ switch model
             end
             
             
-            %% Find Robin boundaries (if any)
+            %% Find Pressure boundaries (if any)
             if ~isempty(type_Pressure)
-                % Computes the Robin dof of the domain
+                % Computes the Pressure dof of the domain
                 nPrex       = length(type_Pressure);
                 Pressure_side = [];
                 for kk = 1 : nPrex
@@ -196,6 +196,7 @@ switch model
             
             type_Dirichlet = DATA.flag_dirichlet{d};
             type_Neumann   = DATA.flag_neumann{d};
+            type_Pressure  = DATA.flag_pressure{d};
             
             if isempty(type_Dirichlet) && isempty(type_Neumann) && isempty(type_Pressure)
                 error(['No boundary conditions are imposed on component ', num2str(d)]);
@@ -239,10 +240,22 @@ switch model
                 MESH.Neumann_side{d} = [];
             end
             
+            %% Find Pressure boundaries (if any)
+            if ~isempty(type_Pressure)
+                % Computes the Pressure dof of the domain
+                nPrex       = length(type_Pressure);
+                Pressure_side = [];
+                for kk = 1 : nPrex
+                    Pressure_side = [Pressure_side,find(MESH.boundaries(bc_flag_row,:) == type_Pressure(kk))];
+                end
+                MESH.Pressure_side{d} = unique(Pressure_side);
+            else
+                MESH.Pressure_side{d} = [];
+            end
+            
         end
         
-        MESH.internal_dof  = [MESH.internal_dof; d*MESH.numNodes+[1:MESH.numVertices]' ];
-        
+        MESH.internal_dof  = [MESH.internal_dof; MESH.dim*MESH.numNodes+[1:MESH.numVertices]' ];
         
     otherwise
         error('BC_info: unknown model')

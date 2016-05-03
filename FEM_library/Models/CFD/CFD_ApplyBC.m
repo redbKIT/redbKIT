@@ -1,22 +1,40 @@
-function [A_in, F_in, u_D] =  CFD_ApplyBC(A, F, FE_SPACE, MESH, DATA, t, zero_Dirichlet)
+function [A_in, F_in, u_D] =  CFD_ApplyBC(A, F, FE_SPACE, FE_SPACE_p, MESH, DATA, t, zero_Dirichlet)
+%CSM_APPLYBC apply boundary conditions for CSM problem in 2D/3D
+%
+%   [A_IN, F_IN, U_DIRICHLET] = CFD_ApplyBC(A, F, FE_SPACE, MESH, DATA) given an
+%   assembled matrix A, righ-hand side vector F, a FE_SPACE, a MESH data structure and
+%   a DATA structure, applies Neumann, Normal Pressure and Dirichlet boundary
+%   conditions. It returns the matrix A_IN (matrix A + BCs then restricted
+%   to internal dofs), the vector F_IN (vector F + BCs then restricted
+%   to internal dofs) and the vector U_DIRICHLET containing the
+%   Dirichlet datum evaluated in the Dirichlet dofs.
+%
+%   [A_IN, F_IN, U_DIRICHLET] = CFD_ApplyBC(A, F, FE_SPACE, MESH, DATA, T) as
+%   before, but with the additional input T (time) for time-dependent
+%   problems.
+%
+%   [A_IN, F_IN, U_DIRICHLET] = CFD_ApplyBC(A, F, FE_SPACE, MESH, DATA, T, ZERO_DIRICHLET)
+%   If ZERO_DIRICHLET = 1, applies homogeneous Dirichlet boundary
+%   conditions (useful for Newton iterations). ZERO_DIRICHLET = 0 by
+%   default.
 
 %   This file is part of redbKIT.
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch> 
 
-if nargin < 6
+if nargin < 7
     t = [];
 end
 
 if isempty(A)
-    A = sparse(MESH.numNodes*MESH.dim, MESH.numNodes*MESH.dim);
+    A = sparse(FE_SPACE.numDof + FE_SPACE_p.numDof, FE_SPACE.numDof + FE_SPACE_p.numDof);
 end
 
 if isempty(F)
-    F = sparse(MESH.numNodes*MESH.dim, 1);
+    F = sparse(FE_SPACE.numDof + FE_SPACE_p.numDof, 1);
 end
 
-if nargin < 7
+if nargin < 8
     zero_Dirichlet = 0;
 end
 
@@ -142,7 +160,7 @@ switch MESH.dim
                     Rrows(1+(l-1)*nbn:l*nbn)    = MESH.boundaries(1:nbn,face);
                     Rcoef(1+(l-1)*nbn:l*nbn)    = detjac*phi*u_Neumann_loc;
                 end
-                F = F + sparse(Rrows+(k-1)*MESH.numNodes,1,Rcoef,MESH.dim*MESH.numNodes,1);
+                F = F + sparse(Rrows+(k-1)*MESH.numNodes,1,Rcoef,FE_SPACE.numDof + FE_SPACE_p.numDof,1);
                 
             end
         end
@@ -224,8 +242,7 @@ end
 
 u_D  = u_D * (1 - zero_Dirichlet);
 
-F_in = F(MESH.internal_dof)...
-    -A(MESH.internal_dof,MESH.Dirichlet_dof)*u_D;
+F_in = F(MESH.internal_dof) - A(MESH.internal_dof,MESH.Dirichlet_dof)*u_D;
 
 A_in = A(MESH.internal_dof,MESH.internal_dof);
 

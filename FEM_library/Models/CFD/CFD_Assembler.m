@@ -1,4 +1,4 @@
-function [varargout] = CSM_Assembler(output, MESH, DATA, FE_SPACE, U_h, t, subdomain)
+function [varargout] = CFD_Assembler(output, MESH, DATA, FE_SPACE_v, FE_SPACE_p, U_h, t, subdomain)
 %CSM_ASSEMBLER assembler for 2D/3D CSM models
 %
 %   [F_ext]       = CSM_ASSEMBLER('external_forces', MESH, DATA, FE_SPACE, U_h, t, subdomain)
@@ -10,26 +10,15 @@ function [varargout] = CSM_Assembler(output, MESH, DATA, FE_SPACE, U_h, t, subdo
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri@epfl.ch>
 
-if nargin < 5 || isempty(U_h)
-    U_h = zeros(MESH.dim*MESH.numNodes,1);
-end
-
-switch DATA.Material_Model
-    case 'Linear'
-        material_param = [DATA.Young DATA.Poisson];
-        
-    case 'StVenantKirchhoff'
-        material_param = [DATA.Young DATA.Poisson];
-        
-    case 'Neohookean'
-        material_param = [DATA.Shear DATA.Poisson];
-end
-
-if nargin < 6
-    t = [];
+if nargin < 6 || isempty(U_h)
+    U_h = zeros(FE_SPACE_v.numDof + FE_SPACE_p.numDof,1);
 end
 
 if nargin < 7
+    t = [];
+end
+
+if nargin < 8
     subdomain = [];
 end
 
@@ -46,24 +35,44 @@ end
 
 switch output
     
-    case 'external_forces'
+    case 'volume_force'
         
-        varargout{1} = compute_external_forces(MESH, DATA, FE_SPACE, t, index_subd);
+        F_volume = compute_external_forces(MESH, DATA, FE_SPACE_v, t, index_subd);
         
-    case 'internal_forces'
+        varargout{1} = [F_volume; zeros(FE_SPACE_p.numDof,1)];
         
-        [F_in, dF_in] = compute_internal_forces(material_param, MESH, DATA, FE_SPACE, U_h, index_subd);
+    case 'Stokes'
         
-        varargout{1} = F_in;
-        varargout{2} = dF_in;
+        [A] = compute_Stokes_matrix(DATA.kinematic_viscosity, MESH, FE_SPACE_v, FE_SPACE_p, index_subd);
         
-    case 'all'
+        varargout{1} = A;    
         
-        F_ext         = compute_external_forces(MESH, DATA, FE_SPACE, t, index_subd);
-        [F_in, dF_in] = compute_internal_forces(material_param, MESH, DATA, FE_SPACE, U_h, index_subd);
+    case 'convective_Oseen'
+        
+        [C] = compute_convective_Oseen_matrix(DATA.density, MESH, FE_SPACE_v, FE_SPACE_p, U_h, index_subd);
                 
-        varargout{1} = F_in - F_ext;
-        varargout{2} = dF_in;
+        varargout{1} = 0*C;
+        
+    case 'convective'
+        
+        [C1, C2] = compute_convective_matrix(DATA.density, MESH, FE_SPACE_v, FE_SPACE_p, U_h, index_subd);
+        
+        varargout{1} = C1;
+        varargout{2} = C2;
+        
+        
+    case 'mass_velocity'
+        
+        [M_v] = compute_mass( MESH, FE_SPACE_v, index_subd);
+        
+        varargout{1} = M_v;
+        
+    case 'mass_pressure'
+        
+        [M_p] = compute_mass( MESH, FE_SPACE_p, index_subd);
+        
+        varargout{1} = M_p;
+
         
     otherwise
         error('output option not available')
@@ -124,22 +133,69 @@ for k = 1 : MESH.dim
         FE_SPACE.quad_weights, MESH.jac(index_subd), FE_SPACE.phi);
     
     % Build sparse matrix and vector
-    F_ext    = [F_ext; sparse(rowF, 1, coefF, MESH.numNodes, 1)];
+    F_ext    = [F_ext; sparse(rowF, 1, coefF, FE_SPACE.numDofScalar, 1)];
     
 end
 
 end
 %==========================================================================
-function [F_in, dF_in] = compute_internal_forces(material_param, MESH, DATA, FE_SPACE, U_h, index_subd)
+function [M] = compute_mass( MESH, FE_SPACE, index_subd)
 
 % C_OMP assembly, returns matrices in sparse vector format
-[rowdG, coldG, coefdG, rowG, coefG] = ...
-    CSM_assembler_C_omp(MESH.dim, DATA.Material_Model, material_param, U_h, MESH.elements, FE_SPACE.numElemDof, ...
-    FE_SPACE.quad_weights, MESH.invjac(index_subd,:,:), MESH.jac(index_subd), FE_SPACE.phi, FE_SPACE.dphi_ref);
+[rowM, colM, coefM] = Mass_assembler_C_omp(MESH.dim, MESH.elements, FE_SPACE.numElemDof, ...
+     FE_SPACE.quad_weights, MESH.jac(index_subd), FE_SPACE.phi);
 
-% Build sparse matrix and vector
-F_in    = sparse(rowG, 1, coefG, MESH.numNodes*MESH.dim, 1);
-dF_in   = sparse(rowdG, coldG, coefdG, MESH.numNodes*MESH.dim, MESH.numNodes*MESH.dim);
+% Build sparse matrix
+M_scalar   = sparse(rowM, colM, coefM, FE_SPACE.numDofScalar, FE_SPACE.numDofScalar);
+M          = [];
+for k = 1 : FE_SPACE.numComponents
+    M = blkdiag(M, M_scalar);
+end
+
+end
+%==========================================================================
+function [A] =  compute_Stokes_matrix(viscosity, MESH, FE_SPACE_v, FE_SPACE_p, index_subd)
+        
+% C_OMP assembly, returns matrices in sparse vector format
+[rowA, colA, coefA] = ...
+    CFD_assembler_C_omp('Stokes', viscosity, MESH.dim, MESH.elements, ...
+    FE_SPACE_v.numElemDof, FE_SPACE_p.numElemDof, FE_SPACE_v.numDof, ...
+    FE_SPACE_v.quad_weights, MESH.invjac(index_subd,:,:), MESH.jac(index_subd), ...
+    FE_SPACE_v.phi, FE_SPACE_v.dphi_ref, FE_SPACE_p.phi);
+
+% Build sparse matrix
+A   = sparse(rowA, colA, coefA, FE_SPACE_v.numDof + FE_SPACE_p.numDof, FE_SPACE_v.numDof + FE_SPACE_p.numDof);
+
+end
+%==========================================================================
+function [C] =  compute_convective_Oseen_matrix(density, MESH, FE_SPACE_v, FE_SPACE_p, U_h, index_subd)
+        
+% C_OMP assembly, returns matrices in sparse vector format
+[rowA, colA, coefA] = ...
+    CFD_assembler_C_omp('convective_Oseen', density, MESH.dim, MESH.elements, ...
+    FE_SPACE_v.numElemDof, FE_SPACE_v.numDof, ...
+    FE_SPACE_v.quad_weights, MESH.invjac(index_subd,:,:), MESH.jac(index_subd), ...
+    FE_SPACE_v.phi, FE_SPACE_v.dphi_ref, U_h);
+
+% Build sparse matrix
+
+C   = sparse(rowA, colA, coefA, FE_SPACE_v.numDof + FE_SPACE_p.numDof, FE_SPACE_v.numDof + FE_SPACE_p.numDof);
+C   = density * C;
+end
+%==========================================================================
+function [C1, C2] =  compute_convective_matrix(density, MESH, FE_SPACE_v, FE_SPACE_p, U_h, index_subd)
+        
+% C_OMP assembly, returns matrices in sparse vector format
+[rowA, colA, coefA, rowB, colB, coefB] = ...
+    CFD_assembler_C_omp('convective', density, MESH.dim, MESH.elements, ...
+    FE_SPACE_v.numElemDof, FE_SPACE_v.numDof, ...
+    FE_SPACE_v.quad_weights, MESH.invjac(index_subd,:,:), MESH.jac(index_subd), ...
+    FE_SPACE_v.phi, FE_SPACE_v.dphi_ref, U_h);
+
+% Build sparse matrix
+
+C1   = sparse(rowA, colA, coefA, FE_SPACE_v.numDof + FE_SPACE_p.numDof, FE_SPACE_v.numDof + FE_SPACE_p.numDof);
+C2   = sparse(rowB, colB, coefB, FE_SPACE_v.numDof + FE_SPACE_p.numDof, FE_SPACE_v.numDof + FE_SPACE_p.numDof);
 
 end
 %==========================================================================
