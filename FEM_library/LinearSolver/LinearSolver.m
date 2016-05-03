@@ -8,7 +8,7 @@
 %    M_options          - struct containing linear solver options
 %    M_type             - linear solver type (automatically set by constructor)
 %                         see M_options.type
-%    M_precon           - Preconditioner object (only used in combination 
+%    M_precon           - Preconditioner object (only used in combination
 %                         with iterative methods)
 
 %   This file is part of redbKIT.
@@ -20,9 +20,9 @@ properties
     %M_precon - see also Preconditioner.m
     M_precon;
 
-    %M_options - 
-    %    type (mandatory): 'backslash', 'MUMPS', 'gmres'
-    %    mumps_reordering (only for type = 'MUMPS'): 
+    %M_options -
+    %    type (mandatory): 'backslash', 'MUMPS', 'gmres', 'matlab_lu'
+    %    mumps_reordering (only for type = 'MUMPS'):
     %               0 - Approximate Minimum Degree is used
     %               3 - SCOTCH (if available)
     %               4 - PORD (if available)
@@ -44,7 +44,15 @@ classdef LinearSolver < handle
         M_options;
         M_precon;
         M_verbose;
+        M_haveFactorization;
         M_solveTime;
+    end
+    
+    properties (Access = private)
+        M_L;
+        M_U;
+        M_perm;
+        M_invperm;
     end
     
     methods
@@ -56,6 +64,7 @@ classdef LinearSolver < handle
             obj.M_type      = Options.type;
             obj.M_verbose   = false;
             obj.M_solveTime = 0;
+            obj.M_haveFactorization = false;
             
         end
         
@@ -121,6 +130,22 @@ classdef LinearSolver < handle
                     
                     id.JOB = -2;
                     id = dmumps(id);
+                    obj.M_solveTime = toc(time_solve);
+                    
+                case 'matlab_lu'
+                    time_solve = tic;
+                    
+                    if  ~obj.M_haveFactorization
+                        [obj.M_L , obj.M_U , obj.M_perm , q ]  = lu(A, 'vector');
+                        obj.M_invperm             = 0*q ;
+                        obj.M_invperm(q)          = 1:length(q);
+                        obj.M_haveFactorization = true;
+                    end
+                    
+                    x = obj.M_L \ b(obj.M_perm);
+                    x = obj.M_U \ x;
+                    x = x(obj.M_invperm);
+                    
                     obj.M_solveTime = toc(time_solve);
                     
                 case 'gmres'
