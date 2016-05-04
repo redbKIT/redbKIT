@@ -10,4 +10,4 @@ dim      =  2;
 %% P1-P1 approximation with Dohrman-Bochev stabilization
 fem        = {'P2', 'P1'};
 
-[U, MESH, DATA] = NSsteadySolver(dim, elements, vertices, boundaries, fem, 'datafile', [], 'SolP2');
+[U, MESH, DATA] = NS_Solver(dim, elements, vertices, boundaries, fem, 'datafile', [], 'SolP2');

@@ -10,4 +10,4 @@ dim      =  3;
 fem        = {'P2', 'P1'};
 [~,~,~]    = mkdir('Figures');
 
-[U, MESH, DATA] = NSsteadySolver(dim, elements, vertices, boundaries, fem, 'bbody3D_data', [], 'Figures/SolP2');
+[U, MESH, DATA] = NS_Solver(dim, elements, vertices, boundaries, fem, 'bbody3D_data', [], 'Figures/SolP2');
