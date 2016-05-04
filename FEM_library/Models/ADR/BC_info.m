@@ -261,3 +261,8 @@ switch model
         error('BC_info: unknown model')
         
 end
+
+MESH.bc_flag_row = bc_flag_row;
+
+end
+

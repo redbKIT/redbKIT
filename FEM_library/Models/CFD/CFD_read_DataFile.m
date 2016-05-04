@@ -50,5 +50,4 @@ end
 
 [ DATA ] = dataParser( DATA );
 
-
 end

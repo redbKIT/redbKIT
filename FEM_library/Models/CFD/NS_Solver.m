@@ -1,5 +1,5 @@
-function [u, MESH, DATA] = NSsteadySolver(dim, elements, vertices, boundaries, fem, data_file, param, vtk_filename)
-%CSM_SOLVER Static Structural Finite Element Solver
+function [u, MESH, DATA] = NS_Solver(dim, elements, vertices, boundaries, fem, data_file, param, vtk_filename)
+%NS_SOLVER steady Navier-Stokes Equations solver
 
 %   This file is part of redbKIT.
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
@@ -41,6 +41,8 @@ end
 [ FE_SPACE_v ] = buildFESpace( MESH, fem{1}, dim, quad_order );
 [ FE_SPACE_p ] = buildFESpace( MESH, fem{2}, 1, quad_order );
 
+MESH.internal_dof_c{MESH.dim+1} = 1:FE_SPACE_p.numDof;
+        
 totSize = FE_SPACE_v.numDof + FE_SPACE_p.numDof;
 
 fprintf('\n **** PROBLEM''S SIZE INFO ****\n');
@@ -55,7 +57,7 @@ PreconFactory = PreconditionerFactory( );
 Precon        = PreconFactory.CreatePrecon(DATA.Preconditioner.type, DATA);
 
 if isfield(DATA.Preconditioner, 'type') && strcmp( DATA.Preconditioner.type, 'AdditiveSchwarz')
-    R      = CSM_overlapping_DD(MESH, DATA.Preconditioner.num_subdomains,  DATA.Preconditioner.overlap_level);
+    R      = CFD_overlapping_DD(MESH, FE_SPACE_v, FE_SPACE_p, DATA.Preconditioner.num_subdomains,  DATA.Preconditioner.overlap_level);
     Precon.SetRestrictions( R );
 end
 

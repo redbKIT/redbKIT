@@ -29,12 +29,27 @@ data.kinematic_viscosity = 1/150;
 data.density             = 1;
 
 % Nonlinear solver
-data.NonlinearSolver.tol         = 1e-8; 
-data.NonlinearSolver.maxit       = 30;
+data.NonLinearSolver.tol         = 1e-8; 
+data.NonLinearSolver.maxit       = 30;
+
+% % Linear Solver
+% data.LinearSolver.type           = 'MUMPS'; % MUMPS, backslash, gmres
+% data.mumps_reordering            = 7;
+% 
+% % Preconditioner
+% data.Preconditioner.type         = 'None'; % AdditiveSchwarz, None, ILU
+
 
 % Linear Solver
-data.LinearSolver.type           = 'MUMPS'; % MUMPS, backslash, gmres
-data.mumps_reordering            = 7;
+data.LinearSolver.type              = 'gmres'; % MUMPS, backslash, gmres
+data.LinearSolver.tol               = 1e-8;
+data.LinearSolver.maxit             = 500;
+data.LinearSolver.gmres_verbosity   = 5;
+data.LinearSolver.mumps_reordering  = 4;
 
 % Preconditioner
-data.Preconditioner.type         = 'None'; % AdditiveSchwarz, None, ILU
+data.Preconditioner.type              = 'AdditiveSchwarz'; % AdditiveSchwarz, None, ILU
+data.Preconditioner.local_solver      = 'MUMPS'; % matlab_lu, MUMPS
+data.Preconditioner.overlap_level     = 2;
+data.Preconditioner.mumps_reordering  = 4;
+data.Preconditioner.num_subdomains    = 4; %poolsize, number of subdomains

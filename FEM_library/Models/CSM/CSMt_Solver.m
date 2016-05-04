@@ -57,8 +57,15 @@ TimeAdvance = Newmark_TimeAdvance( DATA.time.beta, DATA.time.gamma, dt );
 u0  = [];
 du0 = [];
 for k = 1 : FE_SPACE.numComponents
-    u0  = [u0; DATA.u0{k}(  MESH.nodes(1,:), MESH.nodes(2,:), t0, param )'];
-    du0 = [du0; DATA.du0{k}( MESH.nodes(1,:), MESH.nodes(2,:), t0, param )'];
+    switch dim
+        case 2
+            u0  = [u0; DATA.u0{k}(  MESH.nodes(1,:), MESH.nodes(2,:), t0, param )'];
+            du0 = [du0; DATA.du0{k}( MESH.nodes(1,:), MESH.nodes(2,:), t0, param )'];
+            
+        case 3
+            u0  = [u0; DATA.u0{k}(  MESH.nodes(1,:), MESH.nodes(2,:), MESH.nodes(3,:), t0, param )'];
+            du0 = [du0; DATA.du0{k}( MESH.nodes(1,:), MESH.nodes(2,:), MESH.nodes(1,:), t0, param )'];
+    end
 end
 d2u0 = 0*du0;
 u = u0;
