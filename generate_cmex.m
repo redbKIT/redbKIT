@@ -1,4 +1,16 @@
 function generate_cmex(hasOpenMP)
+%GENERATE_CMEX compiles finite element assemblers written in C
+%
+%   GENERATE_CMEX(HASOPENMP) if HASOPENMP = 1, compiles with flag -fopenmp.
+%   Default is HASOPENMP = 0. 
+%
+%   On Linux: to check whether openmp is available on your system, open a 
+%   terminal and type:
+%   $ echo |cpp -fopenmp -dM |grep -i open
+
+%   This file is part of redbKIT.
+%   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
+%   Author: Federico Negri <federico.negri at epfl.ch>
 
 if nargin < 1 || isempty(hasOpenMP)
     hasOpenMP = 0;
@@ -6,70 +18,28 @@ end
 
 if hasOpenMP
     fprintf('\nCompiling with openmp enabled\n');
+    Flags = 'CFLAGS="\$CFLAGS -fopenmp" LDFLAGS="\$LDFLAGS -fopenmp"';
+
 else
     fprintf('\nCompiling without openmp\n');
+    Flags = '';
 end
 
-%setPath;
+source_files{1} = {'FEM_library/Models/ADR/','ADR_assembler_C_omp.c'};
+source_files{2} = {'FEM_library/Models/ADR/','Mass_assembler_C_omp.c'};
+source_files{3} = {'FEM_library/Models/CSM/','CSM_assembler_C_omp.c'};
+source_files{4} = {'FEM_library/Models/CSM/','CSM_assembler_ExtForces.c'};
+source_files{5} = {'FEM_library/Models/CFD/','CFD_assembler_C_omp.c'};
+source_files{6} = {'FEM_library/Models/CFD/','CFD_assembler_ExtForces.c'};
 
-this_path = pwd;
-
-cd FEM_library/
-
-%% FEM
-cd Models/
-
-%% ADR Model
-cd ADR/
-% Generate C-Mex assemblers from matlab code and compile
-%ADR_assembly2D_prj;
-%ADR_assembly3D_prj;
-
-% Compile C assembler
-% to check whether openmp is available:
-%   $ echo |cpp -fopenmp -dM |grep -i open
-if hasOpenMP
-    mex ADR_assembler_C_omp.c CFLAGS="\$CFLAGS -fopenmp" LDFLAGS="\$LDFLAGS -fopenmp"
-else
-    mex ADR_assembler_C_omp.c
-end
-
-if hasOpenMP
-    mex Mass_assembler_C_omp.c CFLAGS="\$CFLAGS -fopenmp" LDFLAGS="\$LDFLAGS -fopenmp"
-else
-    mex Mass_assembler_C_omp.c
-end
-
-cd ../
-
-%% CSM Model
-cd CSM/
-
-% Compile C assembler
-if hasOpenMP
-    mex CSM_assembler_C_omp.c CFLAGS="\$CFLAGS -fopenmp" LDFLAGS="\$LDFLAGS -fopenmp"
-    mex CSM_assembler_ExtForces.c CFLAGS="\$CFLAGS -fopenmp" LDFLAGS="\$LDFLAGS -fopenmp"
+for i = 1 : length(source_files)
     
-else
-    mex CSM_assembler_C_omp.c
-    mex CSM_assembler_ExtForces.c
-end
-
-cd ../
-
-%% CFD Model
-cd CFD/
-
-% Compile C assembler
-if hasOpenMP
-    mex CFD_assembler_C_omp.c CFLAGS="\$CFLAGS -fopenmp" LDFLAGS="\$LDFLAGS -fopenmp"
-    mex CFD_assembler_ExtForces.c CFLAGS="\$CFLAGS -fopenmp" LDFLAGS="\$LDFLAGS -fopenmp"
+    file_path = [pwd, '/', source_files{i}{1}];
+    file_name = source_files{i}{2};
     
-else
-    mex CFD_assembler_C_omp.c
-    mex CFD_assembler_ExtForces.c
+    mex_command = sprintf( 'mex %s%s %s -outdir %s', file_path, file_name, Flags, file_path);
+    eval( mex_command );
+    
 end
-
-cd(this_path)
 
 end
