@@ -140,7 +140,7 @@ u = U_k;
 
 %% Export to VTK
 if ~isempty(vtk_filename)
-    CSM_export_solution(MESH.dim, u, MESH.vertices, MESH.elements, MESH.numVertices, vtk_filename);
+    CSM_export_solution(MESH.dim, u, MESH.vertices, MESH.elements, MESH.numNodes, vtk_filename);
 end
  
 return

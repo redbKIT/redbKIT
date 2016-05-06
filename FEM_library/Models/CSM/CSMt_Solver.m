@@ -64,12 +64,12 @@ for k = 1 : FE_SPACE.numComponents
             
         case 3
             u0  = [u0; DATA.u0{k}(  MESH.nodes(1,:), MESH.nodes(2,:), MESH.nodes(3,:), t0, param )'];
-            du0 = [du0; DATA.du0{k}( MESH.nodes(1,:), MESH.nodes(2,:), MESH.nodes(1,:), t0, param )'];
+            du0 = [du0; DATA.du0{k}( MESH.nodes(1,:), MESH.nodes(2,:), MESH.nodes(3,:), t0, param )'];
     end
 end
 d2u0 = 0*du0;
 u = u0;
-CSM_export_solution(MESH.dim, u0, MESH.vertices, MESH.elements, MESH.numVertices, vtk_filename, 0);
+CSM_export_solution(MESH.dim, u0, MESH.vertices, MESH.elements, MESH.numNodes, vtk_filename, 0);
 
 TimeAdvance.Initialize( u0, du0, d2u0 );
 Coef_Mass = TimeAdvance.MassCoefficient( );
@@ -195,7 +195,7 @@ while ( t < tf )
     
     %% Export to VTK
     if ~isempty(vtk_filename)
-        CSM_export_solution(MESH.dim, u, MESH.vertices, MESH.elements, MESH.numVertices, vtk_filename, k_t);
+        CSM_export_solution(MESH.dim, u, MESH.vertices, MESH.elements, MESH.numNodes, vtk_filename, k_t);
     end
     
     TimeAdvance.Update( u );
