@@ -15,7 +15,7 @@ MESH.numVertices = size(vertices,2);
 
 %% Build higher order (P2 or P3) mesh if required
 if ~strcmp(fem,'P1')
-    fprintf('\n Generating P2 mesh ... ')
+    fprintf('\n Generating %s mesh ... ', fem)
     time_mesh = tic;
     [MESH.elements, MESH.nodes, MESH.boundaries] = ...
         feval(['P1to',fem,'mesh',num2str(dim),'D'],elements, vertices, boundaries);

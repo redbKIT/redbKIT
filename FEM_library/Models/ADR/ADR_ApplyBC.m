@@ -158,7 +158,7 @@ switch MESH.dim
             u_Dirichlet = DATA.bcDir(x,y,t,param);
             
             F_in = F(MESH.internal_dof)...
-                -A(MESH.internal_dof,MESH.Dirichlet_dof)*u_Dirichlet';
+                -A(MESH.internal_dof,MESH.Dirichlet_dof)*u_Dirichlet.';
             
             A_in = A(MESH.internal_dof,MESH.internal_dof);
             
@@ -190,7 +190,7 @@ switch MESH.dim
             u_Dirichlet = DATA.bcDir(x,y,z,t,param);
             
             F_in = F(MESH.internal_dof)...
-                -A(MESH.internal_dof,MESH.Dirichlet_dof)*u_Dirichlet';
+                -A(MESH.internal_dof,MESH.Dirichlet_dof)*u_Dirichlet.';
             
             A_in = A(MESH.internal_dof,MESH.internal_dof);
             

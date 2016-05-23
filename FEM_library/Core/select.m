@@ -24,6 +24,11 @@ switch dim
                 nln = 6;
                 nbn = 3;
                 
+            case 'B1'
+                
+                nln = 4;
+                nbn = 2;     
+                
             otherwise
                 
                 error([fem, 'FE space not available in 2D']);

@@ -49,6 +49,21 @@ switch dim
                 dphiy(5,:) = 4*x;
                 dphiy(6,:) = 4-4*x-8*y;
                 
+            case 'B1'
+                
+                phi(1,:) = (1-x-y).*(1-9*x.*y);
+                phi(2,:) = x-9*x.*y.*(1-x-y);
+                phi(3,:) = y-9*x.*y.*(1-x-y);
+                phi(4,:) = 27*x.*y.*(1-x-y);
+                dphix(1,:) = 18*x.*y-1-9*(1-y).*y;
+                dphix(2,:) = 18*x.*y+1-9*(1-y).*y;
+                dphix(3,:) = 9*y.*(-1+2*x+y);
+                dphix(4,:) = -27*y.*(-1+2*x+y);
+                dphiy(1,:) = 9*x.^2+(18*y-9).*x-1;
+                dphiy(2,:) = 9*x.*(-1+x+2*y);
+                dphiy(3,:) = 9*x.^2+(18*y-9).*x+1;
+                dphiy(4,:) = -27*x.*(-1+x+2*y);
+                
             otherwise
                 msg = [fem, ' finite element space not available'];
                 error(msg)
@@ -63,6 +78,9 @@ switch dim
                     BDOF = [1 2];
                 case 'P2'
                     BDOF = [1 2 4];
+                case 'B1'
+                    BDOF = [1 2];    
+                    
                 otherwise
                     error(['Boundary integrals not supported for ', fem ,' FE space'])
             end
