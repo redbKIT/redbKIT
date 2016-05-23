@@ -5,6 +5,7 @@ function [varargout] = CSM_Assembler(output, MESH, DATA, FE_SPACE, U_h, t, subdo
 %   [F_in]        = CSM_ASSEMBLER('internal_forces', MESH, DATA, FE_SPACE, U_h, t, subdomain)
 %   [F_in, dF_in] = CSM_ASSEMBLER('internal_forces', MESH, DATA, FE_SPACE, U_h, t, subdomain)
 %   [F, dF]       = CSM_ASSEMBLER('all',             MESH, DATA, FE_SPACE, U_h, t, subdomain)
+%   [M]           = CSM_ASSEMBLER('mass',            MESH, DATA, FE_SPACE, U_h, t, subdomain)
 
 %   This file is part of redbKIT.
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
@@ -49,6 +50,9 @@ end
 
 switch output
     
+    case 'mass'
+        varargout{1} = compute_mass(MESH, FE_SPACE, index_subd);
+
     case 'external_forces'
         
         varargout{1} = compute_external_forces(MESH, DATA, FE_SPACE, t, index_subd);
@@ -143,6 +147,21 @@ function [F_in, dF_in] = compute_internal_forces(material_param, MESH, DATA, FE_
 % Build sparse matrix and vector
 F_in    = sparse(rowG, 1, coefG, MESH.numNodes*MESH.dim, 1);
 dF_in   = sparse(rowdG, coldG, coefdG, MESH.numNodes*MESH.dim, MESH.numNodes*MESH.dim);
+
+end
+%==========================================================================
+function [M] = compute_mass( MESH, FE_SPACE, index_subd)
+
+% C_OMP assembly, returns matrices in sparse vector format
+[rowM, colM, coefM] = Mass_assembler_C_omp(MESH.dim, MESH.elements, FE_SPACE.numElemDof, ...
+     FE_SPACE.quad_weights, MESH.jac(index_subd), FE_SPACE.phi);
+
+% Build sparse matrix
+M_scalar   = sparse(rowM, colM, coefM, MESH.numNodes, MESH.numNodes);
+M          = [];
+for k = 1 : FE_SPACE.numComponents
+    M = blkdiag(M, M_scalar);
+end
 
 end
 %==========================================================================

@@ -1,7 +1,7 @@
-function DATA = CSM_read_DataFile(data_file, dim, param)
-%CSM_READ_DATAFILE data_file parser
+function DATA = CFD_read_DataFile(data_file, dim)
+%CFD_READ_DATAFILE data_file parser
 %
-%   DATA = CSM_READ_DATAFILE(DATA_FILE) read the file specified by the string
+%   DATA = CFD_READ_DATAFILE(DATA_FILE) read the file specified by the string
 %   DATA_FILE and put the fields values into the struct DATA
 
 %   This file is part of redbKIT.
@@ -25,20 +25,17 @@ switch dim
         
         DATA.bcDir          = @(x,y,t,param)(0.*x.*y);
         DATA.bcNeu          = @(x,y,t,param)(0.*x.*y);
-        DATA.bcPrex         = @(x,y,t,param)(0.*x.*y);
         DATA.force          = @(x,y,t,param)(0.*x.*y);
                             
     case 3
         
         DATA.bcDir          = @(x,y,z,t,param)(0.*x.*y);
         DATA.bcNeu          = @(x,y,z,t,param)(0.*x.*y);
-        DATA.bcPrex         = @(x,y,z,t,param)(0.*x.*y);
         DATA.force          = @(x,y,z,t,param)(0.*x.*y);
 end
 
-DATA.Material_Model = 'Linear';
-DATA.Young          = 1e+6;
-DATA.Poisson        = 0.4;
+DATA.kinematic_viscosity  = 1;
+DATA.density              = 1;
 
 %% Read data_file and put problem-data into the DATA struct
 
