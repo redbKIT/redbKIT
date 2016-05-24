@@ -11,7 +11,7 @@ fig_folder = 'Figures/DEIM/';
 [~,~,~] =  mkdir(fig_folder);
 
 %% POD on RHS snapshots: U_rhs is a POD basis for the RHS
-[U_rhs,    ~,    HyRED.Sigma_rhs]     = VPOD_basis_computation(S_rhs, [], tolPOD(1));
+[U_rhs,    ~,    HyRED.Sigma_rhs]     = VPOD_basis_computation(S_rhs, [], tolPOD(1), 1);
 
 % generate figure
 handle1 = figure;
@@ -54,8 +54,8 @@ HyRED.U_rhs     = U_rhs(HyRED.IDEIM_rhs,:);
 %% compute and store "reduced mesh" (corresponding to DEIM indices)
 ndf       =  length(FOM.MESH.internal_dof); 
 
-[ ~, node_to_element, node_to_boundary ] = compute_adjacency_elements(FOM.MESH.vertices, ...
-    FOM.MESH.elements, FOM.MESH.dim, FOM.MESH.boundaries); 
+[ ~, node_to_element, node_to_boundary ] = compute_adjacency_elements(FOM.MESH.nodes, ...
+    FOM.MESH.elements, FOM.MESH.dim, FOM.MESH.boundaries, FOM.FE_SPACE.fem); 
 
 [IDEIM_mA_elem, ~, IDEIM_mA_bound ]     = CSM_DEIM_Index_to_Elements('matrix', HyRED.IDEIM_m,   ndf, node_to_element, ...
     node_to_boundary, FOM.MESH.internal_dof, FOM.MESH.numNodes, FOM.MESH.dim);
