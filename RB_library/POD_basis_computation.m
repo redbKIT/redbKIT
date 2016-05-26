@@ -25,7 +25,7 @@ if nargin < 4 || isempty(D)
 end
 
 H_D   = sqrt(D);
-u_D   = u*H_D;
+u_D   = full( u*H_D );
 
 % Form Correlation matrix
 if nargin < 2 || isempty(Xnorm)
@@ -49,14 +49,19 @@ else
     
 end
 
-
 fprintf('\n   POD_basis_computation: %d modes selected \n',N);
 
-PSI   =  sparse(PSI(:,1:N));
+PSI   =  PSI(:,1:N);
 
-V = [];
-for cc = 1 : size(PSI,2)    
-    V = [V 1/sqrt(Sigma(cc))*linear_combo(u_D,PSI(:,cc))];
+% V = [];
+% for cc = 1 : size(PSI,2)    
+%     V = [V 1/sqrt(Sigma(cc))*linear_combo(u_D,PSI(:,cc))];
+% end
+
+% Form POD basis
+V   =  u_D*PSI;
+for cc = 1 : N
+    V(:,cc) = 1/(Sigma(cc)) * V(:,cc);
 end
 
 Sigma = sqrt(Sigma);

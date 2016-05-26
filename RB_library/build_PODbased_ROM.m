@@ -55,7 +55,7 @@ if isfield(FOM,'stabFactor')
 end
 
 Ns = size(sample_grid,1);
-S  = zeros(FOM.FE_SPACE.numDof, Ns);
+S  = zeros(length(FOM.MESH.internal_dof), Ns);
 
 %% Compute snapshots
 fprintf('\n Compute snapshots ...')

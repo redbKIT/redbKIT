@@ -19,11 +19,11 @@ end
 switch method
     case 'Galerkin'
         
-        for q = 1 : FOM.Qa
+        parfor q = 1 : FOM.Qa
             ANq{q} = V'*(FOM.Aq{q}*V);
         end
         
-        for q = 1 : FOM.Qf
+        parfor q = 1 : FOM.Qf
             FNq{q} = V'*FOM.Fq{q};
         end
         
