@@ -138,10 +138,12 @@ end
 
 u = U_k;
 
-%% Export to VTK
+%% Export Displacement to VTK
 if ~isempty(vtk_filename)
     CSM_export_solution(MESH.dim, u, MESH.vertices, MESH.elements, MESH.numNodes, vtk_filename);
-    
+end
+
+if DATA.Output.ComputeVonMisesStress
     fprintf('\n   -- Compute Element Stresses... ');
     t_assembly = tic;
     [Sigma]  =  CSM_Assembler('stress', MESH, DATA, FE_SPACE, full(U_k));
@@ -149,33 +151,7 @@ if ~isempty(vtk_filename)
     fprintf('done in %3.3f s\n', t_assembly);
     
     Sigma_VM = sqrt( (Sigma(:,1) - Sigma(:,5)).^2 + (Sigma(:,5) - Sigma(:,9)).^2 + (Sigma(:,9) - Sigma(:,1)).^2 );
-    
-    if dim == 2
-        exportData=struct('iteration', {-1},...
-            'vertices', {vertices'},...
-            'elements', {elements(1:3,:)'},...
-            'outputFile', {[vtk_filename,'_SVstress']},...
-            'title', {'SV'},...
-            'variableName',{{'Sigma_VM'}},...
-            'variableType',{{'SCALARS'}},...
-            'variableData',{{Sigma_VM'}});
-        
-        exporter2dVTK_cell(exportData);
-        
-    elseif dim ==3
-        exportData=struct('iteration', {-1},...
-            'vertices', {vertices'},...
-            'elements', {elements(1:4,:)'},...
-            'outputFile', {[vtk_filename,'_SVstress']},...
-            'title', {'SV'},...
-             'variableName',{{'Sigma_VM'}},...
-            'variableType',{{'SCALARS'}},...
-            'variableData',{{Sigma_VM'}});
-        
-        exporter3dVTK_cell(exportData);
-        
-    end
-
+    CSM_export_VonMisesStress(MESH.dim, Sigma_VM, MESH.vertices, MESH.elements, [vtk_filename, '_VMstress']);
 end
  
 return

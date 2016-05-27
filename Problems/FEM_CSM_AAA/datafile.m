@@ -39,7 +39,7 @@ data.Density = 1;
 
 % NonLinear Solver
 data.NonLinearSolver.tol               = 1e-6;
-data.NonLinearSolver.maxit             = 15;
+data.NonLinearSolver.maxit             = 1;
 
 % Solver and Preconditioner
 %   If parallel pool available, use gmres with AdditiveSchwarz preconditioner
@@ -54,7 +54,7 @@ end
 if poolsize > 0
     
     % Linear Solver
-    data.LinearSolver.type              = 'MUMPS'; % MUMPS, backslash, gmres
+    data.LinearSolver.type              = 'backslash'; % MUMPS, backslash, gmres
     data.LinearSolver.tol               = 1e-8;
     data.LinearSolver.maxit             = 500;
     data.LinearSolver.gmres_verbosity   = 5;
@@ -76,3 +76,5 @@ else
     data.Preconditioner.type         = 'None'; % AdditiveSchwarz, None, ILU
 end
 
+% OutPut Options
+data.Output.ComputeVonMisesStress = true;

@@ -40,6 +40,8 @@ DATA.Material_Model = 'Linear';
 DATA.Young          = 1e+6;
 DATA.Poisson        = 0.4;
 
+DATA.Output.ComputeVonMisesStress = false;
+
 %% Read data_file and put problem-data into the DATA struct
 
 eval(data_file);

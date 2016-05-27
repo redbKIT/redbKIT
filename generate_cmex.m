@@ -31,6 +31,7 @@ source_files{3} = {'FEM_library/Models/CSM/','CSM_assembler_C_omp.c'};
 source_files{4} = {'FEM_library/Models/CSM/','CSM_assembler_ExtForces.c'};
 source_files{5} = {'FEM_library/Models/CFD/','CFD_assembler_C_omp.c'};
 source_files{6} = {'FEM_library/Models/CFD/','CFD_assembler_ExtForces.c'};
+source_files{7} = {'FEM_library/Models/CSM/','CSM_ComputeStress_C_omp.c'};
 
 for i = 1 : length(source_files)
     
