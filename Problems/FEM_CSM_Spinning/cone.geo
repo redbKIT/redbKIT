@@ -9,6 +9,10 @@ lc_apex = 0.001;
 lc = 0.02;
 lc_apex = 0.001;
 
+// Coarse2
+lc = 0.008;
+lc_apex = 0.008;
+
 H  = 0.1;
 R  = 0.05;
 

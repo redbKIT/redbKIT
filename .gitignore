@@ -9,6 +9,7 @@
 *.mexa64
 *.mexmaci64
 *.vtk
+*.pvsm
 codegen/
 Problems/test_log.txt
 Problems/RB_AffineDevice/Figures/

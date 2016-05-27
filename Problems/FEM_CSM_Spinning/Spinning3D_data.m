@@ -1,6 +1,5 @@
 %DATAFILE for linear elasticity problem
-
-ang_vel = 300;
+ang_vel = 600;
 
 % Source term
 data.force{1} = @(x,y,z,t,param)(0.*x.*y);
@@ -40,13 +39,14 @@ data.u0{1} = @(x,y,z,t,param)(0.*x.*y);
 data.u0{2} = @(x,y,z,t,param)(cos(alpha)*y -sin(alpha)*z - y);
 data.u0{3} = @(x,y,z,t,param)(sin(alpha)*y +cos(alpha)*z - z);
 
-%data.du0{1} = @(x, y, z, param_p, param_g, t)( (ang_vel * sqrt(x.^2+y.^2) .* abs(sin(atan(y./x)))) .*(x>0) + (ang_vel * sqrt(x.^2+y.^2) .* abs(cos(atan(x./y)))).*(x<=0) );
-%data.du0{2} = @(x, y, z, param_p, param_g, t)( (ang_vel * sqrt(x.^2+y.^2) .* abs(cos(atan(y./x)))) .*(x>0) + (ang_vel * sqrt(x.^2+y.^2).* (-1).*abs(sin(atan(x./y)))).*(x<=0));
-%data.du0{3} = @(x, y, z, param_p, param_g, t)(0.*x.*y);
+% data.du0{1} = @(x,y,z,t,param)( (y<=0).* ( (ang_vel * sqrt(x.^2+y.^2) .* abs(sin(atan(y./x)))) .*(x>0) + (ang_vel * sqrt(x.^2+y.^2) .* abs(cos(atan(x./y)))).*(x<=0) ) + (y>0).* ( (ang_vel * sqrt(x.^2+y.^2) .* (-1).* abs(cos(atan(x./y)))) .*(x>0) + (ang_vel * sqrt(x.^2+y.^2) .* (-1) .* abs(sin(atan(y./x)))).*(x<=0) ));
+% data.du0{2} = @(x,y,z,t,param)( (y<=0).* ( (ang_vel * sqrt(x.^2+y.^2) .* abs(cos(atan(y./x)))) .*(x>0) + (ang_vel * sqrt(x.^2+y.^2).* (-1).*abs(sin(atan(x./y)))).*(x<=0)) + (y>0).* ( (ang_vel * sqrt(x.^2+y.^2) .* abs(sin(atan(x./y)))) .*(x>0) + (ang_vel * sqrt(x.^2+y.^2) .* (-1) .*abs(cos(atan(y./x)))).*(x<=0) ));
+% data.du0{3} = @(x,y,z,t,param)(0.*x.*y);
 
-data.du0{1} = @(x,y,z,t,param)( (y<=0).* ( (ang_vel * sqrt(x.^2+y.^2) .* abs(sin(atan(y./x)))) .*(x>0) + (ang_vel * sqrt(x.^2+y.^2) .* abs(cos(atan(x./y)))).*(x<=0) ) + (y>0).* ( (ang_vel * sqrt(x.^2+y.^2) .* (-1).* abs(cos(atan(x./y)))) .*(x>0) + (ang_vel * sqrt(x.^2+y.^2) .* (-1) .* abs(sin(atan(y./x)))).*(x<=0) ));
-data.du0{2} = @(x,y,z,t,param)( (y<=0).* ( (ang_vel * sqrt(x.^2+y.^2) .* abs(cos(atan(y./x)))) .*(x>0) + (ang_vel * sqrt(x.^2+y.^2).* (-1).*abs(sin(atan(x./y)))).*(x<=0)) + (y>0).* ( (ang_vel * sqrt(x.^2+y.^2) .* abs(sin(atan(x./y)))) .*(x>0) + (ang_vel * sqrt(x.^2+y.^2) .* (-1) .*abs(cos(atan(y./x)))).*(x<=0) ));
+data.du0{1} = @(x,y,z,t,param)( - ang_vel * sqrt(x.^2+y.^2) .* sin(atan2(y,x)) );
+data.du0{2} = @(x,y,z,t,param)(   ang_vel * sqrt(x.^2+y.^2) .* cos(atan2(y,x)) );
 data.du0{3} = @(x,y,z,t,param)(0.*x.*y);
+
 
 % material parameters (aluminium)
 data.Young   = 80*1e+9;
@@ -71,3 +71,14 @@ data.time.gamma      = 0.833;%1/2;
 data.time.beta       = 0.444;%1/4;
 data.time.alpha_m    = 0;
 data.time.alpha_f    = 0.333;
+
+%% ROM Options
+data.OfflineTraining.Solution.h5_filename       = 'Snapshots/DisplacementSnapshots.h5';
+data.OfflineTraining.Solution.h5_section        = 'Displacement';
+data.OfflineTraining.Solution.SamplingFrequency = 1;
+
+data.OfflineTraining.System.h5_filename                      = 'Snapshots/SystemSnapshots.h5';
+data.OfflineTraining.System.InternalForces.h5_section        = 'F_int';
+data.OfflineTraining.System.InternalForces.SamplingFrequency = 1;
+data.OfflineTraining.System.ExternalForces.h5_section        = 'F_ext';
+data.OfflineTraining.System.ExternalForces.SamplingFrequency = 1;

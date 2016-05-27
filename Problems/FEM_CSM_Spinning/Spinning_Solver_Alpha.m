@@ -73,7 +73,8 @@ Rot_X_Matrix = [1 0 0; 0 cos(alpha) -sin(alpha); 0 sin(alpha) cos(alpha)];
 dU_n_tmp     = [du0(1:MESH.numNodes)'; du0(1+MESH.numNodes:2*MESH.numNodes)'; du0(2*MESH.numNodes+1:end)'];
 dU_n_tmp     = Rot_X_Matrix  * dU_n_tmp;
 du0          = [dU_n_tmp(1,:)'; dU_n_tmp(2,:)'; dU_n_tmp(3,:)'];
-d2u0 = zeros(MESH.numNodes*MESH.dim,1);
+
+% CSM_export_solution(MESH.dim, du0, Rot_X_Matrix * MESH.vertices, MESH.elements, MESH.numNodes, [vtk_filename,'Vel_'],0);
 
 %def_vert = Rot_X_Matrix * vertices;
 %[ MESH ] = buildMESH( dim, elements, def_vert, boundaries, fem, quad_order, DATA, 'CSM' );
@@ -99,7 +100,7 @@ end
 TimeAdvance = GeneralizedAlpha_TimeAdvance( DATA.time.beta, DATA.time.gamma, DATA.time.alpha_m, DATA.time.alpha_f, dt );
 
 CSM_export_solution(MESH.dim, u0, MESH.vertices, MESH.elements, MESH.numNodes, vtk_filename, 0);
-CSM_export_solution(MESH.dim, du0, MESH.vertices, MESH.elements, MESH.numNodes, 'Figures/Initial_velocity');
+CSM_export_solution(MESH.dim, du0, MESH.vertices, MESH.elements, MESH.numNodes, [vtk_filename,'Vel_'],0, 'StructureVelocity');
 
 fprintf('\n **** PROBLEM''S SIZE INFO ****\n');
 fprintf(' * Number of Vertices  = %d \n',MESH.numVertices);
@@ -126,15 +127,10 @@ M    =  M * DATA.Density;
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s', t_assembly);
 
-LinSolver = LinearSolver( DATA.LinearSolver );
-
-TimeAdvance.Initialize( u0, du0, d2u0 );
-Coef_Mass = TimeAdvance.MassCoefficient( );
-
 % Assemble matrix and right-hand side
 fprintf('\n -- Assembling external Forces at t0... ');
 t_assembly = tic;
-F_ext_old      = CSM_Assembler('external_forces', MESH, DATA, FE_SPACE, [], t0);%M*(-9.81*ones(size(M,1),1));%
+F_ext_old      = CSM_Assembler('external_forces', MESH, DATA, FE_SPACE, [], t0);
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s\n', t_assembly);
 
@@ -143,6 +139,13 @@ t_assembly = tic;
 [F_in_old]  =  CSM_Assembler('internal_forces', MESH, DATA, FE_SPACE, u0);
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s\n', t_assembly)
+
+d2u0 = M \ (F_ext_old - F_in_old);
+
+TimeAdvance.Initialize( u0, du0, d2u0 );
+Coef_Mass = TimeAdvance.MassCoefficient( );
+
+LinSolver = LinearSolver( DATA.LinearSolver );
 
 %% Time Loop
 while ( t < tf )
@@ -246,6 +249,7 @@ while ( t < tf )
     %% Export to VTK
     if ~isempty(vtk_filename) && mod(k_t+1,2)
         CSM_export_solution(MESH.dim, u, MESH.vertices, MESH.elements, MESH.numNodes, vtk_filename, k_t);
+        CSM_export_solution(MESH.dim, u, MESH.vertices, MESH.elements, MESH.numNodes, [vtk_filename, 'Vel_'], k_t, 'StructureVelocity');
     end
     
     TimeAdvance.Update( u );

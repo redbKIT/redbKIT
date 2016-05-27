@@ -13,6 +13,6 @@ dim      =  3;
 
 
 %% Solve
-[~,~,~] = mkdir('FiguresA');
+[~,~,~] = mkdir('FiguresB');
 %[U, FE_SPACE, MESH, DATA] = Spinning_Solver(dim, elements, vertices, boundaries, fem, 'Spinning3D_data', [], 'Figures/SolSpinning_');
-[U, FE_SPACE, MESH, DATA] = Spinning_Solver_Alpha(dim, elements, vertices, boundaries, fem, 'Spinning3D_data', [], 'FiguresA/SolSpinningA_');
+[U, FE_SPACE, MESH, DATA] = Spinning_Solver_Alpha(dim, elements, vertices, boundaries, fem, 'Spinning3D_data', [], 'FiguresB/SolSpinningP1_');

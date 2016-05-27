@@ -52,7 +52,7 @@ t         = DATA.time.t0;
 k_t       = 0;
 
 
-TimeAdvance = Newmark_TimeAdvance( DATA.time.beta, DATA.time.gamma, dt );
+TimeAdvance = GeneralizedAlpha_TimeAdvance( DATA.time.beta, DATA.time.gamma, DATA.time.alpha_m, DATA.time.alpha_f, dt );
 
 u0  = [];
 du0 = [];
@@ -101,6 +101,19 @@ fprintf('done in %3.3f s', t_assembly);
 
 LinSolver = LinearSolver( DATA.LinearSolver );
 
+% Assemble matrix and right-hand side
+fprintf('\n -- Assembling external Forces at t0... ');
+t_assembly = tic;
+F_ext_old      = CSM_Assembler('external_forces', MESH, DATA, FE_SPACE, [], t0);%M*(-9.81*ones(size(M,1),1));%
+t_assembly = toc(t_assembly);
+fprintf('done in %3.3f s\n', t_assembly);
+
+fprintf('\n -- Assembling internal Forces at t0... ');
+t_assembly = tic;
+F_in_old  =  CSM_Assembler('internal_forces', MESH, DATA, FE_SPACE, u0);
+t_assembly = toc(t_assembly);
+fprintf('done in %3.3f s\n', t_assembly)
+
 %% Time Loop
 while ( t < tf )
     
@@ -132,7 +145,6 @@ while ( t < tf )
     F_ext      = CSM_Assembler('external_forces', MESH, DATA, FE_SPACE, [], t);
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);
-    F_ext = F_ext + M * Csi;
     
     fprintf('\n -- Assembling internal Forces... ');
     t_assembly = tic;
@@ -140,8 +152,12 @@ while ( t < tf )
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);
     
-    Residual  = Coef_Mass * M * U_k +  F_in - F_ext;
-    Jacobian  = Coef_Mass * M + dF_in;
+    Residual  = Coef_Mass * M * U_k +  ...
+                  (1 - TimeAdvance.M_alpha_f) * F_in  + TimeAdvance.M_alpha_f * F_in_old ...
+                - (1 - TimeAdvance.M_alpha_f) * F_ext + TimeAdvance.M_alpha_f * F_ext_old ...
+                - M * Csi;
+            
+    Jacobian  = Coef_Mass * M + (1 - TimeAdvance.M_alpha_f) * dF_in;
     
     % Apply boundary conditions
     fprintf('\n -- Apply boundary conditions ... ');
@@ -174,8 +190,12 @@ while ( t < tf )
         t_assembly = toc(t_assembly);
         fprintf('done in %3.3f s\n', t_assembly);
         
-        Residual  = Coef_Mass * M * U_k +  F_in - F_ext;
-        Jacobian  = Coef_Mass * M + dF_in;
+        Residual  = Coef_Mass * M * U_k +  ...
+                  (1 - TimeAdvance.M_alpha_f) * F_in  + TimeAdvance.M_alpha_f * F_in_old ...
+                - (1 - TimeAdvance.M_alpha_f) * F_ext + TimeAdvance.M_alpha_f * F_ext_old ...
+                - M * Csi;
+            
+        Jacobian  = Coef_Mass * M + (1 - TimeAdvance.M_alpha_f) * dF_in;
         
         % Apply boundary conditions
         fprintf('\n   -- Apply boundary conditions ... ');
@@ -199,6 +219,9 @@ while ( t < tf )
     end
     
     TimeAdvance.Update( u );
+    
+    F_ext_old = F_ext;
+    F_in_old  = F_in;
     
     iter_time = toc(iter_time);
     fprintf('\n-------------- Iteration time: %3.2f s -----------------',iter_time);
