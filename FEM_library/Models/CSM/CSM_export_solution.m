@@ -17,7 +17,7 @@ function CSM_export_solution(dim, u, vertices, elements, nov, outputFileName, it
 %   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch> 
 
-titleData = 'STR_solution';
+titleData = 'CSM_solution';
 if nargin < 7
       iter = -1;
 end

@@ -6,6 +6,7 @@ function [varargout] = CSM_Assembler(output, MESH, DATA, FE_SPACE, U_h, t, subdo
 %   [F_in, dF_in] = CSM_ASSEMBLER('internal_forces', MESH, DATA, FE_SPACE, U_h, t, subdomain)
 %   [F, dF]       = CSM_ASSEMBLER('all',             MESH, DATA, FE_SPACE, U_h, t, subdomain)
 %   [M]           = CSM_ASSEMBLER('mass',            MESH, DATA, FE_SPACE, U_h, t, subdomain)
+%   [S]           = CSM_ASSEMBLER('stress',          MESH, DATA, FE_SPACE, U_h, t, subdomain)
 
 %   This file is part of redbKIT.
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
@@ -71,6 +72,12 @@ switch output
                 
         varargout{1} = F_in - F_ext;
         varargout{2} = dF_in;
+        
+        
+    case 'stress'
+        
+        [S] = compute_stress(material_param, MESH, DATA, FE_SPACE, U_h, index_subd);
+        varargout{1} = S;
         
     otherwise
         error('output option not available')
@@ -147,6 +154,19 @@ function [F_in, dF_in] = compute_internal_forces(material_param, MESH, DATA, FE_
 % Build sparse matrix and vector
 F_in    = sparse(rowG, 1, coefG, MESH.numNodes*MESH.dim, 1);
 dF_in   = sparse(rowdG, coldG, coefdG, MESH.numNodes*MESH.dim, MESH.numNodes*MESH.dim);
+
+end
+%==========================================================================
+function [S] = compute_stress(material_param, MESH, DATA, FE_SPACE, U_h, index_subd)
+
+% C_OMP compute element stresses, returns dense matrix of size 
+% N_elements x MESH.dim^2
+
+[quad_nodes, quad_weights]   = quadrature(MESH.dim, 1);
+[phi, dphi_ref]              = fem_basis(FE_SPACE.dim, FE_SPACE.fem, quad_nodes);
+
+[S] = CSM_ComputeStress_C_omp(MESH.dim, DATA.Material_Model, material_param, U_h, MESH.elements, FE_SPACE.numElemDof,...
+      quad_weights, MESH.invjac(index_subd,:,:), MESH.jac(index_subd), phi, dphi_ref);
 
 end
 %==========================================================================

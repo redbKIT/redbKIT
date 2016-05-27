@@ -1,4 +1,4 @@
-function exporterSubDomains2dVTK(data)
+function exporter2dVTK_cell(data)
 %
 %*****************************************************************************
 %% exporter2dVTK writes a VTK file for unstructured mesh
