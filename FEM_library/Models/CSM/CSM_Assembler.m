@@ -23,8 +23,8 @@ switch DATA.Material_Model
     case 'StVenantKirchhoff'
         material_param = [DATA.Young DATA.Poisson];
         
-    case 'Neohookean'
-        material_param = [DATA.Shear DATA.Poisson];
+    case 'NeoHookean'
+        material_param = [DATA.Young DATA.Poisson];%[DATA.Shear DATA.Poisson];
         
     case 'SEMMT'
         material_param = [DATA.Young DATA.Poisson DATA.Stiffening_power];     
@@ -146,10 +146,18 @@ end
 %==========================================================================
 function [F_in, dF_in] = compute_internal_forces(material_param, MESH, DATA, FE_SPACE, U_h, index_subd)
 
-% C_OMP assembly, returns matrices in sparse vector format
-[rowdG, coldG, coefdG, rowG, coefG] = ...
-    CSM_assembler_C_omp(MESH.dim, DATA.Material_Model, material_param, U_h, MESH.elements, FE_SPACE.numElemDof, ...
-    FE_SPACE.quad_weights, MESH.invjac(index_subd,:,:), MESH.jac(index_subd), FE_SPACE.phi, FE_SPACE.dphi_ref);
+
+if strcmp(DATA.Material_Model, 'NeoHookean')
+    % M assembly, returns matrices in sparse vector format
+    [rowdG, coldG, coefdG, rowG, coefG] = ...
+        CSM_assembler_M_omp_mex(MESH.dim, 3, material_param, U_h, MESH.elements, FE_SPACE.numElemDof, ...
+        FE_SPACE.quad_weights, MESH.invjac(index_subd,:,:), MESH.jac(index_subd), FE_SPACE.phi, FE_SPACE.dphi_ref);
+else
+    % C_OMP assembly, returns matrices in sparse vector format
+    [rowdG, coldG, coefdG, rowG, coefG] = ...
+        CSM_assembler_C_omp(MESH.dim, DATA.Material_Model, material_param, U_h, MESH.elements, FE_SPACE.numElemDof, ...
+        FE_SPACE.quad_weights, MESH.invjac(index_subd,:,:), MESH.jac(index_subd), FE_SPACE.phi, FE_SPACE.dphi_ref);
+end
 
 % Build sparse matrix and vector
 F_in    = sparse(rowG, 1, coefG, MESH.numNodes*MESH.dim, 1);

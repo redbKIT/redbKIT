@@ -143,6 +143,7 @@ if ~isempty(vtk_filename)
     CSM_export_solution(MESH.dim, u, MESH.vertices, MESH.elements, MESH.numNodes, vtk_filename);
 end
 
+%% Compute Von Mises Stress
 if DATA.Output.ComputeVonMisesStress
     fprintf('\n   -- Compute Element Stresses... ');
     t_assembly = tic;

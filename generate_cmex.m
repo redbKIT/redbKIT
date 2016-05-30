@@ -16,6 +16,9 @@ if nargin < 1 || isempty(hasOpenMP)
     hasOpenMP = 0;
 end
 
+
+%% Compile C code
+
 if hasOpenMP
     fprintf('\nCompiling with openmp enabled\n');
     Flags = 'CFLAGS="\$CFLAGS -fopenmp" LDFLAGS="\$LDFLAGS -fopenmp"';
@@ -40,6 +43,22 @@ for i = 1 : length(source_files)
     
     mex_command = sprintf( 'mex %s%s %s -outdir %s', file_path, file_name, Flags, file_path);
     eval( mex_command );
+    
+end
+
+%% Mexify some Matlab codes
+
+here = pwd;
+source_files{1} = {'FEM_library/Models/CSM/','mexify_CSM_Assembly_M'};
+
+for i = 1 : length(source_files)
+    
+    file_path = [pwd, '/', source_files{i}{1}];
+    file_name = source_files{i}{2};
+        
+    eval(['cd ', file_path]);
+    eval( file_name );
+    eval(['cd ', here]);
     
 end
 
