@@ -1385,9 +1385,7 @@ void NeoHookean2Material(mxArray* plhs[], const mxArray* prhs[])
                             double dP_iso[dim][dim];
                             double dP_iso1[dim][dim];
                             double dP_iso24[dim][dim];
-                            /*double dP_iso2[dim][dim];*/
                             double dP_iso3[dim][dim];
-                            /*double dP_iso4[dim][dim];*/
                             double dP_iso5[dim][dim];
                             double dP_iso5_tmp[dim][dim];
                             double dP_iso5_tmp2[dim][dim];
@@ -1395,8 +1393,6 @@ void NeoHookean2Material(mxArray* plhs[], const mxArray* prhs[])
                             MatrixScalar(dim, -2.0 / 3.0 * mu * pow23detF[q] * Mdot(dim, invFT[q], GradU),
                                     F[q], dP_iso1);
                             
-                            /*MatrixScalar(dim, 2.0 / 9.0 * mu * pow23detF[q] * Trace(dim, C[q]) * Mdot(dim, invFT[q], GradU),
-                                    invFT[q], dP_iso2);*/
                             MatrixScalar(dim, mu * pow23detF[q] * 
                                                 ( 2.0 / 9.0 * I_C[q]  * Mdot(dim, invFT[q], GradU) 
                                                  -2.0 / 3.0 * Mdot(dim, F[q], GradU) ),
@@ -1404,7 +1400,6 @@ void NeoHookean2Material(mxArray* plhs[], const mxArray* prhs[])
                             
                             MatrixScalar(dim, mu * pow23detF[q], GradU, dP_iso3);
                             
-                            /*MatrixScalar(dim, -2.0 / 3.0 * mu * pow23detF[q]* Mdot(dim, F[q], GradU), invFT[q], dP_iso4);*/
                             
                             MatrixProductAlphaT2(dim, 1.0, invFT[q], GradU, dP_iso5_tmp);
                             MatrixProductAlpha(dim, 1.0, dP_iso5_tmp, invFT[q], dP_iso5_tmp2);

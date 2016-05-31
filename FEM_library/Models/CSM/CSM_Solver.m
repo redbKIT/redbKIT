@@ -73,40 +73,49 @@ dU             = zeros(MESH.numNodes*MESH.dim,1);
 U_k            = zeros(MESH.numNodes*MESH.dim,1);
 U_k(MESH.Dirichlet_dof) = u_D;
 
+SolidModel = CSM_AssemblerClass( MESH, DATA, FE_SPACE );
+
 % Assemble matrix and right-hand side
 fprintf('\n -- Assembling external Forces... ');
 t_assembly = tic;
-F_ext      = CSM_Assembler('external_forces', MESH, DATA, FE_SPACE);
+F_ext      = SolidModel.compute_volumetric_forces();
+[~, F_ext] =  CSM_ApplyBC([], F_ext, FE_SPACE, MESH, DATA, [], 1);
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s\n', t_assembly);
 
 fprintf('\n -- Assembling internal Forces... ');
 t_assembly = tic;
-[F_in, dF_in]  =  CSM_Assembler('internal_forces', MESH, DATA, FE_SPACE, U_k);
+F_in      = SolidModel.compute_internal_forces(U_k);
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s\n', t_assembly);
 
-Residual = F_in - F_ext;
-% Apply boundary conditions
-fprintf('\n -- Apply boundary conditions ... ');
-t_assembly = tic;
-[A, b]   =  CSM_ApplyBC(dF_in, -Residual, FE_SPACE, MESH, DATA, [], 1);
-t_assembly = toc(t_assembly);
-fprintf('done in %3.3f s\n', t_assembly);
-
-res0Norm = norm(b);
+Residual = F_in(MESH.internal_dof) - F_ext;
+res0Norm = norm(Residual);
 
 LinSolver = LinearSolver( DATA.LinearSolver );
 
 fprintf('\n============ Start Newton Iterations ============\n\n');
 while (k <= maxIter && incrNorm > tol && resRelNorm > tol)
-            
+    
+    fprintf('\n -- Assembling jacobian matrix... ');
+    t_assembly = tic;
+    dF_in     = SolidModel.compute_jacobian(U_k);
+    t_assembly = toc(t_assembly);
+    fprintf('done in %3.3f s\n', t_assembly);
+    
+    % Apply boundary conditions
+    fprintf('\n -- Apply boundary conditions ... ');
+    t_assembly = tic;
+    A   =  CSM_ApplyBC(dF_in, [], FE_SPACE, MESH, DATA, [], 1);
+    t_assembly = toc(t_assembly);
+    fprintf('done in %3.3f s\n', t_assembly);
+
     % Solve
     fprintf('\n   -- Solve J x = -R ... ');    
     Precon.Build( A );
     fprintf('\n        time to build the preconditioner %3.3f s \n', Precon.GetBuildTime());
     LinSolver.SetPreconditioner( Precon );
-    dU(MESH.internal_dof) = LinSolver.Solve( A, b );
+    dU(MESH.internal_dof) = LinSolver.Solve( A, -Residual );
     fprintf('\n        time to solve the linear system in %3.3f s \n', LinSolver.GetSolveTime());
     
     % update solution
@@ -116,20 +125,13 @@ while (k <= maxIter && incrNorm > tol && resRelNorm > tol)
     % Assemble matrix and right-hand side
     fprintf('\n   -- Assembling internal forces... ');
     t_assembly = tic;
-    [F_in, dF_in]  =  CSM_Assembler('internal_forces', MESH, DATA, FE_SPACE, full(U_k));
+    F_in       = SolidModel.compute_internal_forces(U_k);
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);
     
-    Residual   = F_in - F_ext;
+    Residual = F_in(MESH.internal_dof) - F_ext;
     
-    % Apply boundary conditions
-    fprintf('\n   -- Apply boundary conditions ... ');
-    t_assembly = tic;
-    [A, b]   =  CSM_ApplyBC(dF_in, -Residual, FE_SPACE, MESH, DATA, [], 1);
-    t_assembly = toc(t_assembly);
-    fprintf('done in %3.3f s\n', t_assembly);
-    
-    resRelNorm = norm(b) / res0Norm;
+    resRelNorm = norm(Residual) / res0Norm;
     
     fprintf('\n **** Iteration  k = %d:  norm(dU)/norm(Uk) = %1.2e, Residual Rel Norm = %1.2e \n\n',k,full(incrNorm), full(norm(resRelNorm)));
     k = k + 1;

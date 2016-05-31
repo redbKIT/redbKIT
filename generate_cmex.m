@@ -28,38 +28,60 @@ else
     Flags = '';
 end
 
+
 source_files{1} = {'FEM_library/Models/ADR/','ADR_assembler_C_omp.c'};
+dependencies{1} = {};
 source_files{2} = {'FEM_library/Models/ADR/','Mass_assembler_C_omp.c'};
+dependencies{2} = {};
 source_files{3} = {'FEM_library/Models/CSM/','CSM_assembler_C_omp.c'};
+dependencies{3} = {};
 source_files{4} = {'FEM_library/Models/CSM/','CSM_assembler_ExtForces.c'};
+dependencies{4} = {};
 source_files{5} = {'FEM_library/Models/CFD/','CFD_assembler_C_omp.c'};
+dependencies{5} = {};
 source_files{6} = {'FEM_library/Models/CFD/','CFD_assembler_ExtForces.c'};
+dependencies{6} = {};
 source_files{7} = {'FEM_library/Models/CSM/','CSM_ComputeStress_C_omp.c'};
+dependencies{7} = {};
+source_files{8} = {'FEM_library/Models/CSM/','CSM_assembler_C_omp_Q.c'};
+dependencies{8} = {};
+source_files{9} = {'FEM_library/Models/CSM/','CSM_assembler_C_omp_Q2.c'};
+dependencies{9} = {'Tools.c', 'NeoHookeanMaterial.c', 'LinearElasticMaterial.c', ...
+                   'SEMMTMaterial.c', 'NeoHookean2Material.c', 'StVenantKirchhoffMaterial.c'};
 
 for i = 1 : length(source_files)
     
     file_path = [pwd, '/', source_files{i}{1}];
     file_name = source_files{i}{2};
     
-    mex_command = sprintf( 'mex %s%s %s -outdir %s', file_path, file_name, Flags, file_path);
-    eval( mex_command );
+    all_dep = '';
+    if ~isempty( dependencies{i} )
+        for j = 1 : length( dependencies{i})
+            
+            this_dep =  sprintf('%s%s', file_path, dependencies{i}{j});
+            all_dep = [all_dep, ' ', this_dep]; 
+        end
+        
+    end
     
+    mex_command = sprintf( 'mex %s%s %s %s -outdir %s', file_path, file_name, all_dep, Flags, file_path);
+    eval( mex_command );
 end
 
 %% Mexify some Matlab codes
 
-here = pwd;
-source_files{1} = {'FEM_library/Models/CSM/','mexify_CSM_Assembly_M'};
-
-for i = 1 : length(source_files)
-    
-    file_path = [pwd, '/', source_files{i}{1}];
-    file_name = source_files{i}{2};
-        
-    eval(['cd ', file_path]);
-    eval( file_name );
-    eval(['cd ', here]);
-    
-end
+% here = pwd;
+% source_files_M{1} = {'FEM_library/Models/CSM/','mexify_CSM_Assembly_M'};
+% 
+% for i = 1 : length(source_files_M)
+%     
+%     file_path = [pwd, '/', source_files_M{i}{1}];
+%     file_name = source_files_M{i}{2};
+%         
+%     eval(['cd ', file_path]);
+%     eval( file_name );
+%     eval(['cd ', here]);
+%     
+% end
 
 end
