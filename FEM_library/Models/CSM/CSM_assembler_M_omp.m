@@ -13,11 +13,11 @@ nln2         = nln*nln;
 n_blocks     = dim;
 n_blocks2    = n_blocks^2;
 
-rowdG         = zeros(noe, n_blocks2*nln2);
+rowdG         = zeros(noe*n_blocks2*nln2,1);
 coldG         = rowdG;
 coefdG        = rowdG;
 
-rowG         = zeros(noe, n_blocks*nln);
+rowG         = zeros(noe*n_blocks*nln,1);
 coefG        = rowG;
 
 NumQuadPoints          = length(w);

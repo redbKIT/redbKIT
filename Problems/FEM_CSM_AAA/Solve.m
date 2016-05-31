@@ -1,4 +1,4 @@
-clc
+%clc
 clear all
 
 dim      =  3;
@@ -9,4 +9,4 @@ fem      =  'P1';
 
 %% Solve
 [~,~,~] = mkdir('Figures');
-[U, FE_SPACE, MESH, DATA] = CSM_Solver(dim, elements, vertices, boundaries, fem, 'datafile', [], 'Figures/SolFEMP1_AAA');
+[U, FE_SPACE, MESH, DATA] = CSM_Solver(dim, elements, vertices, boundaries, fem, 'datafile', [], 'Figures/SolFEMP1NH2_AAA');

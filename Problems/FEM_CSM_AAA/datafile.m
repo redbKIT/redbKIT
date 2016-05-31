@@ -16,7 +16,7 @@ data.bcNeu{2} = @(x, y, z, t, param)(0.*x.*y.*z);
 data.bcNeu{3} = @(x, y, z, t, param)(0 + 0.*x.*y.*z);
 
 % Normal Pressure
-data.bcPrex   = @(x, y, z, t, param)(-80 + 0*x.*y.*z);
+data.bcPrex   = @(x, y, z, t, param)(-80*1333 + 0*x.*y.*z);
 
 % BC flag
 data.flag_dirichlet{1} = [1];
@@ -32,14 +32,14 @@ data.flag_neumann{3}   = [3];
 data.flag_pressure{3}  = [2];
 
 % material parameters
-data.Material_Model = 'StVenantKirchhoff';%'StVenantKirchhoff', 'Linear'
+data.Material_Model = 'NeoHookean2';%'StVenantKirchhoff', 'Linear','NeoHookean'
 data.Young   = 4.0e+6;
-data.Poisson = 0.45;
+data.Poisson = 0.4;
 data.Density = 1;
 
 % NonLinear Solver
-data.NonLinearSolver.tol               = 1e-6;
-data.NonLinearSolver.maxit             = 1;
+data.NonLinearSolver.tol               = 1e-9;
+data.NonLinearSolver.maxit             = 8;
 
 % Solver and Preconditioner
 %   If parallel pool available, use gmres with AdditiveSchwarz preconditioner
@@ -54,7 +54,7 @@ end
 if poolsize > 0
     
     % Linear Solver
-    data.LinearSolver.type              = 'backslash'; % MUMPS, backslash, gmres
+    data.LinearSolver.type              = 'MUMPS'; % MUMPS, backslash, gmres
     data.LinearSolver.tol               = 1e-8;
     data.LinearSolver.maxit             = 500;
     data.LinearSolver.gmres_verbosity   = 5;
