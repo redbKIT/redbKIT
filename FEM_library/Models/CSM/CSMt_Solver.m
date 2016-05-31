@@ -91,10 +91,12 @@ if isfield(DATA.Preconditioner, 'type') && strcmp( DATA.Preconditioner.type, 'Ad
     Precon.SetRestrictions( R );
 end
 
+SolidModel = CSM_Assembler( MESH, DATA, FE_SPACE );
+
 %% Assemble mass matrix
 fprintf('\n Assembling mass matrix... ');
 t_assembly = tic;
-M    =  CSM_Assembler('mass', MESH, DATA, FE_SPACE);
+M    =  SolidModel.compute_mass();
 M    =  M * DATA.Density;
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s', t_assembly);
@@ -104,13 +106,15 @@ LinSolver = LinearSolver( DATA.LinearSolver );
 % Assemble matrix and right-hand side
 fprintf('\n -- Assembling external Forces at t0... ');
 t_assembly = tic;
-F_ext_old      = CSM_Assembler('external_forces', MESH, DATA, FE_SPACE, [], t0);%M*(-9.81*ones(size(M,1),1));%
+F_ext_old      = SolidModel.compute_volumetric_forces(t0);
+%CSM_Assembler('external_forces', MESH, DATA, FE_SPACE, [], t0);%M*(-9.81*ones(size(M,1),1));%
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s\n', t_assembly);
 
 fprintf('\n -- Assembling internal Forces at t0... ');
 t_assembly = tic;
-F_in_old  =  CSM_Assembler('internal_forces', MESH, DATA, FE_SPACE, u0);
+F_in_old  =  SolidModel.compute_internal_forces( u0 );
+%CSM_Assembler('internal_forces', MESH, DATA, FE_SPACE, u0);
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s\n', t_assembly)
 
@@ -142,13 +146,15 @@ while ( t < tf )
     % Assemble matrix and right-hand side
     fprintf('\n -- Assembling external Forces... ');
     t_assembly = tic;
-    F_ext      = CSM_Assembler('external_forces', MESH, DATA, FE_SPACE, [], t);
+    F_ext      = SolidModel.compute_volumetric_forces( t );
+    %CSM_Assembler('external_forces', MESH, DATA, FE_SPACE, [], t);
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);
     
-    fprintf('\n -- Assembling internal Forces... ');
+    fprintf('\n -- Assembling internal Forces ... ');
     t_assembly = tic;
-    [F_in, dF_in]  =  CSM_Assembler('internal_forces', MESH, DATA, FE_SPACE, U_k);
+    %[F_in, dF_in]  =  CSM_Assembler('internal_forces', MESH, DATA, FE_SPACE, U_k);
+    F_in      = SolidModel.compute_internal_forces( U_k );
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);
     
@@ -156,6 +162,14 @@ while ( t < tf )
                   (1 - TimeAdvance.M_alpha_f) * F_in  + TimeAdvance.M_alpha_f * F_in_old ...
                 - (1 - TimeAdvance.M_alpha_f) * F_ext + TimeAdvance.M_alpha_f * F_ext_old ...
                 - M * Csi;
+            
+            
+    fprintf('\n -- Assembling Jacobian matrix... ');
+    t_assembly = tic;
+    %[F_in, dF_in]  =  CSM_Assembler('internal_forces', MESH, DATA, FE_SPACE, U_k);
+    dF_in     = SolidModel.compute_jacobian( U_k );
+    t_assembly = toc(t_assembly);
+    fprintf('done in %3.3f s\n', t_assembly);        
             
     Jacobian  = Coef_Mass * M + (1 - TimeAdvance.M_alpha_f) * dF_in;
     
@@ -186,7 +200,9 @@ while ( t < tf )
         % Assemble matrix and right-hand side
         fprintf('\n   -- Assembling internal forces... ');
         t_assembly = tic;
-        [F_in, dF_in]  =  CSM_Assembler('internal_forces', MESH, DATA, FE_SPACE, full(U_k));
+        %[F_in, dF_in]  =  CSM_Assembler('internal_forces', MESH, DATA, FE_SPACE, full(U_k));
+        F_in      = SolidModel.compute_internal_forces( full ( U_k ) );
+        dF_in     = SolidModel.compute_jacobian( full ( U_k ) );
         t_assembly = toc(t_assembly);
         fprintf('done in %3.3f s\n', t_assembly);
         

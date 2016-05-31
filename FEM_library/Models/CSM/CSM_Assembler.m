@@ -12,7 +12,7 @@
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri@epfl.ch>
 
-classdef CSM_AssemblerClass < handle
+classdef CSM_Assembler < handle
     
     properties (GetAccess = public, SetAccess = protected)
         M_MESH;
@@ -32,7 +32,7 @@ classdef CSM_AssemblerClass < handle
         
         %==========================================================================
         %% Constructor
-        function obj = CSM_AssemblerClass( MESH, DATA, FE_SPACE )
+        function obj = CSM_Assembler( MESH, DATA, FE_SPACE )
             
             obj.M_MESH      = MESH;
             obj.M_DATA      = DATA;

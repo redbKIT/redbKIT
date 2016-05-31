@@ -1,4 +1,4 @@
-function [varargout] = CSM_Assembler(output, MESH, DATA, FE_SPACE, U_h, t, subdomain)
+function [varargout] = CSM_Assembler_function(output, MESH, DATA, FE_SPACE, U_h, t, subdomain)
 %CSM_ASSEMBLER assembler for 2D/3D CSM models
 %
 %   [F_ext]       = CSM_ASSEMBLER('external_forces', MESH, DATA, FE_SPACE, U_h, t, subdomain)
@@ -11,6 +11,8 @@ function [varargout] = CSM_Assembler(output, MESH, DATA, FE_SPACE, U_h, t, subdo
 %   This file is part of redbKIT.
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri@epfl.ch>
+
+warning('CSM_Assembler_function is deprecated, use CSM_Assembler class instead')
 
 if nargin < 5 || isempty(U_h)
     U_h = zeros(MESH.dim*MESH.numNodes,1);

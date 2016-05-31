@@ -73,7 +73,7 @@ dU             = zeros(MESH.numNodes*MESH.dim,1);
 U_k            = zeros(MESH.numNodes*MESH.dim,1);
 U_k(MESH.Dirichlet_dof) = u_D;
 
-SolidModel = CSM_AssemblerClass( MESH, DATA, FE_SPACE );
+SolidModel = CSM_Assembler( MESH, DATA, FE_SPACE );
 
 % Assemble matrix and right-hand side
 fprintf('\n -- Assembling external Forces... ');
@@ -91,6 +91,7 @@ fprintf('done in %3.3f s\n', t_assembly);
 
 Residual = F_in(MESH.internal_dof) - F_ext;
 res0Norm = norm(Residual);
+resNorm_old = norm(Residual);
 
 LinSolver = LinearSolver( DATA.LinearSolver );
 
@@ -117,22 +118,48 @@ while (k <= maxIter && incrNorm > tol && resRelNorm > tol)
     LinSolver.SetPreconditioner( Precon );
     dU(MESH.internal_dof) = LinSolver.Solve( A, -Residual );
     fprintf('\n        time to solve the linear system in %3.3f s \n', LinSolver.GetSolveTime());
-    
+
     % update solution
-    U_k        = U_k + dU;
+    U_k_tmp     = U_k + dU;
     incrNorm   = norm(dU)/norm(U_k);
     
-    % Assemble matrix and right-hand side
+    % Assemble residual
     fprintf('\n   -- Assembling internal forces... ');
     t_assembly = tic;
-    F_in       = SolidModel.compute_internal_forces(U_k);
+    F_in       = SolidModel.compute_internal_forces(U_k_tmp);
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);
     
     Residual = F_in(MESH.internal_dof) - F_ext;
-    
     resRelNorm = norm(Residual) / res0Norm;
+
+    % backtracking if needed
+    alpha          = 1;
+    backtrack_iter = 0;
     
+    while (norm(Residual) > 2 * resNorm_old && backtrack_iter < 5 )
+    
+        alpha = alpha * 0.75;
+        backtrack_iter = backtrack_iter + 1;
+        
+        % update solution
+        U_k_tmp     = U_k + alpha * dU;
+        
+        % Assemble residual
+        fprintf('\n    -- Backtracing: Assembling internal forces... ');
+        t_assembly = tic;
+        F_in       = SolidModel.compute_internal_forces(U_k_tmp);
+        t_assembly = toc(t_assembly);
+        Residual = F_in(MESH.internal_dof) - F_ext;
+        resRelNorm = norm(Residual) / res0Norm;
+        fprintf('done in %3.3f s, Residual Rel Norm = %1.2e\n', t_assembly, full(norm(resRelNorm)));
+        
+    end
+    
+    U_k = U_k_tmp;
+    incrNorm   = norm(alpha*dU)/norm(U_k);
+    resNorm_old = norm(Residual);
+
     fprintf('\n **** Iteration  k = %d:  norm(dU)/norm(Uk) = %1.2e, Residual Rel Norm = %1.2e \n\n',k,full(incrNorm), full(norm(resRelNorm)));
     k = k + 1;
     
@@ -149,7 +176,7 @@ end
 if DATA.Output.ComputeVonMisesStress
     fprintf('\n   -- Compute Element Stresses... ');
     t_assembly = tic;
-    [Sigma]  =  CSM_Assembler('stress', MESH, DATA, FE_SPACE, full(U_k));
+    [Sigma]  =  CSM_Assembler_function('stress', MESH, DATA, FE_SPACE, full(U_k));
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);
     
