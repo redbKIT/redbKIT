@@ -53,22 +53,24 @@ v2 = nodes(faces(:,3),1:3) - nodes(faces(:,1),1:3);
 % compute normals using cross product (nodes have same size)
 normals = normalizeVector3d(cross(v1, v2, 2));
 
-%check correct orientation (outward)
-faces    = faces';
-elements = elements';
-nodes = nodes';
-elements_row = [elements(1,:) elements(2,:) elements(3,:) elements(4,:)];
-
-id_e = zeros(size(faces,2),1);
-parfor i = 1 : size(faces, 2)
-    id_e(i)        = FaceToElement(faces(:,i), elements, elements_row);
-    centroid_el    = mean(nodes(:,elements(:,id_e(i))),2) ;
-    centroid_face  = mean(nodes(:,faces(:,i)),2) ;
-    sign_normalf   = normals(i,:)*(centroid_face - centroid_el);
-    if sign_normalf < 0
-        normals(i,:) = - normals(i,:);
-    end
-end
+%% check correct orientation (outward)
+% Uncomment the following lines if your mesh does not have outward normals
+%
+% faces    = faces';
+% elements = elements';
+% nodes = nodes';
+% elements_row = [elements(1,:) elements(2,:) elements(3,:) elements(4,:)];
+% 
+% id_e = zeros(size(faces,2),1);
+% parfor i = 1 : size(faces, 2)
+%     id_e(i)        = FaceToElement(faces(:,i), elements, elements_row);
+%     centroid_el    = mean(nodes(:,elements(:,id_e(i))),2) ;
+%     centroid_face  = mean(nodes(:,faces(:,i)),2) ;
+%     sign_normalf   = normals(i,:)*(centroid_face - centroid_el);
+%     if sign_normalf < 0
+%         normals(i,:) = - normals(i,:);
+%     end
+% end
 
     
 end
