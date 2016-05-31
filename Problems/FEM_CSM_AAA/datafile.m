@@ -16,7 +16,7 @@ data.bcNeu{2} = @(x, y, z, t, param)(0.*x.*y.*z);
 data.bcNeu{3} = @(x, y, z, t, param)(0 + 0.*x.*y.*z);
 
 % Normal Pressure
-data.bcPrex   = @(x, y, z, t, param)(-80*1333 + 0*x.*y.*z);
+data.bcPrex   = @(x, y, z, t, param)(-95*1333 + 0*x.*y.*z);
 
 % BC flag
 data.flag_dirichlet{1} = [1];
@@ -33,13 +33,13 @@ data.flag_pressure{3}  = [2];
 
 % material parameters
 data.Material_Model = 'NeoHookean2';%'StVenantKirchhoff', 'Linear','NeoHookean'
-data.Young   = 4.0e+6;
-data.Poisson = 0.4;
+data.Young   = 8e+7;
+data.Poisson = 0.45;
 data.Density = 1;
 
 % NonLinear Solver
-data.NonLinearSolver.tol               = 1e-9;
-data.NonLinearSolver.maxit             = 8;
+data.NonLinearSolver.tol               = 1e-6;
+data.NonLinearSolver.maxit             = 14;
 
 % Solver and Preconditioner
 %   If parallel pool available, use gmres with AdditiveSchwarz preconditioner
@@ -55,15 +55,15 @@ if poolsize > 0
     
     % Linear Solver
     data.LinearSolver.type              = 'MUMPS'; % MUMPS, backslash, gmres
-    data.LinearSolver.tol               = 1e-8;
-    data.LinearSolver.maxit             = 500;
-    data.LinearSolver.gmres_verbosity   = 5;
+    data.LinearSolver.tol               = 1e-7;
+    data.LinearSolver.maxit             = 800;
+    data.LinearSolver.gmres_verbosity   = 10;
     data.LinearSolver.mumps_reordering  = 7;
     
     % Preconditioner
     data.Preconditioner.type         = 'None'; % AdditiveSchwarz, None, ILU
-    data.Preconditioner.local_solver = 'matlab_lu'; % matlab_lu, MUMPS
-    data.Preconditioner.overlap_level     = 2;
+    data.Preconditioner.local_solver = 'MUMPS'; % matlab_lu, MUMPS
+    data.Preconditioner.overlap_level     = 4;
     data.Preconditioner.mumps_reordering  = 7;
     data.Preconditioner.num_subdomains    = poolsize; %poolsize, number of subdomains
     
