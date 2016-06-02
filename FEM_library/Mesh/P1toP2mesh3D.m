@@ -2,18 +2,18 @@ function [elements,vertices,boundaries,rings]=P1toP2mesh3D(elements,vertices,bou
 %P1TOP2MESH3D computes a P2 grid in 3D
 
 %   F. Saleri 9-20-01.
+%   F. Negri 2016, Add mesh Graph to speedup computations (still inefficient)
 
-
-
-[n,nov]     =  size(vertices);
-[n,noe]     =  size(elements);
-n_of_sides  =  nov + noe - 1;
+[~,nov]     =  size(vertices);
+[~,noe]     =  size(elements);
 nside       =  nov;
 
-elements = [elements(1:4,:); zeros(6,noe)];
-%vertices = [vertices,zeros([3,n_of_sides])];
+elements = [elements(1:4,:); zeros(6,noe); elements(5,:)];
+ 
+[ a ] = compute_adjacency(vertices, elements, 3, 'P1');
 
-a = sparse(nov,nov);
+[ii,jj,vv] = find(a);
+a = sparse(ii, jj, vv*0 - 1, nov, nov);
 
 for ie = 1:noe
       i = elements(1,ie);%0
@@ -23,7 +23,7 @@ for ie = 1:noe
       
       % 4, mid point of 0-1
       l1 = a(i,j);
-      if l1 == 0
+      if l1 == -1
             nside = nside + 1;
             a(i,j) = nside;
             a(j,i) = nside;
@@ -35,7 +35,7 @@ for ie = 1:noe
       
       % 5, mid point of 1-2
       l2 = a(j,k);
-      if l2 == 0
+      if l2 == -1
             nside = nside + 1;
             a(j,k) = nside;
             a(k,j) = nside;
@@ -47,7 +47,7 @@ for ie = 1:noe
       
       % 6, mid point of 2-0
       l3 = a(k,i);
-      if l3 == 0
+      if l3 == -1
             nside = nside + 1;
             a(k,i) = nside;
             a(i,k) = nside;
@@ -59,7 +59,7 @@ for ie = 1:noe
       
       % 7, mid point of 0-3
       l4 = a(i,h);
-      if l4 == 0
+      if l4 == -1
             nside = nside + 1;
             a(h,i) = nside;
             a(i,h) = nside;
@@ -71,7 +71,7 @@ for ie = 1:noe
       
       % 8, mid point of 1-3
       l5 = a(j,h);
-      if l5 == 0
+      if l5 == -1
             nside = nside + 1;
             a(h,j) = nside;
             a(j,h) = nside;
@@ -83,7 +83,7 @@ for ie = 1:noe
       
       % 9, mid point of 2-3
       l6 = a(k,h);
-      if l6 == 0
+      if l6 == -1
             nside = nside + 1;
             a(h,k) = nside;
             a(k,h) = nside;
