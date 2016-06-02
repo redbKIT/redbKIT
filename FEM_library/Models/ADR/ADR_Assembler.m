@@ -151,8 +151,9 @@ end
     FE_SPACE.quad_weights, MESH.invjac(index_subd,:,:), MESH.jac(index_subd), FE_SPACE.phi, FE_SPACE.dphi_ref);
 
 %% Build sparse matrices and rhs
-A    = sparse(Arows,Acols,Acoef,MESH.numNodes,MESH.numNodes);
-M    = sparse(Arows,Acols,Mcoef,MESH.numNodes,MESH.numNodes);
-F    = sparse(Rrows,1,Rcoef,MESH.numNodes,1);
+A    = GlobalAssemble(Arows,Acols,Acoef,MESH.numNodes,MESH.numNodes);
+M    = GlobalAssemble(Arows,Acols,Mcoef,MESH.numNodes,MESH.numNodes);
+F    = GlobalAssemble(Rrows,1,Rcoef,MESH.numNodes,1);
+
 
 return

@@ -1,4 +1,3 @@
-%function [varargout] = CSM_AssemblerClass(output, MESH, DATA, FE_SPACE, U_h, t)
 %CSM_ASSEMBLER assembler for 2D/3D CSM models
 %
 %   [F_ext]       = CSM_ASSEMBLER('external_forces', MESH, DATA, FE_SPACE, U_h, t, subdomain)
@@ -22,12 +21,7 @@ classdef CSM_Assembler < handle
         M_MaterialModel;
         M_MaterialParam;
     end
-    
-    %properties (Access = private)
-    %    M_L;
-    %    M_U;
-    %end
-    
+   
     methods
         
         %==========================================================================
@@ -119,7 +113,7 @@ classdef CSM_Assembler < handle
                     obj.M_FE_SPACE.quad_weights, obj.M_MESH.jac, obj.M_FE_SPACE.phi);
                 
                 % Build sparse matrix and vector
-                F_ext    = [F_ext; sparse(rowF, 1, coefF, obj.M_MESH.numNodes, 1)];
+                F_ext    = [F_ext; GlobalAssemble(rowF, 1, coefF, obj.M_MESH.numNodes, 1)];
                 
             end
             
@@ -158,7 +152,7 @@ classdef CSM_Assembler < handle
                 obj.M_FE_SPACE.quad_weights, obj.M_MESH.jac, obj.M_FE_SPACE.phi);
             
             % Build sparse matrix
-            M_scalar   = sparse(rowM, colM, coefM, obj.M_MESH.numNodes, obj.M_MESH.numNodes);
+            M_scalar   = GlobalAssemble(rowM, colM, coefM, obj.M_MESH.numNodes, obj.M_MESH.numNodes);
             M          = [];
             for k = 1 : obj.M_FE_SPACE.numComponents
                 M = blkdiag(M, M_scalar);
@@ -193,7 +187,7 @@ classdef CSM_Assembler < handle
                 obj.M_FE_SPACE.quad_weights, obj.M_MESH.invjac, obj.M_MESH.jac, obj.M_FE_SPACE.phi, obj.M_FE_SPACE.dphi_ref);
             
             % Build sparse matrix and vector
-            F_in    = sparse(rowG, 1, coefG, obj.M_MESH.numNodes*obj.M_MESH.dim, 1);
+            F_in    = GlobalAssemble(rowG, 1, coefG, obj.M_MESH.numNodes*obj.M_MESH.dim, 1);
             
         end
         
@@ -208,7 +202,7 @@ classdef CSM_Assembler < handle
                 obj.M_FE_SPACE.quad_weights, obj.M_MESH.invjac, obj.M_MESH.jac, obj.M_FE_SPACE.phi, obj.M_FE_SPACE.dphi_ref);
             
             % Build sparse matrix and vector
-            dF_in   = sparse(rowdG, coldG, coefdG, obj.M_MESH.numNodes*obj.M_MESH.dim, obj.M_MESH.numNodes*obj.M_MESH.dim);
+            dF_in   = GlobalAssemble(rowdG, coldG, coefdG, obj.M_MESH.numNodes*obj.M_MESH.dim, obj.M_MESH.numNodes*obj.M_MESH.dim);
             
         end
         
