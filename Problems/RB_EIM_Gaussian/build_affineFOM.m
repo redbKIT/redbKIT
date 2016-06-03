@@ -18,6 +18,7 @@ FOM.Qa = 3;
 FOM.P  = 3;
 FOM.mu_min =  [     0.2     0.15   0  ];
 FOM.mu_max =  [     0.8     0.35   360  ];
+FOM.model  = 'ADR';
 
 %% Read problem parameters and BCs from data_file
 DATA       = read_DataFile(data_file);

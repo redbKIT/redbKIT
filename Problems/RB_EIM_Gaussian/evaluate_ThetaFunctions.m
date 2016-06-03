@@ -1,11 +1,11 @@
-function [ theta_a, theta_f ] = evaluate_ThetaFunctions( mu, M, varargin )
+function [ theta_a, theta_f ] = evaluate_ThetaFunctions( mu, FOM, M, varargin )
 
 Qa = 3;
 
 load EIM_quad EIM_quad;
 load PHI_EIM PHI_EIM;
 
-if nargin < 2
+if nargin < 3
     M  = size(EIM_quad, 1); 
 end
 
