@@ -15,6 +15,8 @@ FOM.P  = 3;
 FOM.mu_min = [ 0.0      1      2     ];
 FOM.mu_max = [ 0.6      20     50    ];
 
+FOM.model = 'ADR';
+
 %% Read problem parameters and BCs from data_file
 DATA   = read_DataFile(data_file);
 if nargin < 6

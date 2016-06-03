@@ -33,6 +33,8 @@ end
 %% initialize ROM struct
 if isfield(FOM, 'model')
     ROM.model   = FOM.model;
+else
+    ROM.model = 'ADR';
 end
 
 ROM.MESH   = FOM.MESH;

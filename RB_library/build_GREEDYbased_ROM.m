@@ -34,6 +34,21 @@ ROM.P      = FOM.P;
 ROM.method = method;
 ROM.u_D    = FOM.u_D;
 
+if isfield(FOM, 'model')
+    ROM.model   = FOM.model;
+else
+    ROM.model = 'ADR';
+end
+
+ROM.MESH   = FOM.MESH;
+if isfield(FOM, 'DATA')
+    ROM.DATA   = FOM.DATA;
+end
+
+if isfield(FOM, 'HyRED')
+    ROM.HyRED  = FOM.HyRED;
+end
+
 if isfield(FOM,'stabFactor')
     ROM.stabFactor   = FOM.stabFactor;
 end
