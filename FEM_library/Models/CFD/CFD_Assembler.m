@@ -1,10 +1,5 @@
 function [varargout] = CFD_Assembler(output, MESH, DATA, FE_SPACE_v, FE_SPACE_p, U_h, t, subdomain)
-%CSM_ASSEMBLER assembler for 2D/3D CSM models
-%
-%   [F_ext]       = CSM_ASSEMBLER('external_forces', MESH, DATA, FE_SPACE, U_h, t, subdomain)
-%   [F_in]        = CSM_ASSEMBLER('internal_forces', MESH, DATA, FE_SPACE, U_h, t, subdomain)
-%   [F_in, dF_in] = CSM_ASSEMBLER('internal_forces', MESH, DATA, FE_SPACE, U_h, t, subdomain)
-%   [F, dF]       = CSM_ASSEMBLER('all',             MESH, DATA, FE_SPACE, U_h, t, subdomain)
+%CFD_ASSEMBLER assembler for 2D/3D CFD models
 
 %   This file is part of redbKIT.
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)

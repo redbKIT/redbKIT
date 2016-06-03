@@ -1,10 +1,9 @@
 function [mu_samples, mu_greedy_index] = FullFactorial_ParameterSpace(P, mu_min, mu_max, mu_bar, mu_samples_Dimension, logflag)
 %FULLFACTORIAL_PARAMETERSPACE generates a tensor product grid
 
-%   Author: F. Negri (federico.negri@epfl.ch) 2013-2014
-%   Copyright (C) Federico Negri, CMCS, EPFL
-
-
+%   This file is part of redbKIT.
+%   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
+%   Author: Federico Negri <federico.negri at epfl.ch>
 
 if nargin < 6 || isempty(logflag)
       logflag = zeros(1,P);

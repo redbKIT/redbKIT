@@ -1,4 +1,8 @@
 classdef HDF5_DenseMultiCVector < handle
+
+%   This file is part of redbKIT.
+%   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
+%   Author: Federico Negri <federico.negri at epfl.ch>    
     
     properties (GetAccess = public, SetAccess = protected)
         filename;

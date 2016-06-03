@@ -4,9 +4,10 @@ function [IDEIM_sparse,PHI_sparse] = MDEIM(U_sparse, m)
 %   [IDEIM_SPARSE] = MDEIM(U_SPARSE) given a sparse basis matrix
 %   U_SPARSE of size Nh^2 x M, returns a M x 1 vector IDEIM_SPARSE of indices 
 %   from 1 to Nh^2. 
-%
-%   Author: F. Negri (federico.negri@epfl.ch) 2014-2015
-%   Copyright (C) Federico Negri, CMCS, EPFL
+
+%   This file is part of redbKIT.
+%   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
+%   Author: Federico Negri <federico.negri at epfl.ch> 
 
 fprintf('\nStart MDEIM ... ');
 timeMDEIM = tic;

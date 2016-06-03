@@ -38,12 +38,8 @@ for i = 1 : noe
     
     iii = iii + nln2;
     
-    
 end
 
-A = sparse(row,col,coef,nov,nov);
+A = GlobalAssemble(row,col,coef,nov,nov);
 
 end
-    
-
-
