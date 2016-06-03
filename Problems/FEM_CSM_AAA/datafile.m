@@ -16,7 +16,7 @@ data.bcNeu{2} = @(x, y, z, t, param)(0.*x.*y.*z);
 data.bcNeu{3} = @(x, y, z, t, param)(0 + 0.*x.*y.*z);
 
 % Normal Pressure
-data.bcPrex   = @(x, y, z, t, param)(-95*1333 + 0*x.*y.*z);
+data.bcPrex   = @(x, y, z, t, param)(-120*1333 + 0*x.*y.*z);
 
 % BC flag
 data.flag_dirichlet{1} = [1];
@@ -34,7 +34,7 @@ data.flag_pressure{3}  = [2];
 % material parameters
 data.Material_Model = 'NeoHookean2';%'StVenantKirchhoff', 'Linear','NeoHookean'
 data.Young   = 8e+7;
-data.Poisson = 0.45;
+data.Poisson = 0.49;
 data.Density = 1;
 
 % NonLinear Solver

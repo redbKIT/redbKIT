@@ -1,4 +1,4 @@
-function Solve(material_model, tf, fem)
+function U = Solve(material_model, tf, fem)
 %SOLVE shows how to perform a CSM dynamic simulation
 
 %   This file is part of redbKIT.

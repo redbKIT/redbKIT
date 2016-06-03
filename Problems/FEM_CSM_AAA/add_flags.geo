@@ -1,6 +1,6 @@
 
 
-Merge "AAA_meshMedium.msh";
+Merge "AAA_meshFine.msh";
 CreateTopology;
 
 Physical Surface(1) = {2,3,4,5,6,7,8,9,10,11,12}; // rings

@@ -1,8 +1,7 @@
-%clc
+clc
 clear all
 
 dim      =  3;
-fem      =  'B1';
 
 %% load P1 mesh
 [vertices, boundaries, elements] = msh_to_Mmesh('AAA_meshFineFlags', dim);
@@ -10,4 +9,10 @@ fem      =  'B1';
 
 %% Solve
 [~,~,~] = mkdir('Figures');
-[U, FE_SPACE, MESH, DATA] = CSM_Solver(dim, elements, vertices, boundaries, fem, 'datafile', [], 'Figures/NeoHookean_FineB1');
+
+fem      =  'P2';
+U_P2 = CSM_Solver(dim, elements, vertices, boundaries, fem, 'datafile', [], 'Figures/NeoHookean_FineP2');
+
+
+fem      =  'P1';
+U_P1 = CSM_Solver(dim, elements, vertices, boundaries, fem, 'datafile', [], 'Figures/NeoHookean_FineP1');
