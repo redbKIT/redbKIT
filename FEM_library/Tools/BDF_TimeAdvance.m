@@ -1,4 +1,4 @@
-%BDF_TimeAdvance class to Handle the time advancing scheme based on BDF
+%BDF_TIMEADVANCE class to Handle the time advancing scheme based on BDF
 %schemes
 
 %   This file is part of redbKIT.

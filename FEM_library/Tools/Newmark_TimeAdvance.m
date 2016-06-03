@@ -1,4 +1,4 @@
-%Newmark_TimeAdvance class to Handle the time advancing scheme based on 
+%NEWMARK_TimeAdvance class to Handle the time advancing scheme based on 
 %Newmark scheme
 
 %   This file is part of redbKIT.

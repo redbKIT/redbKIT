@@ -1,4 +1,4 @@
-%GeneralizedAlpha_TimeAdvance class to Handle the time advancing scheme based 
+%GENERALIZEDALPHA_TIMEADVANCE class to Handle the time advancing scheme based 
 %on Generalized Alpha scheme
 
 %   This file is part of redbKIT.

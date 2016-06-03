@@ -1,4 +1,4 @@
-function exporterSubDomains3dVTK(data)
+function exporter3dVTK_cell(data)
 %
 %*****************************************************************************
 %% exporterSubDomains3dVTK writes a VTK file for unstructured mesh

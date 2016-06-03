@@ -1,4 +1,5 @@
 classdef Preconditioner < handle
+%PRECONDITIONER abstract class for preconditioner object
 
 %   This file is part of redbKIT.
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)

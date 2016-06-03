@@ -1,5 +1,8 @@
 function [x,flag,relres,iter,resvec] = my_gmres(A,b,restart,tol,maxit,M1,M2,x,verbosity,varargin)
-%GMRES   Generalized Minimum Residual Method.
+%MY_GMRES   Generalized Minimum Residual Method.
+%
+%   Slightly modified version of Matlab built-in GMRES function.
+%  
 %   X = GMRES(A,B) attempts to solve the system of linear equations A*X = B
 %   for X.  The N-by-N coefficient matrix A must be square and the right
 %   hand side column vector B must have length N. This uses the unrestarted

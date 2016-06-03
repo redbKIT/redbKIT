@@ -1,4 +1,5 @@
 classdef AS_Preconditioner < Preconditioner & handle
+%AS_PRECONDITIONER One-level additive schwarz preconditioner    
     
 %   This file is part of redbKIT.
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)

@@ -22,8 +22,11 @@ function A = GlobalAssemble( i, j, s, m, n )
 %   S. Engblom, D. Lukarski: Fast Matlab compatible sparse assembly on multicore computers, 
 %   in Parallel Comput. 56:1--17 (2016)
 %
-% See also sparse, fsparse.
+%   See also sparse, fsparse.
 
+%   This file is part of redbKIT.
+%   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
+%   Author: Federico Negri <federico.negri at epfl.ch> 
 
 if exist('fsparse', 'file') == 3
     
