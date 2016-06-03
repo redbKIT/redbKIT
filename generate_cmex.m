@@ -46,8 +46,9 @@ dependencies{7} = {};
 source_files{8} = {'FEM_library/Models/CSM/','CSM_assembler_C_omp_Q.c'};
 dependencies{8} = {};
 source_files{9} = {'FEM_library/Models/CSM/','CSM_assembler_C_omp_Q2.c'};
-dependencies{9} = {'Tools.c', 'NeoHookeanMaterial.c', 'LinearElasticMaterial.c', ...
-                   'SEMMTMaterial.c', 'NeoHookean2Material.c', 'StVenantKirchhoffMaterial.c'};
+dependencies{9} = {'MaterialModels/Tools.c', 'MaterialModels/NeoHookeanMaterial.c',...
+                   'MaterialModels/LinearElasticMaterial.c', 'MaterialModels/SEMMTMaterial.c', ...
+                   'MaterialModels/NeoHookean2Material.c', 'MaterialModels/StVenantKirchhoffMaterial.c'};
 
 for i = 1 : length(source_files)
     
