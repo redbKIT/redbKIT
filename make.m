@@ -1,7 +1,7 @@
-function generate_cmex(hasOpenMP)
-%GENERATE_CMEX compiles finite element assemblers written in C
+function make(hasOpenMP)
+%MAKE compiles finite element assemblers written in C
 %
-%   GENERATE_CMEX(HASOPENMP) if HASOPENMP = 1, compiles with flag -fopenmp.
+%   MAKE(HASOPENMP) if HASOPENMP = 1, compiles with flag -fopenmp.
 %   Default is HASOPENMP = 0. 
 %
 %   On Linux: to check whether openmp is available on your system, open a 
@@ -50,8 +50,10 @@ dependencies{9} = {'MaterialModels/Tools.c', 'MaterialModels/NeoHookeanMaterial.
                    'MaterialModels/LinearElasticMaterial.c', 'MaterialModels/SEMMTMaterial.c', ...
                    'MaterialModels/NeoHookean2Material.c', 'MaterialModels/StVenantKirchhoffMaterial.c'};
 
-for i = 1 : length(source_files)
+n_sources = length(source_files);               
+for i = 1 : n_sources
     
+    fprintf('\n ** Compiling %d of %d \n', i, n_sources)
     file_path = [pwd, '/', source_files{i}{1}];
     file_name = source_files{i}{2};
     
