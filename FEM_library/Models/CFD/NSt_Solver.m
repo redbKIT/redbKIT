@@ -88,17 +88,21 @@ if isfield(DATA.Preconditioner, 'type') && strcmp( DATA.Preconditioner.type, 'Ad
     Precon.SetRestrictions( R );
 end
 
+%% Create Fluid Assembler Object
+FluidModel = CFD_Assembler( MESH, DATA, FE_SPACE_v, FE_SPACE_p );
+
+
 %% Assemble Constant Terms
 fprintf('\n   -- Assembling Stokes terms... ');
 t_assembly = tic;
-[A_Stokes] = CFD_Assembler('Stokes', MESH, DATA, FE_SPACE_v, FE_SPACE_p);
+[A_Stokes] = FluidModel.compute_Stokes_matrix();
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s\n', t_assembly);
 
 fprintf('\n Assembling mass matrix... ');
 t_assembly = tic;
-Mv = CFD_Assembler('mass_velocity', MESH, DATA, FE_SPACE_v, FE_SPACE_p);
-Mp = CFD_Assembler('mass_pressure', MESH, DATA, FE_SPACE_v, FE_SPACE_p);
+Mv = FluidModel.compute_mass_velocity();
+Mp = FluidModel.compute_mass_pressure();
 M  = blkdiag(DATA.density * Mv, 0*Mp);
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s', t_assembly);
@@ -158,7 +162,7 @@ while ( t < tf )
             % Assemble matrix and right-hand side
             fprintf('\n -- Assembling Convective Term... ');
             t_assembly = tic;
-            [C1] = CFD_Assembler('convective_Oseen', MESH, DATA, FE_SPACE_v, FE_SPACE_p, v_extrapolated);
+            [C1] = FluidModel.compute_convective_Oseen_matrix( v_extrapolated );
             t_assembly = toc(t_assembly);
             fprintf('done in %3.3f s\n', t_assembly);
             
@@ -198,7 +202,7 @@ while ( t < tf )
             % Assemble matrix and right-hand side
             fprintf('\n   -- Assembling Convective terms... ');
             t_assembly = tic;
-            [C1, C2] = CFD_Assembler('convective', MESH, DATA, FE_SPACE_v, FE_SPACE_p, U_k);
+            [C1, C2] = FluidModel.compute_convective_matrix( U_k );
             t_assembly = toc(t_assembly);
             fprintf('done in %3.3f s\n', t_assembly);
             
@@ -231,7 +235,7 @@ while ( t < tf )
                 % Assemble matrix and right-hand side
                 fprintf('\n   -- Assembling Convective terms... ');
                 t_assembly = tic;
-                [C1, C2] = CFD_Assembler('convective', MESH, DATA, FE_SPACE_v, FE_SPACE_p, U_k);
+                [C1, C2] = FluidModel.compute_convective_matrix( U_k );
                 t_assembly = toc(t_assembly);
                 fprintf('done in %3.3f s\n', t_assembly);
                 

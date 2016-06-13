@@ -253,12 +253,12 @@ void AssembleConvective_Oseen(mxArray* plhs[], const mxArray* prhs[])
     double* gradrefphiV = mxGetPr(prhs[10]);
     double* U_h   = mxGetPr(prhs[11]);
     
-    double gradphiV[dim][nlnV][NumQuadPoints];
+    double gradphiV[NumQuadPoints][dim][nlnV];
     double* elements  = mxGetPr(prhs[3]);
     
     double GradV[dim][dim];
     double GradU[dim][dim];
-    double U_hq[dim][NumQuadPoints];
+    double U_hq[NumQuadPoints][dim];
     
     double* material_param = mxGetPr(prhs[1]);
     double density = material_param[0];
@@ -269,31 +269,32 @@ void AssembleConvective_Oseen(mxArray* plhs[], const mxArray* prhs[])
 #pragma omp parallel for shared(invjac,detjac,elements,myAcols,myArows,myAcoef,U_h) private(gradphiV,GradV,GradU,U_hq,ie,k,l,q,d1,d2) firstprivate(phiV,gradrefphiV,w,numRowsElements,local_matrix_size,nlnV,NumScalarDofsV,density)
     for (ie = 0; ie < noe; ie = ie + 1 )
     {
-        for (k = 0; k < nlnV; k = k + 1 )
-        {
-            for (q = 0; q < NumQuadPoints; q = q + 1 )
-            {
-                for (d1 = 0; d1 < dim; d1 = d1 + 1 )
-                {
-                    gradphiV[d1][k][q] = 0;
-                    for (d2 = 0; d2 < dim; d2 = d2 + 1 )
-                    {
-                        gradphiV[d1][k][q] = gradphiV[d1][k][q] + INVJAC(ie,d1,d2)*GRADREFPHIV(k,q,d2);
-                    }
-                }
-            }
-        }
         
         for (q = 0; q < NumQuadPoints; q = q + 1 )
         {
             for (d1 = 0; d1 < dim; d1 = d1 + 1 )
             {
-                U_hq[d1][q] = 0;
+                for (k = 0; k < nlnV; k = k + 1 )
+                {
+                    gradphiV[q][d1][k] = 0;
+                    for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+                    {
+                        gradphiV[q][d1][k] = gradphiV[q][d1][k] + INVJAC(ie,d1,d2)*GRADREFPHIV(k,q,d2);
+                    }
+                }
+            }
+        }
+
+        for (q = 0; q < NumQuadPoints; q = q + 1 )
+        {
+            for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+            {
+                U_hq[q][d1] = 0;
                 for (k = 0; k < nlnV; k = k + 1 )
                 {
                     int e_k;
                     e_k = (int)(elements[ie*numRowsElements + k] + d1*NumScalarDofsV - 1);
-                    U_hq[d1][q] = U_hq[d1][q] + U_h[e_k] * phiV[k+q*nlnV];
+                    U_hq[q][d1] = U_hq[q][d1] + U_h[e_k] * phiV[k+q*nlnV];
                 }
             }
         }
@@ -312,7 +313,7 @@ void AssembleConvective_Oseen(mxArray* plhs[], const mxArray* prhs[])
                 {
                     for (d1 = 0; d1 < dim; d1 = d1 + 1 )
                     {
-                        aloc  = aloc + U_hq[d1][q] * gradphiV[d1][b][q] * phiV[a+q*nlnV] * w[q];
+                        aloc  = aloc + U_hq[q][d1] * gradphiV[q][d1][b] * phiV[a+q*nlnV] * w[q];
                     }
                 }
                 

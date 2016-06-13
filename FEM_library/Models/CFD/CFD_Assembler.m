@@ -1,196 +1,226 @@
-function [varargout] = CFD_Assembler(output, MESH, DATA, FE_SPACE_v, FE_SPACE_p, U_h, t, subdomain)
-%CFD_ASSEMBLER assembler for 2D/3D CFD models
+%CFD_ASSEMBLER assembler class for 2D/3D Computational Fluid Mechanics
+% CFD_ASSEMBLER methods:
+%    CFD_ASSEMBLER                - constructor
+%    SetMaterialParameters        - set parameters vector
+%    compute_volumetric_forces    - assemble volumetric rhs contribute 
+%    compute_surface_forces       - assemble surface rhs contribute 
+%    compute_external_forces      - assemble all external forces
+%    compute_mass                 - assemble mass matrix
+%    compute_stress               - compute stress for postprocessing
+%    compute_internal_forces      - assemble vector of internal forces
+%    compute_jacobian             - assemble jacobian (tangent stiffness) matrix
+%
+% CFD_ASSEMBLER properties:
+%    M_MESH             - struct containing MESH data
+%    M_DATA             - struct containing DATA information
+%    M_FE_SPACE         - struct containing Finite Element space data
+%    M_MaterialModel    - string containing name of the material model
+%    M_MaterialParam    - vector containing material parameters
 
 %   This file is part of redbKIT.
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri@epfl.ch>
 
-if nargin < 6 || isempty(U_h)
-    U_h = zeros(FE_SPACE_v.numDof + FE_SPACE_p.numDof,1);
-end
-
-if nargin < 7
-    t = [];
-end
-
-if nargin < 8
-    subdomain = [];
-end
-
-if ~isempty(subdomain)
-    index_subd = [];
-    for q = 1 : length(subdomain)
-        index_subd = [index_subd find(MESH.elements(FE_SPACE.numElemDof+1,:) == subdomain(q))];
+classdef CFD_Assembler < handle
+    
+    properties (GetAccess = public, SetAccess = protected)
+        M_MESH;
+        M_DATA;
+        M_FE_SPACE_v;
+        M_FE_SPACE_p;
+        M_totSize;
+        M_density;
+        M_kinematic_viscosity;
     end
-    MESH.elements = MESH.elements(:,index_subd);
-    MESH.numElem  = size(MESH.elements,2);
-else
-    index_subd = [1:MESH.numElem];
-end
-
-switch output
-    
-    case 'volume_force'
+   
+    methods
         
-        F_volume = compute_external_forces(MESH, DATA, FE_SPACE_v, t, index_subd);
+        %==========================================================================
+        %% Constructor
+        function obj = CFD_Assembler( MESH, DATA, FE_SPACE_v, FE_SPACE_p )
+            
+            obj.M_MESH        = MESH;
+            obj.M_DATA        = DATA;
+            obj.M_FE_SPACE_v  = FE_SPACE_v;
+            obj.M_FE_SPACE_p  = FE_SPACE_p;
+            obj.M_totSize     = FE_SPACE_v.numDof + FE_SPACE_p.numDof;
+            obj = SetFluidParameters( obj );
+            
+        end
         
-        varargout{1} = [F_volume; zeros(FE_SPACE_p.numDof,1)];
+        %==========================================================================
+        %% SetMaterialParameters
+        function obj = SetFluidParameters( obj )
+            
+             if isfield(obj.M_DATA, 'density')
+                 obj.M_density = obj.M_DATA.density;
+             else
+                 warning('\nCFD_ASSEMBLER class: density not provided, set to 1 by default \n')
+                 obj.M_density = obj.M_DATA.density;
+             end
+             
+             if isfield(obj.M_DATA, 'kinematic_viscosity')
+                 obj.M_kinematic_viscosity = obj.M_DATA.kinematic_viscosity;
+             else
+                 warning('\nCFD_ASSEMBLER class: kinematic viscosity not provided\n set to 1 by default \n')
+                 obj.M_kinematic_viscosity = obj.M_DATA.kinematic_viscosity;
+             end
+             
+        end
         
-    case 'Stokes'
-        
-        [A] = compute_Stokes_matrix(DATA.kinematic_viscosity, MESH, FE_SPACE_v, FE_SPACE_p, index_subd);
-        
-        varargout{1} = A;    
-        
-    case 'convective_Oseen'
-        
-        [C] = compute_convective_Oseen_matrix(DATA.density, MESH, FE_SPACE_v, FE_SPACE_p, U_h, index_subd);
+        %==========================================================================
+        %% Compute_external_forces
+        function F_ext = compute_external_forces(obj, t)
+            
+            if nargin < 2 || isempty(t)
+                t = [];
+            end
+            
+            % Computations of all quadrature nodes in the elements
+            coord_ref = obj.M_MESH.chi;
+            switch obj.M_MESH.dim
                 
-        varargout{1} = 0*C;
-        
-    case 'convective'
-        
-        [C1, C2] = compute_convective_matrix(DATA.density, MESH, FE_SPACE_v, FE_SPACE_p, U_h, index_subd);
-        
-        varargout{1} = C1;
-        varargout{2} = C2;
-        
-        
-    case 'mass_velocity'
-        
-        [M_v] = compute_mass( MESH, FE_SPACE_v, index_subd);
-        
-        varargout{1} = M_v;
-        
-    case 'mass_pressure'
-        
-        [M_p] = compute_mass( MESH, FE_SPACE_p, index_subd);
-        
-        varargout{1} = M_p;
-
-        
-    otherwise
-        error('output option not available')
-end
-
-
-end
-
-%==========================================================================
-function [F_ext] = compute_external_forces(MESH, DATA, FE_SPACE, t, index_subd)
-
-% Computations of all quadrature nodes in the elements
-coord_ref = MESH.chi;
-switch MESH.dim
-    
-    case 2
-        
-        x = zeros(MESH.numElem,FE_SPACE.numQuadNodes); y = x;
-        for j = 1 : 3
-            i = MESH.elements(j,:);
-            vtemp = MESH.vertices(1,i);
-            x = x + vtemp'*coord_ref(j,:);
-            vtemp = MESH.vertices(2,i);
-            y = y + vtemp'*coord_ref(j,:);
+                case 2
+                    
+                    x = zeros(obj.M_MESH.numElem,obj.M_FE_SPACE.numQuadNodes); y = x;
+                    for j = 1 : 3
+                        i = obj.M_MESH.elements(j,:);
+                        vtemp = obj.M_MESH.vertices(1,i);
+                        x = x + vtemp'*coord_ref(j,:);
+                        vtemp = obj.M_MESH.vertices(2,i);
+                        y = y + vtemp'*coord_ref(j,:);
+                    end
+                    
+                    % Evaluation of external forces in the quadrature nodes
+                    for k = 1 : obj.M_MESH.dim
+                        f{k}  = obj.M_DATA.force{k}(x,y,t,obj.M_DATA.param);
+                    end
+                    
+                case 3
+                    
+                    x = zeros(obj.M_MESH.numElem,obj.M_FE_SPACE.numQuadNodes); y = x; z = x;
+                    
+                    for j = 1 : 4
+                        i = obj.M_MESH.elements(j,:);
+                        vtemp = obj.M_MESH.vertices(1,i);
+                        x = x + vtemp'*coord_ref(j,:);
+                        vtemp = obj.M_MESH.vertices(2,i);
+                        y = y + vtemp'*coord_ref(j,:);
+                        vtemp = obj.M_MESH.vertices(3,i);
+                        z = z + vtemp'*coord_ref(j,:);
+                    end
+                    
+                    % Evaluation of external forces in the quadrature nodes
+                    for k = 1 : obj.M_MESH.dim
+                        f{k}  = obj.M_DATA.force{k}(x,y,z,t,obj.M_DATA.param);
+                    end
+                    
+            end
+            
+            % C_OMP assembly, returns matrices in sparse vector format
+            F_ext = [];
+            for k = 1 : obj.M_MESH.dim
+                
+                [rowF, coefF] = CSM_assembler_ExtForces(f{k}, obj.M_MESH.elements, obj.M_FE_SPACE_v.numElemDof, ...
+                    obj.M_FE_SPACE_v.quad_weights, obj.M_MESH.jac, obj.M_FE_SPACE_v.phi);
+                
+                % Build sparse matrix and vector
+                F_ext    = [F_ext; GlobalAssemble(rowF, 1, coefF, obj.M_MESH.numNodes, 1)];
+                
+            end
+            
+            F_ext = [F_ext; zeros(obj.M_FE_SPACE_p.numDof,1)];
         end
         
-        % Evaluation of external forces in the quadrature nodes
-        for k = 1 : MESH.dim
-            f{k}  = DATA.force{k}(x,y,t,DATA.param);
+        %==========================================================================
+        %% compute_Stokes_matrix
+        function A = compute_Stokes_matrix(obj)
+            
+            % C_OMP assembly, returns matrices in sparse vector format
+            [rowA, colA, coefA] = ...
+                CFD_assembler_C_omp('Stokes', obj.M_kinematic_viscosity, obj.M_MESH.dim, obj.M_MESH.elements, ...
+                obj.M_FE_SPACE_v.numElemDof, obj.M_FE_SPACE_p.numElemDof, obj.M_FE_SPACE_v.numDof, ...
+                obj.M_FE_SPACE_v.quad_weights, obj.M_MESH.invjac, obj.M_MESH.jac, ...
+                obj.M_FE_SPACE_v.phi, obj.M_FE_SPACE_v.dphi_ref, obj.M_FE_SPACE_p.phi);
+            
+            % Build sparse matrix
+            A   = GlobalAssemble(rowA, colA, coefA, obj.M_totSize, obj.M_totSize);
+
         end
         
-    case 3
-        
-        x = zeros(MESH.numElem,FE_SPACE.numQuadNodes); y = x; z = x;
-        
-        for j = 1 : 4
-            i = MESH.elements(j,:);
-            vtemp = MESH.vertices(1,i);
-            x = x + vtemp'*coord_ref(j,:);
-            vtemp = MESH.vertices(2,i);
-            y = y + vtemp'*coord_ref(j,:);
-            vtemp = MESH.vertices(3,i);
-            z = z + vtemp'*coord_ref(j,:);
+        %==========================================================================
+        %% compute_convective_Oseen_matrix
+        function C = compute_convective_Oseen_matrix(obj, U_h)
+            
+            if nargin < 2 || isempty(U_h)
+                U_h = zeros(obj.M_totSize,1);
+            end
+
+            % C_OMP assembly, returns matrices in sparse vector format
+            [rowA, colA, coefA] = ...
+                CFD_assembler_C_omp('convective_Oseen', 1.0, obj.M_MESH.dim, obj.M_MESH.elements, ...
+                obj.M_FE_SPACE_v.numElemDof, obj.M_FE_SPACE_v.numDof, ...
+                obj.M_FE_SPACE_v.quad_weights, obj.M_MESH.invjac, obj.M_MESH.jac, ...
+                obj.M_FE_SPACE_v.phi, obj.M_FE_SPACE_v.dphi_ref, U_h);
+            
+            % Build sparse matrix
+            C   = GlobalAssemble(rowA, colA, coefA, obj.M_totSize, obj.M_totSize);
+            C   = obj.M_density * C;
+
         end
         
-        % Evaluation of external forces in the quadrature nodes
-        for k = 1 : MESH.dim
-            f{k}  = DATA.force{k}(x,y,z,t,DATA.param);
+        %==========================================================================
+        %% compute_convective_matrix
+        function [C1, C2] = compute_convective_matrix(obj, U_h)
+            
+            if nargin < 2 || isempty(U_h)
+                U_h = zeros(obj.M_totSize,1);
+            end
+            
+            % C_OMP assembly, returns matrices in sparse vector format
+            [rowA, colA, coefA, rowB, colB, coefB] = ...
+                CFD_assembler_C_omp('convective', 1.0, obj.M_MESH.dim, obj.M_MESH.elements, ...
+                obj.M_FE_SPACE_v.numElemDof, obj.M_FE_SPACE_v.numDof, ...
+                obj.M_FE_SPACE_v.quad_weights, obj.M_MESH.invjac, obj.M_MESH.jac, ...
+                obj.M_FE_SPACE_v.phi, obj.M_FE_SPACE_v.dphi_ref, U_h);
+            
+            % Build sparse matrix
+            C1   = GlobalAssemble(rowA, colA, coefA, obj.M_totSize, obj.M_totSize);
+            C2   = GlobalAssemble(rowB, colB, coefB, obj.M_totSize, obj.M_totSize);
+
+            C1   = obj.M_density * C1;
+            C2   = obj.M_density * C2;
         end
         
-end
-% C_OMP assembly, returns matrices in sparse vector format
-
-F_ext = [];
-for k = 1 : MESH.dim
-    
-    [rowF, coefF] = CSM_assembler_ExtForces(f{k}, MESH.elements, FE_SPACE.numElemDof, ...
-        FE_SPACE.quad_weights, MESH.jac(index_subd), FE_SPACE.phi);
-    
-    % Build sparse matrix and vector
-    F_ext    = [F_ext; sparse(rowF, 1, coefF, FE_SPACE.numDofScalar, 1)];
-    
-end
-
-end
-%==========================================================================
-function [M] = compute_mass( MESH, FE_SPACE, index_subd)
-
-% C_OMP assembly, returns matrices in sparse vector format
-[rowM, colM, coefM] = Mass_assembler_C_omp(MESH.dim, MESH.elements, FE_SPACE.numElemDof, ...
-     FE_SPACE.quad_weights, MESH.jac(index_subd), FE_SPACE.phi);
-
-% Build sparse matrix
-M_scalar   = sparse(rowM, colM, coefM, FE_SPACE.numDofScalar, FE_SPACE.numDofScalar);
-M          = [];
-for k = 1 : FE_SPACE.numComponents
-    M = blkdiag(M, M_scalar);
-end
-
-end
-%==========================================================================
-function [A] =  compute_Stokes_matrix(viscosity, MESH, FE_SPACE_v, FE_SPACE_p, index_subd)
+        %==========================================================================
+        %% compute_mass_velocity
+        function [M] = compute_mass(obj, FE_SPACE)
+            
+            % C_OMP assembly, returns matrices in sparse vector format
+            [rowM, colM, coefM] = Mass_assembler_C_omp(obj.M_MESH.dim, obj.M_MESH.elements, FE_SPACE.numElemDof, ...
+                FE_SPACE.quad_weights, obj.M_MESH.jac, FE_SPACE.phi);
+            
+            % Build sparse matrix
+            M_scalar   = GlobalAssemble(rowM, colM, coefM, FE_SPACE.numDofScalar, FE_SPACE.numDofScalar);
+            M          = [];
+            for k = 1 : FE_SPACE.numComponents
+                M = blkdiag(M, M_scalar);
+            end
+            
+        end
         
-% C_OMP assembly, returns matrices in sparse vector format
-[rowA, colA, coefA] = ...
-    CFD_assembler_C_omp('Stokes', viscosity, MESH.dim, MESH.elements, ...
-    FE_SPACE_v.numElemDof, FE_SPACE_p.numElemDof, FE_SPACE_v.numDof, ...
-    FE_SPACE_v.quad_weights, MESH.invjac(index_subd,:,:), MESH.jac(index_subd), ...
-    FE_SPACE_v.phi, FE_SPACE_v.dphi_ref, FE_SPACE_p.phi);
-
-% Build sparse matrix
-A   = sparse(rowA, colA, coefA, FE_SPACE_v.numDof + FE_SPACE_p.numDof, FE_SPACE_v.numDof + FE_SPACE_p.numDof);
-
-end
-%==========================================================================
-function [C] =  compute_convective_Oseen_matrix(density, MESH, FE_SPACE_v, FE_SPACE_p, U_h, index_subd)
+        %==========================================================================
+        %% compute_mass_velocity
+        function [Mv] = compute_mass_velocity(obj)
+            Mv = compute_mass(obj, obj.M_FE_SPACE_v);
+        end
         
-% C_OMP assembly, returns matrices in sparse vector format
-[rowA, colA, coefA] = ...
-    CFD_assembler_C_omp('convective_Oseen', density, MESH.dim, MESH.elements, ...
-    FE_SPACE_v.numElemDof, FE_SPACE_v.numDof, ...
-    FE_SPACE_v.quad_weights, MESH.invjac(index_subd,:,:), MESH.jac(index_subd), ...
-    FE_SPACE_v.phi, FE_SPACE_v.dphi_ref, U_h);
-
-% Build sparse matrix
-
-C   = sparse(rowA, colA, coefA, FE_SPACE_v.numDof + FE_SPACE_p.numDof, FE_SPACE_v.numDof + FE_SPACE_p.numDof);
-C   = density * C;
-end
-%==========================================================================
-function [C1, C2] =  compute_convective_matrix(density, MESH, FE_SPACE_v, FE_SPACE_p, U_h, index_subd)
+        %==========================================================================
+        %% compute_mass_pressure
+        function [Mp] = compute_mass_pressure(obj)
+            Mp = compute_mass(obj, obj.M_FE_SPACE_p);
+        end
         
-% C_OMP assembly, returns matrices in sparse vector format
-[rowA, colA, coefA, rowB, colB, coefB] = ...
-    CFD_assembler_C_omp('convective', density, MESH.dim, MESH.elements, ...
-    FE_SPACE_v.numElemDof, FE_SPACE_v.numDof, ...
-    FE_SPACE_v.quad_weights, MESH.invjac(index_subd,:,:), MESH.jac(index_subd), ...
-    FE_SPACE_v.phi, FE_SPACE_v.dphi_ref, U_h);
-
-% Build sparse matrix
-
-C1   = sparse(rowA, colA, coefA, FE_SPACE_v.numDof + FE_SPACE_p.numDof, FE_SPACE_v.numDof + FE_SPACE_p.numDof);
-C2   = sparse(rowB, colB, coefB, FE_SPACE_v.numDof + FE_SPACE_p.numDof, FE_SPACE_v.numDof + FE_SPACE_p.numDof);
-
+    end
+    
 end
-%==========================================================================
