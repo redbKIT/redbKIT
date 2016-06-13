@@ -14,6 +14,5 @@ dim      =  3;
 %U_P2 = CSM_Solver(dim, elements, vertices, boundaries, fem, 'datafile', [], 'Figures/NeoHookean_FineP2');
 
 
-fem      =  'P1';
-U_P1N = CSM_Solver(dim, elements, vertices, boundaries, fem, 'datafile', [], 'Figures/NeoHookean_MediumP1');
-U_P1R = CSM_Solver(dim, elements, vertices, boundaries, fem, 'datafile', [], 'Figures/RagavanVorp0_MediumP1');
+fem      =  'P2';
+U_P1R = CSM_Solver(dim, elements, vertices, boundaries, fem, 'datafile', {'RaghavanVorp', 1}, 'Figures/RagavanVorp_MediumP2');

@@ -114,10 +114,10 @@ while (k <= maxIter && incrNorm > tol && resRelNorm > tol)
     % Solve
     fprintf('\n   -- Solve J x = -R ... ');    
     Precon.Build( A );
-    fprintf('\n        time to build the preconditioner %3.3f s \n', Precon.GetBuildTime());
+    fprintf('\n        time to build the preconditioner: %3.3f s \n', Precon.GetBuildTime());
     LinSolver.SetPreconditioner( Precon );
     dU(MESH.internal_dof) = LinSolver.Solve( A, -Residual );
-    fprintf('\n        time to solve the linear system in %3.3f s \n', LinSolver.GetSolveTime());
+    fprintf('\n        time to solve the linear system: %3.3f s \n', LinSolver.GetSolveTime());
 
     % update solution
     U_k_tmp     = U_k + dU;
@@ -137,16 +137,16 @@ while (k <= maxIter && incrNorm > tol && resRelNorm > tol)
     alpha          = 1;
     backtrack_iter = 0;
     
-    while ((norm(Residual) > 2 * resNorm_old || isnan( norm(Residual) )) && backtrack_iter < 5 )
+    while ((norm(Residual) > 2 * resNorm_old || isnan( norm(Residual) )) && backtrack_iter < 8 )
     
-        alpha = alpha * 0.75;
+        alpha = alpha * 0.6;
         backtrack_iter = backtrack_iter + 1;
         
         % update solution
         U_k_tmp     = U_k + alpha * dU;
         
         % Assemble residual
-        fprintf('\n    -- Backtracing: Assembling internal forces... ');
+        fprintf('\n    -- Backtracing alpha = %1.2e: Assembling internal forces... ', alpha);
         t_assembly = tic;
         F_in       = SolidModel.compute_internal_forces(U_k_tmp);
         t_assembly = toc(t_assembly);
@@ -176,14 +176,14 @@ end
 if DATA.Output.ComputeVonMisesStress
     fprintf('\n   -- Compute Element Stresses... ');
     t_assembly = tic;
-    [Sigma]  =  CSM_Assembler_function('stress', MESH, DATA, FE_SPACE, full(U_k));
+    [Sigma]  =  SolidModel.compute_stress(U_k);%CSM_Assembler_function('stress', MESH, DATA, FE_SPACE, full(U_k));
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);
     
     if MESH.dim == 2
-        warning('VonMisesStress to be implemented in 2D')
+        Sigma_VM = sqrt(  Sigma(:,1).^2 + Sigma(:,4).^2 - Sigma(:,1) .* Sigma(:,4) + 3 * Sigma(:,2).^2 );
     elseif MESH.dim == 3
-        Sigma_VM = sqrt( (Sigma(:,1) - Sigma(:,5)).^2 + (Sigma(:,5) - Sigma(:,9)).^2 + (Sigma(:,9) - Sigma(:,1)).^2 );
+        Sigma_VM = sqrt( 0.5 * ( (Sigma(:,1) - Sigma(:,5)).^2 + (Sigma(:,5) - Sigma(:,9)).^2 + (Sigma(:,9) - Sigma(:,1)).^2 + 6 * ( Sigma(:,2).^2 + Sigma(:,6).^2 + Sigma(:,7).^2 ) ) );
     end
     CSM_export_VonMisesStress(MESH.dim, Sigma_VM, MESH.vertices, MESH.elements, [vtk_filename, '_VMstress']);
 end

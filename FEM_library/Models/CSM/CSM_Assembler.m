@@ -183,7 +183,7 @@ classdef CSM_Assembler < handle
             [quad_nodes, quad_weights]   = quadrature(obj.M_MESH.dim, 1);
             [phi, dphi_ref]              = fem_basis(obj.M_FE_SPACE.dim, obj.M_FE_SPACE.fem, quad_nodes);
             
-            [S] = CSM_ComputeStress_C_omp_Q2(obj.M_MESH.dim, [obj.M_MaterialModel,'_stress'], obj.M_MaterialParam, ...
+            [S] = CSM_assembler_C_omp_Q2(obj.M_MESH.dim, [obj.M_MaterialModel,'_stress'], obj.M_MaterialParam, ...
                 U_h, obj.M_MESH.elements, obj.M_FE_SPACE.numElemDof,...
                 quad_weights, obj.M_MESH.invjac, obj.M_MESH.jac, phi, dphi_ref);
             
@@ -207,17 +207,15 @@ classdef CSM_Assembler < handle
         %==========================================================================
         %% Compute internal forces Residual
         function [dF_in] = compute_jacobian(obj, U_h)
-            tic
+
             % C_OMP assembly, returns matrices in sparse vector format
             [rowdG, coldG, coefdG] = ...
                 CSM_assembler_C_omp_Q2(obj.M_MESH.dim, [obj.M_MaterialModel,'_jacobian'], obj.M_MaterialParam, U_h, ...
                 obj.M_MESH.elements, obj.M_FE_SPACE.numElemDof, ...
                 obj.M_FE_SPACE.quad_weights, obj.M_MESH.invjac, obj.M_MESH.jac, obj.M_FE_SPACE.phi, obj.M_FE_SPACE.dphi_ref);
-            toc
+            
             % Build sparse matrix and vector
-            tic
             dF_in   = GlobalAssemble(rowdG, coldG, coefdG, obj.M_MESH.numNodes*obj.M_MESH.dim, obj.M_MESH.numNodes*obj.M_MESH.dim);
-            toc
         end
         
     end
