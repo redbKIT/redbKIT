@@ -357,3 +357,113 @@ void LinearElasticMaterial_jacobian(mxArray* plhs[], const mxArray* prhs[])
 }
 /*************************************************************************/
 
+void LinearElasticMaterial_stress(mxArray* plhs[], const mxArray* prhs[])
+{
+    
+    double* dim_ptr = mxGetPr(prhs[0]);
+    int dim     = (int)(dim_ptr[0]);
+    int noe     = mxGetN(prhs[4]);
+    double* nln_ptr = mxGetPr(prhs[5]);
+    int nln     = (int)(nln_ptr[0]);
+    int numRowsElements  = mxGetM(prhs[4]);
+    int nln2    = nln*nln;
+    
+    plhs[0] = mxCreateDoubleMatrix(noe,dim*dim, mxREAL);
+    double* Sigma    = mxGetPr(plhs[0]);
+    
+    int k,l;
+    int q;
+    int NumQuadPoints     = mxGetN(prhs[6]);
+    int NumNodes          = (int)(mxGetM(prhs[3]) / dim);
+    
+    double* U_h   = mxGetPr(prhs[3]);
+    double* w   = mxGetPr(prhs[6]);
+    double* invjac = mxGetPr(prhs[7]);
+    double* detjac = mxGetPr(prhs[8]);
+    double* phi = mxGetPr(prhs[9]);
+    double* gradrefphi = mxGetPr(prhs[10]);
+    
+    double gradphi[dim][nln];
+    double* elements  = mxGetPr(prhs[4]);
+    
+    double GradUh[dim][dim];
+    
+    double Id[dim][dim];
+    int d1,d2;
+    for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+    {
+        for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+        {
+            Id[d1][d2] = 0;
+            if (d1==d2)
+            {
+                Id[d1][d2] = 1;
+            }
+        }
+    }
+    
+    double F[dim][dim];
+    double EPS[dim][dim];
+    
+    double* material_param = mxGetPr(prhs[2]);
+    double Young = material_param[0];
+    double Poisson = material_param[1];
+    double mu = Young / (2 + 2 * Poisson);
+    double lambda =  Young * Poisson /( (1+Poisson) * (1-2*Poisson) );
+    
+    /* Assembly: loop over the elements */
+    int ie;
+    
+#pragma omp parallel for shared(invjac,detjac,elements,U_h) private(gradphi,F,EPS,GradUh,ie,k,l,q,d1,d2) firstprivate(phi,gradrefphi,w,numRowsElements,nln2,nln,NumNodes,Id,mu,lambda)
+    
+    for (ie = 0; ie < noe; ie = ie + 1 )
+    {
+        q = 0;
+        for (k = 0; k < nln; k = k + 1 )
+        {
+            for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+            {
+                gradphi[d1][k] = 0;
+                for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+                {
+                    gradphi[d1][k] = gradphi[d1][k] + INVJAC(ie,d1,d2)*GRADREFPHI(k,q,d2);
+                }
+            }
+        }
+        
+        for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+        {
+            for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+            {
+                GradUh[d1][d2] = 0;
+                for (k = 0; k < nln; k = k + 1 )
+                {
+                    int e_k;
+                    e_k = (int)(elements[ie*numRowsElements + k] + d1*NumNodes - 1);
+                    GradUh[d1][d2] = GradUh[d1][d2] + U_h[e_k] * gradphi[d2][k];
+                }
+                F[d1][d2] = Id[d1][d2] + GradUh[d1][d2];
+            }
+        }
+        
+        for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+        {
+            for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+            {
+                EPS[d1][d2] = 0.5 * ( F[d1][d2] + F[d2][d1] ) - Id[d1][d2];
+            }
+        }
+        
+        double trace = Trace(dim, EPS);
+        
+        for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+        {
+            for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+            {
+                Sigma[ie+(d1+d2*dim)*noe] = 2 * mu * EPS[d1][d2] + lambda * trace * Id[d1][d2];
+            }
+        }
+        
+    }
+}
+/*************************************************************************/

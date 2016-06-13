@@ -16,6 +16,7 @@
 #include "MaterialModels/NeoHookeanMaterial.h"
 #include "MaterialModels/NeoHookean2Material.h"
 #include "MaterialModels/StVenantKirchhoffMaterial.h"
+#include "MaterialModels/RaghavanVorpMaterial.h"
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -81,6 +82,11 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
             StVenantKirchhoffMaterial_jacobian(plhs, prhs);
     }
     
+    if (strcmp(Material_Model, "StVenantKirchhoff_stress")==0)
+    {
+            StVenantKirchhoffMaterial_stress(plhs, prhs);
+    }
+    
     if (strcmp(Material_Model, "NeoHookean2_forces")==0)
     {
             NeoHookean2Material_forces(plhs, prhs);
@@ -90,7 +96,26 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     {
             NeoHookean2Material_jacobian(plhs, prhs);
     }
+    
+    if (strcmp(Material_Model, "NeoHookean2_stress")==0)
+    {
+            NeoHookean2Material_stress(plhs, prhs);
+    }
+    
+    if (strcmp(Material_Model, "RaghavanVorp_forces")==0)
+    {
+            RaghavanVorpMaterial_forces(plhs, prhs);
+    }
+    
+    if (strcmp(Material_Model, "RaghavanVorp_jacobian")==0)
+    {
+            RaghavanVorpMaterial_jacobian(plhs, prhs);
+    }
    
+    if (strcmp(Material_Model, "RaghavanVorp_stress")==0)
+    {
+            RaghavanVorpMaterial_stress(plhs, prhs);
+    }
     
     /* ===================================== */
     

@@ -1,8 +1,12 @@
-function make(hasOpenMP)
+function make(hasOpenMP, sources)
 %MAKE compiles finite element assemblers written in C
 %
 %   MAKE(HASOPENMP) if HASOPENMP = 1, compiles with flag -fopenmp.
 %   Default is HASOPENMP = 0. 
+%
+%   MAKE(HASOPENMP, SOURCES) SOURCES is a vector of indices specifying the
+%   source files to be compiled, e.g. MAKE(1, 8) compiles source Nr 8 with
+%   OpenMP enabled.
 %
 %   On Linux: to check whether openmp is available on your system, open a 
 %   terminal and type:
@@ -15,7 +19,6 @@ function make(hasOpenMP)
 if nargin < 1 || isempty(hasOpenMP)
     hasOpenMP = 0;
 end
-
 
 %% Compile C code
 
@@ -48,12 +51,23 @@ dependencies{8} = {};
 source_files{9} = {'FEM_library/Models/CSM/','CSM_assembler_C_omp_Q2.c'};
 dependencies{9} = {'MaterialModels/Tools.c', 'MaterialModels/NeoHookeanMaterial.c',...
                    'MaterialModels/LinearElasticMaterial.c', 'MaterialModels/SEMMTMaterial.c', ...
-                   'MaterialModels/NeoHookean2Material.c', 'MaterialModels/StVenantKirchhoffMaterial.c'};
+                   'MaterialModels/NeoHookean2Material.c', 'MaterialModels/StVenantKirchhoffMaterial.c',...
+                   'MaterialModels/RaghavanVorpMaterial.c'};
 
-n_sources = length(source_files);               
-for i = 1 : n_sources
+               
+if nargin < 2 || isempty( sources )
+    sources = 1:length(source_files);
+end
     
-    fprintf('\n ** Compiling %d of %d \n', i, n_sources)
+n_sources = length(sources); 
+
+k = 0;
+
+for i = sources
+    
+    k = k + 1;
+    
+    fprintf('\n ** Compiling source Nr. %d; %d of %d \n', i, k, n_sources)
     file_path = [pwd, '/', source_files{i}{1}];
     file_name = source_files{i}{2};
     

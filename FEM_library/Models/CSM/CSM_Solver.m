@@ -137,7 +137,7 @@ while (k <= maxIter && incrNorm > tol && resRelNorm > tol)
     alpha          = 1;
     backtrack_iter = 0;
     
-    while (norm(Residual) > 2 * resNorm_old && backtrack_iter < 5 )
+    while ((norm(Residual) > 2 * resNorm_old || isnan( norm(Residual) )) && backtrack_iter < 5 )
     
         alpha = alpha * 0.75;
         backtrack_iter = backtrack_iter + 1;
@@ -180,7 +180,11 @@ if DATA.Output.ComputeVonMisesStress
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);
     
-    Sigma_VM = sqrt( (Sigma(:,1) - Sigma(:,5)).^2 + (Sigma(:,5) - Sigma(:,9)).^2 + (Sigma(:,9) - Sigma(:,1)).^2 );
+    if MESH.dim == 2
+        warning('VonMisesStress to be implemented in 2D')
+    elseif MESH.dim == 3
+        Sigma_VM = sqrt( (Sigma(:,1) - Sigma(:,5)).^2 + (Sigma(:,5) - Sigma(:,9)).^2 + (Sigma(:,9) - Sigma(:,1)).^2 );
+    end
     CSM_export_VonMisesStress(MESH.dim, Sigma_VM, MESH.vertices, MESH.elements, [vtk_filename, '_VMstress']);
 end
  
