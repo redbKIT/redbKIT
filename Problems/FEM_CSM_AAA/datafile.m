@@ -16,7 +16,7 @@ data.bcNeu{2} = @(x, y, z, t, param)(0.*x.*y.*z);
 data.bcNeu{3} = @(x, y, z, t, param)(0 + 0.*x.*y.*z);
 
 % Normal Pressure
-data.bcPrex   = @(x, y, z, t, param)(-120*1333 + 0*x.*y.*z);
+data.bcPrex   = @(x, y, z, t, param)(-10*1333 + 0*x.*y.*z);
 
 % BC flag
 data.flag_dirichlet{1} = [1];
@@ -32,10 +32,13 @@ data.flag_neumann{3}   = [3];
 data.flag_pressure{3}  = [2];
 
 % material parameters
-data.Material_Model = 'NeoHookean2';%'StVenantKirchhoff', 'Linear','NeoHookean'
-data.Young   = 8e+7;
+data.Material_Model = 'NeoHookean2';%'StVenantKirchhoff', 'Linear','NeoHookean','RaghavanVorp'
+data.Young   = 2*0.59e+6;%8e+7;
 data.Poisson = 0.49;
 data.Density = 1;
+data.Alpha   = 0.59e+6;
+data.Beta    = 0*1e+7;
+data.Bulk    = 2*data.Alpha / ( 1 - 2* data.Poisson);
 
 % NonLinear Solver
 data.NonLinearSolver.tol               = 1e-6;
@@ -54,7 +57,7 @@ end
 if poolsize > 0
     
     % Linear Solver
-    data.LinearSolver.type              = 'MUMPS'; % MUMPS, backslash, gmres
+    data.LinearSolver.type              = 'backslash'; % MUMPS, backslash, gmres
     data.LinearSolver.tol               = 1e-7;
     data.LinearSolver.maxit             = 800;
     data.LinearSolver.gmres_verbosity   = 10;
