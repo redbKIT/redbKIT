@@ -1,21 +1,22 @@
 %CFD_ASSEMBLER assembler class for 2D/3D Computational Fluid Mechanics
 % CFD_ASSEMBLER methods:
-%    CFD_ASSEMBLER                - constructor
-%    SetMaterialParameters        - set parameters vector
-%    compute_volumetric_forces    - assemble volumetric rhs contribute 
-%    compute_surface_forces       - assemble surface rhs contribute 
-%    compute_external_forces      - assemble all external forces
-%    compute_mass                 - assemble mass matrix
-%    compute_stress               - compute stress for postprocessing
-%    compute_internal_forces      - assemble vector of internal forces
-%    compute_jacobian             - assemble jacobian (tangent stiffness) matrix
+%    CFD_ASSEMBLER                     - constructor
+%    SetFluidParameters                - set parameters vector
+%    compute_external_forces           - assemble volumetric rhs contribute 
+%    compute_Stokes_matrix             - assemble Stokes operator
+%    compute_convective_Oseen_matrix   - assemble convective Oseen matrix 
+%    compute_convective_matrix         - assemble jacobian matrices for newton method
+%    compute_mass_velocity             - assemble velocity mass matrix
+%    compute_mass_pressure             - assemble pressure mass matrix
 %
 % CFD_ASSEMBLER properties:
-%    M_MESH             - struct containing MESH data
-%    M_DATA             - struct containing DATA information
-%    M_FE_SPACE         - struct containing Finite Element space data
-%    M_MaterialModel    - string containing name of the material model
-%    M_MaterialParam    - vector containing material parameters
+%    M_MESH                - struct containing MESH data
+%    M_DATA                - struct containing DATA information
+%    M_FE_SPACE_v          - struct containing Finite Element space data
+%    M_FE_SPACE_p          - struct containing Finite Element space data
+%    M_totSize             - size of the entire system (vel + pressure)
+%    M_density             - density value
+%    M_kinematic_viscosity - kinematic viscosity value
 
 %   This file is part of redbKIT.
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
@@ -150,10 +151,10 @@ classdef CFD_Assembler < handle
         
         %==========================================================================
         %% compute_convective_Oseen_matrix
-        function C = compute_convective_Oseen_matrix(obj, U_h)
+        function C = compute_convective_Oseen_matrix(obj, conv_velocity)
             
-            if nargin < 2 || isempty(U_h)
-                U_h = zeros(obj.M_totSize,1);
+            if nargin < 2 || isempty(conv_velocity)
+                conv_velocity = zeros(obj.M_totSize,1);
             end
 
             % C_OMP assembly, returns matrices in sparse vector format
@@ -161,7 +162,7 @@ classdef CFD_Assembler < handle
                 CFD_assembler_C_omp('convective_Oseen', 1.0, obj.M_MESH.dim, obj.M_MESH.elements, ...
                 obj.M_FE_SPACE_v.numElemDof, obj.M_FE_SPACE_v.numDof, ...
                 obj.M_FE_SPACE_v.quad_weights, obj.M_MESH.invjac, obj.M_MESH.jac, ...
-                obj.M_FE_SPACE_v.phi, obj.M_FE_SPACE_v.dphi_ref, U_h);
+                obj.M_FE_SPACE_v.phi, obj.M_FE_SPACE_v.dphi_ref, conv_velocity);
             
             % Build sparse matrix
             C   = GlobalAssemble(rowA, colA, coefA, obj.M_totSize, obj.M_totSize);
