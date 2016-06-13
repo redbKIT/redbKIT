@@ -32,24 +32,36 @@ data.density             = 1;
 data.NonLinearSolver.tol         = 1e-8; 
 data.NonLinearSolver.maxit       = 30;
 
-% % Linear Solver
-% data.LinearSolver.type           = 'MUMPS'; % MUMPS, backslash, gmres
-% data.mumps_reordering            = 7;
-% 
-% % Preconditioner
-% data.Preconditioner.type         = 'None'; % AdditiveSchwarz, None, ILU
+% Solver and Preconditioner
+%   If parallel pool available, use gmres with AdditiveSchwarz preconditioner
+%   Otherwise use direct solver
+poolobj = gcp('nocreate');
+if isempty(poolobj)
+    poolsize = 0;
+else
+    poolsize = poolobj.NumWorkers;
+end
 
-
-% Linear Solver
-data.LinearSolver.type              = 'gmres'; % MUMPS, backslash, gmres
-data.LinearSolver.tol               = 1e-8;
-data.LinearSolver.maxit             = 500;
-data.LinearSolver.gmres_verbosity   = 5;
-data.LinearSolver.mumps_reordering  = 4;
-
-% Preconditioner
-data.Preconditioner.type              = 'AdditiveSchwarz'; % AdditiveSchwarz, None, ILU
-data.Preconditioner.local_solver      = 'MUMPS'; % matlab_lu, MUMPS
-data.Preconditioner.overlap_level     = 2;
-data.Preconditioner.mumps_reordering  = 4;
-data.Preconditioner.num_subdomains    = 4; %poolsize, number of subdomains
+if poolsize > 0
+    
+    % Linear Solver
+    data.LinearSolver.type              = 'gmres'; % MUMPS, backslash, gmres
+    data.LinearSolver.tol               = 1e-8;
+    data.LinearSolver.maxit             = 500;
+    data.LinearSolver.gmres_verbosity   = 5;
+    
+    % Preconditioner
+    data.Preconditioner.type              = 'AdditiveSchwarz'; % AdditiveSchwarz, None, ILU
+    data.Preconditioner.local_solver      = 'matlab_lu'; % matlab_lu, MUMPS
+    data.Preconditioner.overlap_level     = 2;
+    data.Preconditioner.mumps_reordering  = 7;
+    data.Preconditioner.num_subdomains    = 6; %poolsize, number of subdomains
+    
+else
+    % Linear Solver
+    data.LinearSolver.type              = 'backslash'; % MUMPS, backslash, gmres
+    data.LinearSolver.mumps_reordering  = 7;
+    
+    % Preconditioner
+    data.Preconditioner.type              = 'None'; % AdditiveSchwarz, None, ILU
+end
