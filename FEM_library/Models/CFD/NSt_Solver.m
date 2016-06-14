@@ -119,16 +119,17 @@ LinSolver = LinearSolver( DATA.LinearSolver );
 
 
 %% PreProcessing for Drag and Lift Computation
-compute_DragLift = 0 ;
+compute_AerodynamicForces = 0 ;
 if isfield(DATA, 'Output') && isfield(DATA.Output, 'DragLift')
     if DATA.Output.DragLift.computeDragLift == 1
-        compute_DragLift = true;
+        compute_AerodynamicForces = true;
     end
 end
 
-if compute_DragLift
-    Drag(k_t+1)  = 0;
-    Lift(k_t+1)  = 0;
+if compute_AerodynamicForces
+    AeroF_x(k_t+1)  = 0;
+    AeroF_y(k_t+1)  = 0;
+    AeroF_z(k_t+1)  = 0;
     dofs_drag    = [];
     
     for j = 1 : length(DATA.Output.DragLift.flag)
@@ -140,8 +141,8 @@ if compute_DragLift
     dofs_drag = unique(dofs_drag);
     
     fileDragLift = fopen(DATA.Output.DragLift.filename, 'w+');
-    fprintf(fileDragLift, 'Time          Drag          Lift');
-    fprintf(fileDragLift, '\n%1.4e  %1.4e  %1.4e',  t, Drag(k_t+1),  Lift(k_t+1));
+    fprintf(fileDragLift, 'Time          F_x          F_y          F_z');
+    fprintf(fileDragLift, '\n%1.4e  %1.4e  %1.4e  %1.4e', t, AeroF_x(k_t+1), AeroF_y(k_t+1), AeroF_z(k_t+1));
 end
 
 %% Time Loop
@@ -310,7 +311,7 @@ while ( t < tf )
     end
        
     %% Compute_DragLift
-    if compute_DragLift
+    if compute_AerodynamicForces
         
         if strcmp(DATA.time.nonlinearity,'implicit')
             C_NS = 0*Jacobian;
@@ -321,14 +322,22 @@ while ( t < tf )
         
         W               = zeros(FE_SPACE_v.numDof+FE_SPACE_p.numDof,1);
         W(1:FE_SPACE_v.numDofScalar)        = Z;
-        Drag(k_t+1) = DATA.Output.DragLift.factor*(W'*(-C_NS*u + F_NS));
+        AeroF_x(k_t+1) = DATA.Output.DragLift.factor*(W'*(-C_NS*u + F_NS));
         
         W               = zeros(FE_SPACE_v.numDof+FE_SPACE_p.numDof,1);
         W(FE_SPACE_v.numDofScalar+[1:FE_SPACE_v.numDofScalar])  = Z;
-        Lift(k_t+1)  = DATA.Output.DragLift.factor*(W'*(-C_NS*u  + F_NS));
+        AeroF_y(k_t+1)  = DATA.Output.DragLift.factor*(W'*(-C_NS*u  + F_NS));
         
-        fprintf('\n *** Drag = %f, Lift = %f *** \n',  Drag(k_t+1),  Lift(k_t+1));
-        fprintf(fileDragLift, '\n%1.4e  %1.4e  %1.4e',  t, Drag(k_t+1),  Lift(k_t+1));
+        if MESH.dim == 3
+            W               = zeros(FE_SPACE_v.numDof+FE_SPACE_p.numDof,1);
+            W(2*FE_SPACE_v.numDofScalar+[1:FE_SPACE_v.numDofScalar])  = Z;
+            AeroF_z(k_t+1)  = DATA.Output.DragLift.factor*(W'*(-C_NS*u  + F_NS));
+        else
+            AeroF_z(k_t+1) = 0.0;
+        end
+        
+        fprintf('\n *** F_x = %f, F_y = %f, F_z = %f *** \n',  AeroF_x(k_t+1), AeroF_y(k_t+1), AeroF_z(k_t+1));
+        fprintf(fileDragLift, '\n%1.4e  %1.4e  %1.4e  %1.4e', t, AeroF_x(k_t+1), AeroF_y(k_t+1), AeroF_z(k_t+1));
     end
     
     iter_time = toc(iter_time);
