@@ -28,6 +28,13 @@ else
 end
 t      = [];
 
+use_SUPG = false;
+if isfield(DATA, 'Stabilization')
+    if strcmp( DATA.Stabilization, 'SUPG' )
+        use_SUPG = true;
+    end
+end
+
 %% Set quad_order
 if dim == 2
     quad_order       = 4;
@@ -169,6 +176,18 @@ while ( t < tf )
             F_NS = 1/dt * M * u_BDF;
             C_NS = alpha/dt * M + A_Stokes + C1;
             
+            if use_SUPG
+                
+                fprintf('\n -- Assembling SUPG Terms ... ');
+                t_assembly = tic;
+                [A_SUPG, F_SUPG] = FluidModel.compute_SUPG_semiimplicit( v_extrapolated, v_BDF, dt, alpha);
+                t_assembly = toc(t_assembly);
+                fprintf('done in %3.3f s\n', t_assembly);
+                
+                C_NS             = C_NS + A_SUPG;
+                F_NS             = F_NS - F_SUPG;
+            end
+            
             % Apply boundary conditions
             fprintf('\n -- Apply boundary conditions ... ');
             t_assembly = tic;
@@ -209,6 +228,17 @@ while ( t < tf )
             Residual = 1/dt * M * (alpha*U_k - u_BDF) + A_Stokes * U_k + C1 * U_k;
             Jacobian = alpha/dt * M + A_Stokes + C1 + C2;
             
+            if use_SUPG
+                fprintf('\n -- Assembling SUPG Terms ... ');
+                t_assembly = tic;
+                [A_SUPG, F_SUPG] = FluidModel.compute_SUPG_implicit( U_k, v_BDF, dt, alpha);
+                t_assembly = toc(t_assembly);
+                fprintf('done in %3.3f s\n', t_assembly);
+                
+                Jacobian    = Jacobian + A_SUPG;
+                Residual    = Residual + F_SUPG;
+            end
+            
             % Apply boundary conditions
             fprintf('\n -- Apply boundary conditions ... ');
             t_assembly = tic;
@@ -219,7 +249,7 @@ while ( t < tf )
             res0Norm = norm(b);
             
             fprintf('\n============ Start Newton Iterations ============\n\n');
-            while (k <= maxIter && incrNorm > tol && resRelNorm > tol)
+            while (k <= maxIter && (incrNorm > tol || resRelNorm > tol))
                 
                 % Solve
                 fprintf('\n   -- Solve J x = -R ... ');
@@ -241,6 +271,18 @@ while ( t < tf )
                 
                 Residual = 1/dt * M * (alpha*U_k - u_BDF) + A_Stokes * U_k + C1 * U_k;
                 Jacobian = alpha/dt * M + A_Stokes + C1 + C2;
+                
+                if use_SUPG
+                    
+                    fprintf('\n   -- Assembling SUPG Terms ... ');
+                    t_assembly = tic;
+                    [A_SUPG, F_SUPG] = FluidModel.compute_SUPG_implicit( U_k, v_BDF, dt, alpha);
+                    t_assembly = toc(t_assembly);
+                    fprintf('done in %3.3f s\n', t_assembly);
+                    
+                    Jacobian    = Jacobian + A_SUPG;
+                    Residual    = Residual + F_SUPG;
+                end
                 
                 % Apply boundary conditions
                 fprintf('\n   -- Apply boundary conditions ... ');
