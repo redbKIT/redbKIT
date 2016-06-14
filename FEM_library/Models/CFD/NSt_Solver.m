@@ -74,7 +74,10 @@ for k = 1 : FE_SPACE_v.numComponents
     end
 end
 u = [v0; zeros(FE_SPACE_p.numDof,1)];
-CFD_export_solution(MESH.dim, u(1:FE_SPACE_v.numDof), u(1+FE_SPACE_v.numDof:end), MESH.vertices, MESH.elements, MESH.numNodes, vtk_filename, 0);
+if ~isempty(vtk_filename)
+    CFD_export_solution(MESH.dim, u(1:FE_SPACE_v.numDof), u(1+FE_SPACE_v.numDof:end), MESH.vertices, MESH.elements, MESH.numNodes, vtk_filename, 0);
+end
+
 BDFhandler.Initialize( v0 );
 
 fprintf('\n **** PROBLEM''S SIZE INFO ****\n');
@@ -336,7 +339,7 @@ while ( t < tf )
             AeroF_z(k_t+1) = 0.0;
         end
         
-        fprintf('\n *** F_x = %f, F_y = %f, F_z = %f *** \n',  AeroF_x(k_t+1), AeroF_y(k_t+1), AeroF_z(k_t+1));
+        fprintf('\n *** F_x = %e, F_y = %e, F_z = %e *** \n',  AeroF_x(k_t+1), AeroF_y(k_t+1), AeroF_z(k_t+1));
         fprintf(fileDragLift, '\n%1.4e  %1.4e  %1.4e  %1.4e', t, AeroF_x(k_t+1), AeroF_y(k_t+1), AeroF_z(k_t+1));
     end
     

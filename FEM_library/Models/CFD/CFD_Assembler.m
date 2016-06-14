@@ -8,6 +8,8 @@
 %    compute_convective_matrix         - assemble jacobian matrices for newton method
 %    compute_mass_velocity             - assemble velocity mass matrix
 %    compute_mass_pressure             - assemble pressure mass matrix
+%    compute_SUPG_semiimplicit         - assemble SUPG stabilization for semi-implicit scheme
+%    compute_SUPG_implicit             - assemble SUPG stabilization for implicit scheme
 %
 % CFD_ASSEMBLER properties:
 %    M_MESH                - struct containing MESH data
@@ -237,6 +239,17 @@ classdef CFD_Assembler < handle
                 obj.M_FE_SPACE_v.numElemDof, conv_velocity, v_n, ...
                 obj.M_density, obj.M_kinematic_viscosity, dt, alpha_BDF);
             
+%             [rowA, colA, coefA, rowF, coefF] = ...
+%                 CFD_Assemble_SUPG_SemiImpl_mex('SUPG_SemiImplicit', obj.M_MESH.dim, ... 0 1
+%                 obj.M_MESH.elements,  obj.M_MESH.jac, obj.M_MESH.invjac, ... 2 3 4
+%                 obj.M_FE_SPACE_v.quad_weights, obj.M_FE_SPACE_v.phi, obj.M_FE_SPACE_v.dphi_ref, ... 5 6 7
+%                 obj.M_FE_SPACE_v.numElemDof, obj.M_FE_SPACE_p.numElemDof, ... 8 9
+%                 obj.M_FE_SPACE_v.numDof, obj.M_FE_SPACE_p.numDof,  obj.M_FE_SPACE_p.phi, ... 10 11 12
+%                 conv_velocity, v_n, ... 13 14
+%                 obj.M_density, obj.M_kinematic_viscosity, dt, alpha_BDF,... 15 16 17 18
+%                 obj.M_FE_SPACE_p.dphi_ref);  19
+            
+           
             % Build sparse matrix
             A_SUPG   = GlobalAssemble(rowA, colA, coefA, obj.M_totSize, obj.M_totSize);
             F_SUPG   = GlobalAssemble(rowF, 1,    coefF, obj.M_totSize, 1);
