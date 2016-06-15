@@ -229,6 +229,46 @@ catch err
 end
 cd(TestFolder)
 
+% Test CFD 3D
+cd FEM_CFD_Dfg3D/
+try
+    testname = 'FEM_CFD_Dfg3D_P2ImplicitNoStab';
+    test('B1', 'implicit', 'None');
+    close all;
+    print_test_passed(fid,testname);
+    
+catch err
+    print_error_toFile(fid,err,testname);
+end
+try
+    testname = 'FEM_CFD_Dfg3D_P2SemiImplicitNoStab';
+    test('P2', 'semi-implicit', 'None');
+    close all;
+    print_test_passed(fid,testname);
+    
+catch err
+    print_error_toFile(fid,err,testname);
+end
+try
+    testname = 'FEM_CFD_Dfg3D_P1SemiImplicitSUPG';
+    test('P1', 'semi-implicit', 'SUPG');
+    close all;
+    print_test_passed(fid,testname);
+    
+catch err
+    print_error_toFile(fid,err,testname);
+end
+try
+    testname = 'FEM_CFD_Dfg3D_P1ImplicitSUPG';
+    test('P1', 'implicit', 'SUPG');
+    close all;
+    print_test_passed(fid,testname);
+    
+catch err
+    print_error_toFile(fid,err,testname);
+end
+cd(TestFolder)
+
 % Test
 cd FEM_TestMetis/
 try

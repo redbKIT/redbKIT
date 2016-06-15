@@ -22,6 +22,10 @@ lc_cyl = 0.008;
 lc     = 0.0125; 
 lc_cyl = 0.004;
 
+//L0
+lc     = 0.085; 
+lc_cyl = 0.025;
+
 // Parameters to define the geometry
 
 H  = 0.41;
