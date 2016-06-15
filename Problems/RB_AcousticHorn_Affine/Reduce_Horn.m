@@ -7,7 +7,7 @@ clc
 
 %% Set FE Space and load mesh 
 fem      =  'P1';
-[vertices, boundaries, elements] = msh_to_Mmesh( 'mesh/AcousticHorn_Fine2', 2);
+[vertices, boundaries, elements] = msh_to_Mmesh( 'mesh/AcousticHorn_Coarse', 2);
 
 
 %% Generate Affine Full-Order Model
