@@ -189,6 +189,46 @@ catch err
 end
 cd(TestFolder)
 
+% Test CFD 2D
+cd FEM_CFD_Dfg2D/
+try
+    testname = 'FEM_CFD_Dfg2D_P2ImplicitNoStab';
+    test('P2', 'implicit', 'None');
+    close all;
+    print_test_passed(fid,testname);
+    
+catch err
+    print_error_toFile(fid,err,testname);
+end
+try
+    testname = 'FEM_CFD_Dfg2D_P2SemiImplicitNoStab';
+    test('P2', 'semi-implicit', 'None');
+    close all;
+    print_test_passed(fid,testname);
+    
+catch err
+    print_error_toFile(fid,err,testname);
+end
+try
+    testname = 'FEM_CFD_Dfg2D_P1SemiImplicitSUPG';
+    test('P1', 'semi-implicit', 'SUPG');
+    close all;
+    print_test_passed(fid,testname);
+    
+catch err
+    print_error_toFile(fid,err,testname);
+end
+try
+    testname = 'FEM_CFD_Dfg2D_P1ImplicitSUPG';
+    test('P1', 'implicit', 'SUPG');
+    close all;
+    print_test_passed(fid,testname);
+    
+catch err
+    print_error_toFile(fid,err,testname);
+end
+cd(TestFolder)
+
 % Test
 cd FEM_TestMetis/
 try
@@ -248,13 +288,13 @@ cd(TestFolder)
 t = now;
 c = datevec ( t );
 s = datestr ( c, 0 );
-fprintf(fid,'-------------------------------------------\n');
+fprintf(fid,'----------------------------------------------------\n');
 fprintf(fid, '\nFinished: %s\n', s );
 
 fclose(fid);
 
-fprintf('\n-------------------------------------------\n');
-fprintf('-------------------------------------------\n');
+fprintf('\n----------------------------------------------------\n');
+fprintf('----------------------------------------------------\n');
 type('test_log.txt')
 
 end
@@ -272,8 +312,7 @@ fprintf(fid,'\n');
 end
 
 function print_test_passed(fid,testname)
-fprintf(fid,'-------------------------------------------\n');
-%fprintf(fid,[testname, ': test passed\n']);
-fprintf(fid,'%30s | passed |\n',testname);
+fprintf(fid,'----------------------------------------------------\n');
+fprintf(fid,'%38s | passed |\n',testname);
 
 end
