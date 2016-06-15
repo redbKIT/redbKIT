@@ -44,6 +44,10 @@ if ~isfield(FOM.stabFactor,'rbf_parfor')
     FOM.stabFactor.rbf_parfor = 0;
 end
 
+if ~isfield(FOM.stabFactor,'isreal')
+    FOM.stabFactor.isreal = 1;
+end
+
 if ~isfield(FOM.stabFactor,'inf_sup')
     FOM.stabFactor.inf_sup = 0;
 end
@@ -184,7 +188,7 @@ function [beta] = eval_function(FOM, mu)
 %Compute stability factor at mu
 OPTS.tol    = 1e-5;
 OPTS.issym  = 1;
-OPTS.isreal = 1;
+OPTS.isreal = FOM.stabFactor.isreal;
 OPTS.disp   = 0;
 OPTS.maxit  = 2500;
 
