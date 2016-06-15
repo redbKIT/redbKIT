@@ -13,15 +13,18 @@ if isempty(data_file)
     error('Missing data_file')
 end
 
+if nargin < 7
+    param = [];
+end
+
 if nargin < 8
     vtk_filename = [];
 end
 
 
 %% Read problem parameters and BCs from data_file
-DATA   = CFD_read_DataFile(data_file, dim);
+DATA   = CFD_read_DataFile(data_file, dim, param);
 if nargin < 7
-    param      = [];
     DATA.param = [];
 else
     DATA.param = param;

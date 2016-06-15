@@ -1,7 +1,7 @@
-function DATA = CFD_read_DataFile(data_file, dim)
+function DATA = CFD_read_DataFile(data_file, dim, param)
 %CFD_READ_DATAFILE data_file parser
 %
-%   DATA = CFD_READ_DATAFILE(DATA_FILE) read the file specified by the string
+%   DATA = CFD_READ_DATAFILE(DATA_FILE, DIM, PARAM) read the file specified by the string
 %   DATA_FILE and put the fields values into the struct DATA
 
 %   This file is part of redbKIT.
