@@ -1,6 +1,9 @@
 function install_FAST(hasOpenMP)
 %INSTALL_FAST installs FAST for sparse matrix assembly
 %
+%   INSTALL_FAST(hasOpenMP) if hasOpenMP = 1 enables OpenMP parallelism.
+%   Default is hasOpenMP = 0.
+%
 %   For further details see:
 %   http://user.it.uu.se/~stefane/freeware
 
