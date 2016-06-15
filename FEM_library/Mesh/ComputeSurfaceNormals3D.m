@@ -53,8 +53,9 @@ v2 = nodes(faces(:,3),1:3) - nodes(faces(:,1),1:3);
 % compute normals using cross product (nodes have same size)
 normals = normalizeVector3d(cross(v1, v2, 2));
 
-warning(['ComputeSurfaceNormals3D assumes that boundary elements have correct orientation,', ...
-          'so that surface normals are directed outward. No check on the sign is made.'])
+message = sprintf(['\nComputeSurfaceNormals3D assumes that boundary elements have correct orientation,\n', ...
+                  'so that surface normals are directed outward. No check on the sign is made.\n']);
+warning(message)
 
 %% check correct orientation (outward)
 % Uncomment the following lines if your mesh does not have outward normals
