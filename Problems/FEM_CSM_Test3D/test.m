@@ -7,7 +7,7 @@ end
 dim      =  3;
 
 %% load P1 mesh
-[vertices, boundaries, elements] = msh_to_Mmesh('beam3D_Coarse', dim);
+[vertices, boundaries, elements] = msh_to_Mmesh('beam3D', dim);
 
 %% Solve
 CSM_Solver(dim, elements, vertices, boundaries, fem, 'datafile');

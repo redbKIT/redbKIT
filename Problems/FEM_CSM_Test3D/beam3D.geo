@@ -41,11 +41,11 @@ Surface Loop(25) = {22, 14, 16, 24, 18, 20};
 Volume(26) = {25};
 
 Physical Surface(1) = {14};// left, y = 0
-Physical Surface(2) = {18};// right y = L
+Physical Surface(2) = {-18};// right y = L
 Physical Surface(3) = {16};// z=0
-Physical Surface(4) = {20};// x=0
-Physical Surface(5) = {24};// x=1
-Physical Surface(6) = {22};// z=1
+Physical Surface(4) = {-20};// x=0
+Physical Surface(5) = {-24};// x=1
+Physical Surface(6) = {-22};// z=1
 
 
 Physical Volume(1) = {26};
