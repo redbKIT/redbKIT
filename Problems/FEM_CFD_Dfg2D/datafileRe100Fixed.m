@@ -8,7 +8,7 @@ data.force{1} = @(x, y, t, param)(0.*x.*y);
 data.force{2} = @(x, y, t, param)(0.*x.*y);
 
 % Dirichlet
-data.bcDir_t  = @(t)( 1.5*sin(pi*t/8) );
+data.bcDir_t  = @(t)( sin(pi*t/8) );
 
 data.bcDir{1} = @(x, y, t, param)( data.bcDir_t(t) * 4*U*y.*(H-y)./H^2 .* (x==0)+ 0.*x.*y); 
 data.bcDir{2} = @(x, y, t, param)(0.*x.*y); 
@@ -36,7 +36,7 @@ data.density             = 1;
 %data.Stabilization = 'SUPG';
 
 % Nonlinear solver
-data.NonLinearSolver.tol         = 1e-8; 
+data.NonLinearSolver.tol         = 1e-6; 
 data.NonLinearSolver.maxit       = 30;
 
 % Linear solver

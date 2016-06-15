@@ -8,7 +8,7 @@ data.force{1} = @(x, y, t, param)(0.*x.*y);
 data.force{2} = @(x, y, t, param)(0.*x.*y);
 
 % Dirichlet
-data.bcDir_t  = @(t)( 0.5*(1-cos(pi/2*t)).*(t<2) + 1 * (t>=2));
+data.bcDir_t  = @(t)( 1.*(t>0) ) ; %0.5*(1-cos(pi/2*t)).*(t<2) + 1 * (t>=2));
 
 data.bcDir{1} = @(x, y, t, param)( data.bcDir_t(t) * 4*U*y.*(H-y)./H^2 .* (x==0)+ 0.*x.*y); 
 data.bcDir{2} = @(x, y, t, param)(0.*x.*y); 
@@ -38,7 +38,7 @@ data.NonLinearSolver.tol         = 1e-8;
 data.NonLinearSolver.maxit       = 30;
 
 % Linear solver
-data.LinearSolver.type           = 'MUMPS'; % MUMPS, backslash, gmres
+data.LinearSolver.type           = 'backslash'; % MUMPS, backslash, gmres
 data.mumps_reordering            = 7;
 
 % Preconditioner
@@ -47,8 +47,8 @@ data.Preconditioner.type         = 'None'; % AdditiveSchwarz, None, ILU
 % time 
 data.time.BDF_order  = 2;
 data.time.t0         = 0;
-data.time.dt         = 0.01;
-data.time.tf         = 10;
+data.time.dt         = 0.002;
+data.time.tf         = 2;
 data.time.nonlinearity  = 'implicit';
 
 %% Output options

@@ -26,7 +26,7 @@
 clc
 clear all
 
-test_case = 'Re100Fixed';
+test_case = 'Re100Periodic';
 
 [~,~,~]  = mkdir('Results');
 dim      =  2;
@@ -102,7 +102,7 @@ switch test_case
         plot(t_ref,bdforces_q2_lv6_dt4(:,4),'--k','LineWidth',2)
         legend('Drag Coefficient','Reference Value')
         xlabel('Time [s]')
-        xlim([3 max(t_ref)])
+        %xlim([3 max(t_ref)])
         grid on
         
         subplot(2,1,2)
@@ -111,7 +111,7 @@ switch test_case
         plot(t_ref,bdforces_q2_lv6_dt4(:,5),'--k','LineWidth',2)
         legend('Lift Coefficient','Reference Value')
         xlabel('Time [s]')
-        xlim([5 max(t_ref)])
+        %xlim([5 max(t_ref)])
         grid on
         
         saveas(handle,'Results/Re100Periodic_DragLift','epsc');
