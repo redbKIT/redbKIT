@@ -55,7 +55,7 @@ if poolsize > 0
     data.Preconditioner.local_solver      = 'matlab_lu'; % matlab_lu, MUMPS
     data.Preconditioner.overlap_level     = 2;
     data.Preconditioner.mumps_reordering  = 7;
-    data.Preconditioner.num_subdomains    = 6; %poolsize, number of subdomains
+    data.Preconditioner.num_subdomains    = poolsize; %poolsize, number of subdomains
     
 else
     % Linear Solver
