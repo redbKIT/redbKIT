@@ -52,5 +52,3 @@ lighting phong
 % export solution to vtk for visualization in paraview
 [~,~,~] = mkdir('Figures');
 ADR_export_solution(2, real(uNh(1:ROM.MESH.numVertices)), def_vertices, ROM.MESH.elements(1:3,:), 'Figures/Horn_RBsol');
-
-Online_Analysis;
