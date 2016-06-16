@@ -25,6 +25,10 @@ end
 uh                            = zeros(FOM.MESH.numNodes,1);
 uh(FOM.MESH.internal_dof)     = Ah \ Fh;
 
+if ~isfield(FOM, 'model')
+    FOM.model = 'ADR';
+end
+
 % Apply BCs
 switch FOM.model
     

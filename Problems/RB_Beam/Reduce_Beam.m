@@ -52,14 +52,14 @@ mu_1               = FOM.mu_min;
 ROM        =  ROMp;
 mu         =  FOM.mu_max;
 t_RB       = tic;
-% [uN, uNh]  = solve_RBsystem(ROM, mu);
-[uNh]  = solve_HFsystem(FOM, mu);%solve_RBsystem(ROM, mu);
+[uN, uNh]  = solve_RBsystem(ROM, mu);
+%[uNh]  = solve_HFsystem(FOM, mu);%solve_RBsystem(ROM, mu);
 t_RB       = toc(t_RB);
 fprintf('\n -- RB problem solve in %2.2e s -- \n', t_RB)
 [ deltaN ] = error_estimate(ROM, uN, mu);
 
 [~,~,~]    = mkdir('Figures');
-STR_export_solution(3, uNh, ROM.MESH.vertices, ROM.MESH.elements, ROM.MESH.numVertices, 'Figures/SOL_RB_max');
+CSM_export_solution(3, uNh, ROM.MESH.vertices, ROM.MESH.elements, ROM.MESH.numVertices, 'Figures/SOL_RB_max');
 
 %% Perform Error analysis
 Ntest_sample  = 30;
