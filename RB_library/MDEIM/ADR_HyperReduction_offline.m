@@ -1,9 +1,10 @@
-function [HyRED, U_matrix, U_rhs] = HyperReduction_offline(FOM, S_rhs, S_matrix, tolPOD)
+function [HyRED, U_matrix, U_rhs] = ADR_HyperReduction_offline(FOM, S_rhs, S_matrix, tolPOD)
 %HYPERREDUCTION_OFFLINE given RHS and matrix snapshots, performs POD and
 %(M)DEIM to generate an affine approximation of the system
 
-%   Author: F. Negri (federico.negri@epfl.ch) 2015
-%   Copyright (C) Federico Negri, CMCS, EPFL
+%   This file is part of redbKIT.
+%   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
+%   Author: Federico Negri <federico.negri at epfl.ch> 
 
 
 fig_folder = 'Figures/DEIM/';

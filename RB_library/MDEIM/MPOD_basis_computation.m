@@ -11,7 +11,9 @@ function [U_sparse, V, S] = MPOD_basis_computation(X_sparse, tolPOD, flag_svd)
 %   employs a more accurate (but slower) thin SVD for the computation of 
 %   the POD basis.
 
-%   Author: F. Negri (federico.negri@epfl.ch) 2014-2015
+%   This file is part of redbKIT.
+%   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
+%   Author: Federico Negri <federico.negri at epfl.ch> 
 
 if nargin < 3 || isempty(flag_svd)
     flag_svd = 1;

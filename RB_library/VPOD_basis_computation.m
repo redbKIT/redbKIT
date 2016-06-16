@@ -1,8 +1,9 @@
 function [U, V, S] = VPOD_basis_computation(X, Xnorm, tolPOD, flag_svd)
 %VPOD_BASIS_COMPUTATION implements POD for vectors
 
-%   Author: F. Negri (federico.negri@epfl.ch) 2014-2015
-%   Copyright (C) Federico Negri, CMCS, EPFL
+%   This file is part of redbKIT.
+%   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
+%   Author: Federico Negri <federico.negri at epfl.ch> 
 
 if nargin < 4 || isempty(flag_svd)
     flag_svd = 1;
