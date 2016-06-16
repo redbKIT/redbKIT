@@ -13,29 +13,21 @@ mu_test_Dimension = [50 1 1 1 1];
 
 Jrom     = zeros(size(mu_test,1),3);
 Jfom     = zeros(size(mu_test,1),1);
-rom_time = zeros(size(mu_test,1),3);
 N_vec    = [20 30 50];
 
 
 for j = 1 : 3
       parfor i = 1 : size(mu_test,1)
-            tmp_time    = tic;
-            
             Jrom(i,j)     = output_IRI(mu_test(i,:), ROM, GAMMA_IN_vert, M_in, N_vec(j));
-            
-            rom_time(i,j) = toc(tmp_time);
       end
 end
 
 parfor i = 1 : size(mu_test,1)
-      
-      tmp_time      = tic;
       [Uh]          = Elliptic_Solver(2, ROM.MESH.elements, ROM.MESH.vertices, ROM.MESH.boundaries, FOM.FE_SPACE.fem, 'horn_data', mu_test(i,:));
 
       J             = 1/0.05 * ones(1,length(GAMMA_IN_vert))*M_in*Uh(GAMMA_IN_vert);
 
       Jfom(i) = abs(J-1);
-      fom_time(i) = toc(tmp_time);
 end
 
 
@@ -56,10 +48,3 @@ xlim([FOM.mu_min(1) FOM.mu_max(1)])
 set(findall(handle1,'-property','FontSize'),'FontSize',14)
 
 saveas(handle1,'Figures/Reflection_spectrum_Comparison','fig');
-
-
-fprintf('\n--------------------------------------------------------')
-fprintf('\n Average ROM time = %2.2e s (N=20), %2.2e s (N=30), %2.2e s (N=50)',...
-      mean(rom_time(:,1)),mean(rom_time(:,2)),mean(rom_time(:,3)))
-fprintf('\n Average FOM time = %2.2e s',mean(fom_time))
-fprintf('\n--------------------------------------------------------\n')

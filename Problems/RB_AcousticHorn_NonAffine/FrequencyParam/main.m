@@ -2,7 +2,7 @@ clear all
 clc
 
 %% Set FE Space and load mesh
-fem          =  'P1';
+fem          =  'P2';
 [vertices, boundaries, elements] = msh_to_Mmesh( '../mesh/AcousticHorn_Coarse', 2);
 
 %% Solve nonaffine FOM for a given configuration
@@ -40,7 +40,7 @@ def_vertices  = RBF_MeshDeformation(mu(ROM.DATA.shape_param), ROM.MESH.vertices)
 
 % visualize
 figure
-pdeplot(ROM.MESH.vertices,[],ROM.MESH.elements(1:3,:),'xydata',real(uNh(1:ROM.MESH.numVertices)),'xystyle','interp',...
+pdeplot(def_vertices,[],ROM.MESH.elements(1:3,:),'xydata',real(uNh(1:ROM.MESH.numVertices)),'xystyle','interp',...
     'zdata',real(uNh(1:ROM.MESH.numVertices)),'zstyle','continuous',...
     'colorbar','on','mesh','off');
 colormap(jet);
