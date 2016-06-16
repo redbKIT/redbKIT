@@ -54,9 +54,10 @@ dependencies{9} = {'MaterialModels/Tools.c', 'MaterialModels/NeoHookeanMaterial.
                    'MaterialModels/NeoHookean2Material.c', 'MaterialModels/StVenantKirchhoffMaterial.c',...
                    'MaterialModels/RaghavanVorpMaterial.c'};
 
-               
+Mexify = 0;               
 if nargin < 2 || isempty( sources )
     sources = 1:length(source_files);
+    Mexify  = 1;
 end
     
 n_sources = length(sources); 
@@ -91,16 +92,18 @@ here = pwd;
 %source_files_M{1} = {'FEM_library/Models/CSM/','mexify_CSM_Assembly_M'};
 source_files_M{1} = {'FEM_library/Models/CFD/','mexify_SUPG'};
 
-for i = 1 : length(source_files_M)
-    
-    file_path = [pwd, '/', source_files_M{i}{1}];
-    file_name = source_files_M{i}{2};
+if Mexify
+    for i = 1 : length(source_files_M)
         
-    eval(['cd ', file_path]);
-    eval( file_name );
-    rmdir('codegen', 's');
-    eval(['cd ', here]);
-    
+        file_path = [pwd, '/', source_files_M{i}{1}];
+        file_name = source_files_M{i}{2};
+        
+        eval(['cd ', file_path]);
+        eval( file_name );
+        rmdir('codegen', 's');
+        eval(['cd ', here]);
+        
+    end
 end
 
 end
