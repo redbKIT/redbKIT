@@ -1,13 +1,15 @@
 function [ FOM ] = build_affineFOM( elements, vertices, boundaries, fem, data_file, epsilon )
-  %   For reference, see Section 7.5 of
-  %
-  %   Quarteroni, Manzoni, Negri - REDUCED BASIS METHODS FOR PARTIAL
-  %   DIFFERENTIAL EQUATIONS. AN INTRODUCTION. Springer, 2015
+%   For reference, see Section 7.5 of
+%
+%   Quarteroni, Manzoni, Negri - REDUCED BASIS METHODS FOR PARTIAL
+%   DIFFERENTIAL EQUATIONS. AN INTRODUCTION. Springer, 2015
 
-  %   This file is part of redbKIT.
-  %   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
-  %   Author: Federico Negri <federico.negri at epfl.ch>
+%   This file is part of redbKIT.
+%   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
+%   Author: Federico Negri <federico.negri at epfl.ch>
 
+FOM.model = 'ADR';
+  
 %% For the moment HARDCODED inputs
 FOM.Qa = 2;
 FOM.Qf = 7;

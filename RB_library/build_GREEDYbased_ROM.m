@@ -36,6 +36,7 @@ ROM.u_D    = FOM.u_D;
 
 if isfield(FOM, 'model')
     ROM.model   = FOM.model;
+    FOM.model   = 'ADR';
 else
     ROM.model = 'ADR';
 end

@@ -1,4 +1,4 @@
-function [ theta_a, theta_f ] = evaluate_ThetaFunctions( mu )
+function [ theta_a, theta_f ] = evaluate_ThetaFunctions( mu, varargin )
   %   For reference, see Section 7.5 of
   %
   %   Quarteroni, Manzoni, Negri - REDUCED BASIS METHODS FOR PARTIAL
