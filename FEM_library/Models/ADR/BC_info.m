@@ -20,6 +20,10 @@ if nargin < 3 || isempty(model)
     model = 'ADR';
 end
 
+if ~isfield( MESH, 'dim' )
+    MESH.dim = 2;
+end
+
 %% Parse MESH struct to check if the the required fields are available
 MESH_parser = inputParser;
 MESH_parser.KeepUnmatched = true;
