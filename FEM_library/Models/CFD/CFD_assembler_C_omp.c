@@ -10,6 +10,7 @@
 #include <string.h>
 #define INVJAC(i,j,k) invjac[i+(j+k*dim)*noe]
 #define GRADREFPHIV(i,j,k) gradrefphiV[i+(j+k*NumQuadPoints)*nlnV]
+#define GRADREFPHIP(i,j,k) gradrefphiP[i+(j+k*NumQuadPoints)*nlnP]
 #ifdef _OPENMP
 #include <omp.h>
 #else
@@ -42,7 +43,23 @@ double Trace(int dim, double X[dim][dim])
     return T;
 }
 /*************************************************************************/
-void AssembleStokes(mxArray* plhs[], const mxArray* prhs[])
+/*
+double MetricTensors(int dim, double invjac[dim][dim], double Y[dim][dim])
+{
+    int d1, d2;
+    double Z = 0;
+    for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+    {
+        for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+        {
+            Z = Z + X[d1][d2] * Y[d1][d2];
+        }
+    }
+    return Z;
+}
+*/
+/*************************************************************************/
+void AssembleStokes_Slow(mxArray* plhs[], const mxArray* prhs[])
 {
     double* dim_ptr = mxGetPr(prhs[2]);
     int dim     = (int)(dim_ptr[0]);
@@ -217,7 +234,162 @@ void AssembleStokes(mxArray* plhs[], const mxArray* prhs[])
     }
     
 }
-
+/*************************************************************************/
+void AssembleStokes(mxArray* plhs[], const mxArray* prhs[])
+{
+    double* dim_ptr = mxGetPr(prhs[2]);
+    int dim     = (int)(dim_ptr[0]);
+    int noe     = mxGetN(prhs[3]);
+    double* nln_ptrV = mxGetPr(prhs[4]);
+    int nlnV     = (int)(nln_ptrV[0]);
+    double* nln_ptrP = mxGetPr(prhs[5]);
+    int nlnP     = (int)(nln_ptrP[0]);
+    int numRowsElements  = mxGetM(prhs[3]);
+    
+    int nln  = nlnV + nlnP;
+    int nln2 = nln*nln;
+    int local_matrix_size = nlnV*nlnV*dim*dim + 2*nlnV*nlnP*dim;
+    int global_lenght = noe * local_matrix_size;
+    
+    plhs[0] = mxCreateDoubleMatrix(global_lenght,1, mxREAL);
+    plhs[1] = mxCreateDoubleMatrix(global_lenght,1, mxREAL);
+    plhs[2] = mxCreateDoubleMatrix(global_lenght,1, mxREAL);
+    
+    double* myArows    = mxGetPr(plhs[0]);
+    double* myAcols    = mxGetPr(plhs[1]);
+    double* myAcoef    = mxGetPr(plhs[2]);
+    
+    int k,l;
+    int q;
+    int NumQuadPoints     = mxGetN(prhs[7]);
+    
+    double* NumNodes_ptr = mxGetPr(prhs[6]);
+    int NumScalarDofsV     = (int)(NumNodes_ptr[0] / dim);
+    
+    double* w   = mxGetPr(prhs[7]);
+    double* invjac = mxGetPr(prhs[8]);
+    double* detjac = mxGetPr(prhs[9]);
+    double* phiV = mxGetPr(prhs[10]);
+    double* gradrefphiV = mxGetPr(prhs[11]);
+    double* phiP = mxGetPr(prhs[12]);
+    
+    double gradphiV[NumQuadPoints][nlnV][dim];
+    double* elements  = mxGetPr(prhs[3]);
+        
+    double* material_param = mxGetPr(prhs[1]);
+    double viscosity = material_param[0];
+    
+    /* Assembly: loop over the elements */
+    int ie, d1, d2;
+    
+#pragma omp parallel for shared(invjac,detjac,elements,myAcols,myArows,myAcoef) private(gradphiV,ie,k,l,q,d1,d2) firstprivate(phiV,phiP,gradrefphiV,w,numRowsElements,local_matrix_size,nlnV,nlnP,NumScalarDofsV,viscosity)
+    for (ie = 0; ie < noe; ie = ie + 1 )
+    {
+        
+        for (q = 0; q < NumQuadPoints; q = q + 1 )
+        {
+            for (k = 0; k < nlnV; k = k + 1 )
+            {
+                for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+                {
+                    gradphiV[q][k][d1] = 0;
+                    for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+                    {
+                        gradphiV[q][k][d1] = gradphiV[q][k][d1] + INVJAC(ie,d1,d2)*GRADREFPHIV(k,q,d2);
+                    }
+                }
+            }
+        }
+        
+        int iii = 0;
+        int ii = 0;
+        int a, b;
+        
+        /* loop over velocity test functions --> a */
+        for (a = 0; a < nlnV; a = a + 1 )
+        {
+            /* loop over velocity trial functions --> b */
+            for (b = 0; b < nlnV; b = b + 1 )
+            {
+                double aloc[dim][dim];
+                for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+                {
+                    for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+                    {
+                        aloc[d1][d2] = 0;
+                    }
+                }
+                for (q = 0; q < NumQuadPoints; q = q + 1 )
+                {
+                    double scalar_lapl = 0;
+                    for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+                    {
+                        scalar_lapl  = scalar_lapl + viscosity * gradphiV[q][a][d2] * gradphiV[q][b][d2]  * w[q];
+                    }
+                    
+                    for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+                    {
+                        for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+                        {
+                            aloc[d1][d2]  = aloc[d1][d2] + viscosity * gradphiV[q][a][d2] * gradphiV[q][b][d1]  * w[q];
+                        }
+                    }
+                    
+                    for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+                    {
+                        aloc[d1][d1]  = aloc[d1][d1] + scalar_lapl;
+                    }
+                    
+                }
+                for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+                {
+                    for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+                    {
+                        myArows[ie*local_matrix_size+iii] = elements[a+ie*numRowsElements] + d1 * NumScalarDofsV;
+                        myAcols[ie*local_matrix_size+iii] = elements[b+ie*numRowsElements] + d2 * NumScalarDofsV;
+                        myAcoef[ie*local_matrix_size+iii] = aloc[d1][d2]*detjac[ie];
+                        
+                        iii = iii + 1;
+                    }
+                }
+            }
+            
+            /* loop over pressure trial functions --> b */
+            for (b = 0; b < nlnP; b = b + 1 )
+            {
+                double alocDiv[dim];
+                for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+                {
+                    alocDiv[d1] = 0;
+                }
+                
+                for (q = 0; q < NumQuadPoints; q = q + 1 )
+                {
+                    for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+                    {
+                        alocDiv[d1]  = alocDiv[d1] + ( - phiP[b+q*nlnP] * gradphiV[q][a][d1] ) * w[q];
+                    }
+                }
+                
+                for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+                {
+                    myArows[ie*local_matrix_size+iii] = elements[a+ie*numRowsElements] + d1 * NumScalarDofsV;
+                    myAcols[ie*local_matrix_size+iii] = elements[b+ie*numRowsElements] + dim * NumScalarDofsV;
+                    myAcoef[ie*local_matrix_size+iii] = alocDiv[d1]*detjac[ie];
+                    
+                    iii = iii + 1;
+                    
+                    myAcols[ie*local_matrix_size+iii] = elements[a+ie*numRowsElements] + d1  * NumScalarDofsV;
+                    myArows[ie*local_matrix_size+iii] = elements[b+ie*numRowsElements] + dim * NumScalarDofsV;
+                    myAcoef[ie*local_matrix_size+iii] = -alocDiv[d1]*detjac[ie];
+                    
+                    iii = iii + 1;
+                }
+                
+            }
+        }
+    }
+}
 /*************************************************************************/
 void AssembleConvective_Oseen(mxArray* plhs[], const mxArray* prhs[])
 {
@@ -390,7 +562,7 @@ void AssembleConvective(mxArray* plhs[], const mxArray* prhs[])
     /* Assembly: loop over the elements */
     int ie, d1, d2;
         
-#pragma omp parallel for shared(invjac,detjac,elements,myAcols,myArows,myAcoef,U_h) private(gradphiV,GradV,GradU,GradUh,U_hq,ie,k,l,q,d1,d2) firstprivate(phiV,gradrefphiV,w,numRowsElements,local_matrix_size1,local_matrix_size2,nlnV,NumScalarDofsV,density)
+#pragma omp parallel for shared(invjac,detjac,elements,myAcols,myArows,myAcoef,myBrows,myBcols,myBcoef,U_h) private(gradphiV,GradV,GradU,GradUh,U_hq,ie,k,l,q,d1,d2) firstprivate(phiV,gradrefphiV,w,numRowsElements,local_matrix_size1,local_matrix_size2,nlnV,NumScalarDofsV,density)
     for (ie = 0; ie < noe; ie = ie + 1 )
     {
         for (q = 0; q < NumQuadPoints; q = q + 1 )
@@ -484,17 +656,29 @@ void AssembleConvective(mxArray* plhs[], const mxArray* prhs[])
                     }
                 }
             }
-
                 
         }
     }
 }
+
 /*************************************************************************/
 void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
 {
     
     char *Assembly_name = mxArrayToString(prhs[0]);
     
+    if (strcmp(Assembly_name, "Stokes_Slow")==0)
+    {
+        /* Check for proper number of arguments */
+        if(nrhs!=13) {
+            mexErrMsgTxt("13 inputs are required.");
+        } else if(nlhs>3) {
+            mexErrMsgTxt("Too many output arguments.");
+        }
+
+        AssembleStokes_Slow(plhs, prhs);
+    }
+            
     if (strcmp(Assembly_name, "Stokes")==0)
     {
         /* Check for proper number of arguments */
@@ -505,7 +689,7 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
         }
 
         AssembleStokes(plhs, prhs);
-    }
+    }  
     
     
     if (strcmp(Assembly_name, "convective_Oseen")==0)
@@ -519,6 +703,7 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
         
         AssembleConvective_Oseen(plhs, prhs);
     }
+    
     if (strcmp(Assembly_name, "convective")==0)
     {
         /* Check for proper number of arguments */
