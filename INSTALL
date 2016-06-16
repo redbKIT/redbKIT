@@ -1,0 +1,68 @@
+===========================================
+redbKIT 2.0 INSTALLATION
+===========================================
+
+Pre-requisites
+--------------
+
+For the basic installation, you need:
+-> a reasonably recent version of Matlab
+-> a supported C compiler, see e.g. http://it.mathworks.com/support/compilers/R2016a/
+   (gcc on Unix and gcc/clang on Mac OS X work smoothly)
+
+If you want to speed-up matrix assembly via multithreading, you also need:
+-> a C compiler with OpenMP support, see e.g. http://it.mathworks.com/support/compilers/R2016a/
+   (gcc is tested for both Unix and Mac OS X)
+
+If you want to speed-up Matlab built-in "sparse" command by installing the FAST package,
+you also need:
+-> a supported C compiler for the serial version
+-> a C compiler with OpenMP support for the multithreaded version
+
+If you want to use parallel Additive Schwarz preconditioners, you also need
+-> MATLAB Parallel Computing Toolbox
+-> CMake
+
+
+Basic Installation
+------------------
+
+Open Matlab and navigate to redbKIT root directory. Then type 
+
+>> make
+
+to compile the C-assembly routines and "mexify" some other files.
+
+
+Installation with OpenMP enabled
+--------------------------------
+
+Open Matlab and navigate to redbKIT root directory. Then type 
+
+>> make(1)
+
+to compile the C-assembly routines with OpenMP enabled.
+
+
+Install Metis for Additive Schwarz preconditioners
+--------------------------------------------------
+
+Open Matlab and navigate to the redbKIT directory FEM_library/Mesh
+Then type 
+
+>> install_metismex
+
+
+Install FAST to speed-up Matlab "sparse" command
+--------------------------------------------------
+
+Open Matlab and navigate to the redbKIT directory FEM_library/Tools.
+
+To install the serial version, type
+>> install_FAST
+
+To install the multithreaded version, type
+>> install_FAST(1)
+
+In both cases you will be required to accept FAST's license.
+See http://user.it.uu.se/~stefane/freeware.

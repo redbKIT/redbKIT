@@ -10,16 +10,34 @@ redbKIT is a [MATLAB](http://www.mathworks.com/products/matlab/) library (develo
 
 Implements in the MATLAB language many of the algorithms and methods presented in Chapters 3, 6, 7 and 10 of the book **[QMN16]**, such as
 - proper orthogonal decomposition
-- the greedy algorithm
+- greedy algorithm
 - radial basis function interpolation of stability factors
 - Galerkin and least-squares reduced basis methods
-- the empirical interpolation method
+- the empirical interpolation method and its discrete variant
 
 The implementation is almost independent of the underlying high-fidelity approximation, provided that the high-fidelity model is described in a specified format. Here, we rely on the finite element method as high-fidelity approximation. See below.
 
+As of Release 2.0, an implementation of the Matrix Discrete Empirical Interpolation Method (see [[NMA15]](http://www.sciencedirect.com/science/article/pii/S0021999115006543)) as well as an example of its application to the Helmholtz equation are provided.
+
 
 #### FEM_library
-Provides a flexible implementation of the finite element method for two-dimensional, stationary  advection-diffusion-reaction PDEs. The package can load linear triangular meshes either in the .msh format or in the [MATLAB Partial Differential Equation Toolbox(R)](http://www.mathworks.com/products/pde/index.html?s_tid=gn_loc_drop) format. Results can be either visualized in MATLAB or exported in the [VTK format](http://www.vtk.org/wp-content/uploads/2015/04/file-formats.pdf) for post-processing with [Paraview](http://www.paraview.org/).
+Provides a flexible implementation for the following families of problems:
+- 2D/3D steady and unsteady diffusion-transport-reaction equations, with P1/P2 finite elements.
+
+- 2D/3D steady and unsteady  Navier-Stokes equations approximated by 
+    - P2-P1 or P1Bubble-P1 finite elements for velocity and pressure spaces, respectively;
+    - P1-P1 finite elements stabilized with the SUPG stabilization (implemented as in the framework of the Variational MultiScale Method).
+For the steady case, Newton iterations are provided. For the unsteady case, time advancing is performed via BDF integrator, while the convection term can be treated either implicitly (with Newton subiterations) or with a semi-implicit scheme with extrapolation of the convective term.
+
+- 2D/3D steady and unsteady structural problem. Both linear elasticity and nonlinear hyperelastic St. Venant Kirchhoff, nearly incompressible Neo-Hookean  and Raghavan-Vorp material models are implemented. For the steady case, a basic Newton algorithm with backtracking is provided. In the unsteady case, time advancing is performed via the generalized alpha-scheme suitably combined with Newton subiterations in the nonlinear case.
+
+
+The package can load linear triangular meshes either in the .msh format or in the [MATLAB Partial Differential Equation Toolbox(R)](http://www.mathworks.com/products/pde/index.html?s_tid=gn_loc_drop) format. Results can be either visualized in MATLAB or exported in the (binary) [VTK format](http://www.vtk.org/wp-content/uploads/2015/04/file-formats.pdf) for post-processing with [Paraview](http://www.paraview.org/).
+                  
+
+The assembly routines for the FE vectors and matrices are written in C code using suitable mex interfaces.  For this reason, before using the library you need to first compile the FE assemblers, as explained in the INSTALL file.  Loops over the elements are parallelized via OpenMP, while the global assembly of  sparse matrices from local contributes can be speeded-up by installing the [FAST package](http://user.it.uu.se/~stefane/freeware).
+                  
+The default linear solver is Matlab backslash (sparse direct solver). If available, also MUMPS can be used in a straightforward fashion.  For moderately large size problems, a One-Level (geometric) Additive Schwarz preconditioner can be employed  in combination with a suitable iterative solver (usually gmres). In this case, mesh partitioning is done through the [Meshpart toolbox](http://www.cerfacs.fr/algor/Softs/MESHPART/) and [Metis library](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview).
 
 #### Problems
 Contains a gallery of examples and applications. Many of them are described in Chapters 8, 9 and 10 of the book **[QMN16]**.
@@ -143,7 +161,7 @@ BibTex entry
 Development
 -------
 
-redbKIT was developed and is currently maintained by [`Federico Negri`](http://cmcs.epfl.ch/people/negri) (EPFL).
+redbKIT is developed and maintained by [`Federico Negri`](http://cmcs.epfl.ch/people/negri) (EPFL).
 
 Paola Gervasio (Università degli Studi di Brescia ) is gratefully acknowledged for granting the use of parts of the finite element code MLife.
 
