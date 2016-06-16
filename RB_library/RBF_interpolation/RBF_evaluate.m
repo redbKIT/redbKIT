@@ -12,27 +12,29 @@ function [I_f] = RBF_evaluate(x, RBF_data)
 
 interp_points     = RBF_data.x;
 
-[dimI,  nI]      = size(interp_points);
-[dimX,  nPoints] = size(x);
+[dimI,  ~]      = size(interp_points);
+[dimX,  ~] = size(x);
 
 if (dimI~=dimX)
   error('x should have the same number of rows as RBF_data.x');
 end
 
-f = zeros(1, nPoints);
+I_f = RBF_evaluate_Fast(RBF_data.RBF_function_type, interp_points, x,  RBF_data.constant, RBF_data.coeff);
 
-for i = 1 : nPoints
-    
-    r =  (x(:,i)*ones(1,nI)) - interp_points;
-    r = sqrt(sum(r.*r, 1));
-    
-    s = RBF_data.coeff(nI+1) + sum(RBF_data.coeff(1:nI)'.*RBF_data.RBF_function(r, RBF_data.constant));
-    
-    for k = 1 : dimX
-        s = s + RBF_data.coeff(k+nI+1)*x(k,i);     
-    end
-    
-    I_f(i) = s;
-end
+% I_f = zeros(1, nPoints);
+% 
+% for i = 1 : nPoints
+%     
+%     r =  (x(:,i)*ones(1,nI)) - interp_points;
+%     r = sqrt(sum(r.*r, 1));
+%     
+%     s = RBF_data.coeff(nI+1) + sum(RBF_data.coeff(1:nI)'.*RBF_data.RBF_function(r, RBF_data.constant));
+%     
+%     for k = 1 : dimX
+%         s = s + RBF_data.coeff(k+nI+1)*x(k,i);     
+%     end
+%     
+%     I_f(i) = s;
+% end
 
 end

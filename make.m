@@ -53,6 +53,8 @@ dependencies{9} = {'MaterialModels/Tools.c', 'MaterialModels/NeoHookeanMaterial.
                    'MaterialModels/LinearElasticMaterial.c', 'MaterialModels/SEMMTMaterial.c', ...
                    'MaterialModels/NeoHookean2Material.c', 'MaterialModels/StVenantKirchhoffMaterial.c',...
                    'MaterialModels/RaghavanVorpMaterial.c'};
+source_files{10} = {'RB_library/RBF_interpolation/','RBF_evaluate_Fast.c'};
+dependencies{10} = {};
 
 Mexify = 0;               
 if nargin < 2 || isempty( sources )

@@ -1,4 +1,4 @@
-function RBF_data = RBF_setup(x, y, RBF_function)
+function RBF_data = RBF_setup(x, y, RBF_function_name, constant)
 %RBF_SETUP computes RBF coefficient 
 %
 %   RBF_DATA = RBF_SETUP(X, Y, RBF_FUNCTION) given a matrix X of size dimX
@@ -12,8 +12,8 @@ function RBF_data = RBF_setup(x, y, RBF_function)
 %   Author: Federico Negri <federico.negri at epfl.ch> 
 
 
-if nargin < 3 || isempty(RBF_function)
-    RBF_function = 'gaussian';
+if nargin < 3 || isempty(RBF_function_name)
+    RBF_function_name = 'gaussian';
 end
     
 
@@ -30,10 +30,15 @@ end
 RBF_data.x    = x;
 RBF_data.y    = y;
 
-RBF_data.RBF_function  = RBF_function;
-RBF_data.constant      = (prod(max(x,[],2)-min(x,[],2))/num_int_p)^(1/dimX); %approx. average distance between the nodes 
+RBF_data.RBF_function_type  = RBF_function_name;
 
-switch RBF_function
+if nargin < 4 || isempty(constant)
+    RBF_data.constant      = (prod(max(x,[],2)-min(x,[],2))/num_int_p)^(1/dimX); %approx. average distance between the nodes
+else
+    RBF_data.constant = constant;
+end
+
+switch RBF_function_name
     
       case 'cubic'
         RBF_data.RBF_function   = @(r,c)(r.*r.*r);
