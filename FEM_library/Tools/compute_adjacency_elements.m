@@ -1,6 +1,6 @@
 function [ A, node_to_element, node_to_boundaries ] = compute_adjacency_elements(vertices, elements, dim, boundaries, fem)
-%COMPUTE_ADJACENCY_ELEMENTS compute elemnts adjacency matrix for 2d or 3d 
-%TRI/TET P1 meshes
+%COMPUTE_ADJACENCY_ELEMENTS compute elements adjacency matrix for 2D/3D
+%TRI/TET meshes
 
 %   This file is part of redbKIT.
 %   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
@@ -14,7 +14,7 @@ noe = size(elements,2);
 nov = size(vertices,2);
 node_to_element = cell(1,nov);
 
-nln = select(fem, dim);
+[nln, nbn] = select(fem, dim);
 
 for ie = 1 : noe
     dof = elements(:,ie);
@@ -28,7 +28,6 @@ if nargin >=4 && ~isempty(boundaries)
       
       nbp                = size(boundaries,2);
       node_to_boundaries = cell(1,nov);
-      nbn                = 2 + (dim-2);
       for ib = 1 : nbp
             
             dof = boundaries(1:nbn,ib);
