@@ -1,4 +1,4 @@
-function [ ROM ] = build_PODbased_ROM(FOM, sample_grid, tolPOD, method, D)
+function [ ROM ] = build_PODbased_ROM(FOM, sample_grid, tolPOD, method, D, residual_computation)
 %BUILD_PODBASED_ROM generates a reduced model by means of POD
 %
 %   [ ROM ] = BUILD_PODBASED_ROM(FOM, SAMPLE_GRID, TOLPOD, METHOD, D)
@@ -28,6 +28,10 @@ function [ ROM ] = build_PODbased_ROM(FOM, sample_grid, tolPOD, method, D)
 
 if nargin < 5
     D = [];
+end
+
+if nargin < 6 || isempty(residual_computation)
+    residual_computation = true;
 end
 
 %% initialize ROM struct
@@ -82,8 +86,10 @@ fprintf('\n Project system ...')
 ROM.Xnorm = ROM.V'*(FOM.Xnorm*ROM.V);
 
 %% Compute offline residual terms
-fprintf('\n   Compute offline residual terms ...')
-[ROM.Cqq, ROM.dqq, ROM.Eqq] = offline_residual(FOM, ROM.V);
+if residual_computation
+    fprintf('\n   Compute offline residual terms ...')
+    [ROM.Cqq, ROM.dqq, ROM.Eqq] = offline_residual(FOM, ROM.V);
+end
 
 fprintf('\n *** Finished *** \n')
 
