@@ -36,9 +36,9 @@ ROM.u_D    = FOM.u_D;
 
 if isfield(FOM, 'model')
     ROM.model   = FOM.model;
-    FOM.model   = 'ADR';
 else
     ROM.model = 'ADR';
+    FOM.model   = 'ADR';
 end
 
 ROM.MESH   = FOM.MESH;
