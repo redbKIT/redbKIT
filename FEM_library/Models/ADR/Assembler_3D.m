@@ -26,6 +26,8 @@ function [A, F, M] = Assembler_3D(MESH, DATA, FE_SPACE, OPERATOR, TC_d, TC_t, su
 %   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri@epfl.ch> 
 
+warning('Assembler_3D is deprecated. Use ADR_Assembler instead.')
+
 if nargin < 4 || isempty(OPERATOR)
     OPERATOR = 'all';
 end
