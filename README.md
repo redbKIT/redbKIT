@@ -37,7 +37,7 @@ The package can load linear triangular meshes either in the .msh format or in th
 
 The assembly routines for the FE vectors and matrices are written in C code using suitable mex interfaces.  For this reason, before using the library you need to first compile the FE assemblers, as explained in the INSTALL file.  Loops over the elements are parallelized via OpenMP, while the global assembly of  sparse matrices from local contributes can be speeded-up by installing the [FAST package](http://user.it.uu.se/~stefane/freeware).
                   
-The default linear solver is Matlab backslash (sparse direct solver). If available, also MUMPS can be used in a straightforward fashion.  For moderately large size problems, a One-Level (geometric) Additive Schwarz preconditioner can be employed  in combination with a suitable iterative solver (usually gmres). In this case, mesh partitioning is done through the [Meshpart toolbox](http://www.cerfacs.fr/algor/Softs/MESHPART/) and [Metis library](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview).
+The default linear solver is Matlab backslash (sparse direct solver). If available, also [MUMPS](http://mumps.enseeiht.fr/index.php?page=home) can be used in a straightforward fashion.  For moderately large size problems, a One-Level (geometric) Additive Schwarz preconditioner can be employed  in combination with a suitable iterative solver (usually gmres). In this case, mesh partitioning is done through the [Meshpart toolbox](http://www.cerfacs.fr/algor/Softs/MESHPART/) and [Metis library](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview).
 
 #### Problems
 Contains a gallery of examples and applications. Many of them are described in Chapters 8, 9 and 10 of the book **[QMN16]**.
@@ -53,7 +53,7 @@ You can directly [**`download the current release`**](https://github.com/redbKIT
 
 `redbKIT` contains the following files and folders
 
-[`FEM_library/`](https://github.com/redbKIT/redbKIT/tree/master/FEM_library)  [`LICENSE`](https://github.com/redbKIT/redbKIT/blob/master/LICENSE)  [`Problems/`](https://github.com/redbKIT/redbKIT/tree/master/Problems)  [`RB_library/`](https://github.com/redbKIT/redbKIT/tree/master/RB_library)  [`README.md`](https://github.com/redbKIT/redbKIT/blob/master/README.md)  [`setPath.m`](https://github.com/redbKIT/redbKIT/blob/master/setPath.m)
+[`FEM_library/`](https://github.com/redbKIT/redbKIT/tree/master/FEM_library)  [`LICENSE`](https://github.com/redbKIT/redbKIT/blob/master/LICENSE)  [`Problems/`](https://github.com/redbKIT/redbKIT/tree/master/Problems)  [`RB_library/`](https://github.com/redbKIT/redbKIT/tree/master/RB_library)  [`README.md`](https://github.com/redbKIT/redbKIT/blob/master/README.md)  [`setPath.m`](https://github.com/redbKIT/redbKIT/blob/master/setPath.m)  [`INSTALL`](https://github.com/redbKIT/redbKIT/blob/master/INSTALL)
 
 To check that your operating system and MATLAB installation are supported, and that the code is correctly working, please follow these instructions. Start MATLAB and navigate to the `redbKIT` folder. Then, type in the MATLAB prompt
 
@@ -88,25 +88,13 @@ A welcome message should appear: you can now start using redbKIT!
 
 A gallery of applications is provided in the folder [`Problems/`](https://github.com/redbKIT/redbKIT/tree/master/Problems).
 
-If you want to speedup the finite element assembling operations, you can "mexify" the function
-`ADR_mex_assembler.m` by running the following command in the MATLAB prompt ([`MATLAB Coder`](http://www.mathworks.com/products/matlab-coder/?refresh=true) needed):
+To check that the code is correctly working, please follow these instructions, please type in the MATLAB prompt
 
-	>> coder -build FEM_library/ADR_assembly.prj
+	>> setPath
+	>> cd Problems
+	>> test_all
 
-Then replace `ADR_mex_assembler` with `ADR_mex_assembler_mex` at line 109
-of `Assembler_2D.m`
-
-An HTML documentation of redbKIT can be automatically generated using [`M2HTML`](http://www.artefact.tk/software/matlab/m2html/). To this end, you should download, extract and add to the path [`M2HTML`](http://www.artefact.tk/software/matlab/m2html/) using the following commands:
-
-	>> url_M2HTML = 'http://www.artefact.tk/software/matlab/m2html/m2html.zip';
-	>> unzip(url_M2HTML);
-	>> addpath(genpath(strcat(pwd,'/m2html')));
-
-Then generate the documentation
-
-	>> m2html('mfiles',{'RB_library', 'RB_library/RBF_interpolation' 'FEM_library'}, ...
-	   'htmldir','Documentation', 'recursive','off', 'global','on',...
-	   'template','frame', 'index','menu', 'graph','on');
+The `test_all.m` functions launches a series of tests and generates a log file `test_log.txt`. If all the tests are marked as *passed*, you can start enjoying `redbKIT`. Otherwise, do not hesitate to contact us by email at <redbkit@gmail.com>.
 
 
 License
