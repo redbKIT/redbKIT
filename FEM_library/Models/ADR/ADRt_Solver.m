@@ -34,13 +34,14 @@ if isempty(data_file)
     error('Missing data_file')
 end
 
-%% Read problem parameters and BCs from data_file
-DATA   = read_DataFile(data_file);
 if nargin < 7
-    DATA.param = [];
-else
-    DATA.param = param;
+    param = [];
 end
+
+
+%% Read problem parameters and BCs from data_file
+DATA       = read_DataFile(data_file, dim, param);
+DATA.param = param;
 
 if nargin < 8
     vtk_filename = [];

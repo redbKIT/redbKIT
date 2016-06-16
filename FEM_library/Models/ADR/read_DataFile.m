@@ -1,4 +1,4 @@
-function DATA = read_DataFile(data_file, dim)
+function DATA = read_DataFile(data_file, dim, param)
 %READ_DATAFILE data_file parser
 %
 %   DATA = READ_DATAFILE(DATA_FILE) read the file specified by the string
@@ -10,6 +10,10 @@ function DATA = read_DataFile(data_file, dim)
 
 if nargin < 2 || isempty(dim)
     dim = 2;
+end
+
+if nargin < 3 || isempty(param)
+    param = [];
 end
 
 %% Set Default values
