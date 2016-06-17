@@ -63,6 +63,7 @@ The `Problems` contains a gallery of tests, examples and applications which are 
 `FEM_CSM_Test3D` finite element approximation of the 3D hyper-elastic equations with Saint Venant-Kirchhoff constitutive law *(included in the testsuite)*
 `FEM_CSMt_Test2D` finite element approximation of the 2D nonlinear elastodynamics equations with different constituive laws *(included in the testsuite)*
 `FEM_CSM_ShearCube` finite element approximation of a shear test on a cube with Saint Venant-Kirchhoff material model
+`FEM_MeshMotion_test2D` mesh deformation of a 2D domain (square with a hole) using the harmonic- and solid-extension mesh motion techniques.  
 
 ** Reduced Basis Methods **
 `RB_Mixer` RB approximation of the steady heat conduction-convection problem described in Sects. 3.8, 6.6 and 7.2 of **[QMN16]**
