@@ -6,7 +6,8 @@ redbKIT is a [MATLAB](http://www.mathworks.com/products/matlab/) library (develo
 
 `redbKIT` consists of three main packages: [`RB_library`](https://github.com/redbKIT/redbKIT/tree/master/RB_library), [`FEM_library`](https://github.com/redbKIT/redbKIT/tree/master/FEM_library) and [`Problems`](https://github.com/redbKIT/redbKIT/tree/master/Problems), which are briefly described below.
 
-#### RB_library
+RB_library
+-------
 
 Implements in the MATLAB language many of the algorithms and methods presented in Chapters 3, 6, 7 and 10 of the book **[QMN16]**, such as
 
@@ -21,7 +22,9 @@ The implementation is almost independent of the underlying high-fidelity approxi
 As of Release 2.0, an implementation of the Matrix Discrete Empirical Interpolation Method (see [[NMA15]](http://www.sciencedirect.com/science/article/pii/S0021999115006543)) as well as an example of its application to the Helmholtz equation are provided.
 
 
-#### FEM_library
+FEM_library
+-------
+
 Provides a flexible implementation for the following families of problems:
 - 2D/3D steady and unsteady diffusion-transport-reaction equations, with P1/P2 finite elements.
 
@@ -41,7 +44,9 @@ The assembly routines for the FE vectors and matrices are written in C code usin
                   
 The default linear solver is Matlab backslash (sparse direct solver). If available, also [MUMPS](http://mumps.enseeiht.fr/index.php?page=home) can be used in a straightforward fashion.  For moderately large size problems, a One-Level (geometric) Additive Schwarz preconditioner can be employed  in combination with a suitable iterative solver (usually gmres). In this case, mesh partitioning is done through the [Meshpart toolbox](http://www.cerfacs.fr/algor/Softs/MESHPART/) and [Metis library](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview).
 
-#### Problems
+Problems
+-------
+
 The `Problems` contains a gallery of tests, examples and applications which are listed below (if a problem is marked as *included in the testsuite*, it means that is tested by the `test_all.m` function):
 
 ##### FEM-ADR: Advection-diffusion-reaction equations
