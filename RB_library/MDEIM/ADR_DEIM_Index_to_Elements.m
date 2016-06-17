@@ -1,5 +1,5 @@
-function [IDEIM_elem, DEIM_nodes, IDEIM_boundary] = DEIM_Index_to_Elements(flag, IDEIM, ndf, node_to_element, node_to_boundary, internal_vertices, nov)
-%DEIM_INDEX_TO_ELEMENTS detect the elements to which the nodes seletected 
+function [IDEIM_elem, DEIM_nodes, IDEIM_boundary] = ADR_DEIM_Index_to_Elements(flag, IDEIM, ndf, node_to_element, node_to_boundary, internal_vertices, nov)
+%ADR_DEIM_INDEX_TO_ELEMENTS detect the elements to which the nodes seletected 
 %by the DEIM algorithm belong 
 %
 %   IDEIM: indices vector provided by DEIM.m
@@ -8,8 +8,9 @@ function [IDEIM_elem, DEIM_nodes, IDEIM_boundary] = DEIM_Index_to_Elements(flag,
 %   INTERNAL_VERTICES: index arrays of internal_vertices (since we use lifting to treat Dirichlet BCs)
 %   NOV: number of vertices of the mesh
 
-%   Author: F. Negri (federico.negri@epfl.ch) 2014
-%   Copyright (C) Federico Negri, CMCS, EPFL
+%   This file is part of redbKIT.
+%   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
+%   Author: Federico Negri <federico.negri at epfl.ch> 
 
 
 switch flag
