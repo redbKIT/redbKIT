@@ -102,7 +102,7 @@ The `Problems` contains a gallery of tests, examples and applications which are 
 Download and Installation
 -------
 
-You can directly [**`download the current release`**](https://github.com/redbKIT/redbKIT/archive/master.zip) or clone the git repository
+You can directly [**`download the current release`**](https://github.com/redbKIT/redbKIT/archive/dev.zip) or clone the git repository
 
 	$ git clone https://github.com/redbKIT/redbKIT.git /folder_path
 
