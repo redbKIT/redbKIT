@@ -28,7 +28,8 @@ Provides a flexible implementation for the following families of problems:
 - 2D/3D steady and unsteady  Navier-Stokes equations approximated by 
     - P2-P1 or P1Bubble-P1 finite elements for velocity and pressure spaces, respectively;
     - P1-P1 finite elements stabilized with the SUPG stabilization (implemented as in the framework of the Variational MultiScale Method).
-For the steady case, Newton iterations are provided. For the unsteady case, time advancing is performed via BDF integrator, while the convection term can be treated either implicitly (with Newton subiterations) or with a semi-implicit scheme with extrapolation of the convective term.
+		
+ For the steady case, Newton iterations are provided. For the unsteady case, time advancing is performed via BDF integrator, while the convection term can be treated either implicitly (with Newton subiterations) or with a semi-implicit scheme with extrapolation of the convective term.
 
 - 2D/3D steady and unsteady structural problem. Both linear elasticity and nonlinear hyperelastic St. Venant Kirchhoff, nearly incompressible Neo-Hookean  and Raghavan-Vorp material models are implemented. For the steady case, a basic Newton algorithm with backtracking is provided. In the unsteady case, time advancing is performed via the generalized alpha-scheme suitably combined with Newton subiterations in the nonlinear case.
 
@@ -36,39 +37,44 @@ For the steady case, Newton iterations are provided. For the unsteady case, time
 The package can load linear triangular meshes either in the .msh format or in the [MATLAB Partial Differential Equation Toolbox(R)](http://www.mathworks.com/products/pde/index.html?s_tid=gn_loc_drop) format. Results can be either visualized in MATLAB or exported in the (binary) [VTK format](http://www.vtk.org/wp-content/uploads/2015/04/file-formats.pdf) for post-processing with [Paraview](http://www.paraview.org/).
                   
 
-The assembly routines for the FE vectors and matrices are written in C code using suitable mex interfaces.  For this reason, before using the library you need to first compile the FE assemblers, as explained in the INSTALL file.  Loops over the elements are parallelized via OpenMP, while the global assembly of  sparse matrices from local contributes can be speeded-up by installing the [FAST package](http://user.it.uu.se/~stefane/freeware).
+The assembly routines for the FE vectors and matrices are written in C code using suitable mex interfaces.  For this reason, before using the library you first need to compile the FE assemblers, as explained in the INSTALL file.  Loops over the elements are parallelized via OpenMP, while the global assembly of  sparse matrices from local contributes can be speeded-up by installing the [FAST package](http://user.it.uu.se/~stefane/freeware).
                   
 The default linear solver is Matlab backslash (sparse direct solver). If available, also [MUMPS](http://mumps.enseeiht.fr/index.php?page=home) can be used in a straightforward fashion.  For moderately large size problems, a One-Level (geometric) Additive Schwarz preconditioner can be employed  in combination with a suitable iterative solver (usually gmres). In this case, mesh partitioning is done through the [Meshpart toolbox](http://www.cerfacs.fr/algor/Softs/MESHPART/) and [Metis library](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview).
 
 #### Problems
-Contains a gallery of examples and applications. Many of them are described in Chapters 8, 9 and 10 of the book **[QMN16]**.
+The `Problems` contains a gallery of tests, examples and applications which are listed below (if a problem is marked as *included in the testsuite*, it means that is tested by the `test_all.m` function):
 
-FEM_TestMetis    
-FEM_Test_2DLaplacian
-FEM_Test_3DLaplacian
-FEM_Test_ADRt_2D
-FEM_Test_ADRt_3D
-                 
-FEM_CFD_Steady_Test2D           
-FEM_CFD_Steady_Test3D     
+** FEM-ADR: Advection-diffusion-reaction equations **
+`FEM_TestMetis` test Metis installation (included in the testsuite)
+`FEM_Test_2DLaplacian` test convergence of 2D finite element approximation of the Laplacian in a square domain *(included in the testsuite)*
+`FEM_Test_3DLaplacian` test convergence of 3D finite element approximation of the Laplacian in a cube *(included in the testsuite)*
+`FEM_Test_ADRt_2D` example of 2D finite element approximation of an advection-diffusion problem *(included in the testsuite)*
+`FEM_Test_ADRt_3D` example of 3D finite element approximation of an advection-diffusion problem *(included in the testsuite)*
+          
+** FEM-CFD: Fluid dynamics**
+`FEM_CFD_Steady_Test2D` solution of the steady 2D Navier-Stokes equations in a backward-facing step channel
+`FEM_CFD_Steady_Test3D` solution of the steady 3D Navier-Stokes equations around a bluff body (a description of the geometry is given [here](http://www.sciencedirect.com/science/article/pii/S0898122114006075))
+`FEM_CFD_Dfg2D` 2D unsteady Navier-Stokes equations: flow around a cylinder benchmark. For a detailed description of this problem see the [FeatFlow website](http://www.featflow.de/en/benchmarks/cfdbenchmarking/flow.html). *(included in the testsuite)*
+`FEM_CFD_Dfg3D` 3D unsteady Navier-Stokes equations: flow around a cylinder benchmark. For a detailed description of this problem see the [FeatFlow website](http://www.featflow.de/en/benchmarks/cfdbenchmarking/flow/dfg_flow3d.html). *(included in the testsuite)*
+          
+** FEM-CSM: Solid mechanics **
 
-FEM_CFD_Dfg2D                
-FEM_CFD_Dfg3D       
-                       
-FEM_CSM_Test2D                      
-FEM_CSM_Test3D                
-FEM_CSMt_Test2D
-FEM_CSM_ShearCube           
+`FEM_CSM_Test2D` finite element approximation of the 2D steady linear elasticity equations *(included in the testsuite)*
+`FEM_CSM_Test3D` finite element approximation of the 3D hyper-elastic equations with Saint Venant-Kirchhoff constitutive law *(included in the testsuite)*
+`FEM_CSMt_Test2D` finite element approximation of the 2D nonlinear elastodynamics equations with different constituive laws *(included in the testsuite)*
+`FEM_CSM_ShearCube` finite element approximation of a shear test on a cube with Saint Venant-Kirchhoff material model
 
-RB_AcousticHorn_Affine
-RB_AcousticHorn_NonAffine
+** Reduced Basis Methods **
+`RB_Mixer` RB approximation of the steady heat conduction-convection problem described in Sects. 3.8, 6.6 and 7.2 of **[QMN16]**
+`RB_AffineDevice` RB approximation of the steady heat-transfer problem described in Sects. 8.3 and 9.1 of **[QMN16]** *(included in the testsuite)*
+`RB_Beam` RB approximation of the linear elasticity problem described in Sect. 9.2 of **[QMN16]**
+`RB_Cookies` RB approximation of the steady diffusion problem described in Sect. 7.5 of **[QMN16]**
+`RB_EIM_Gaussian` RB approximation of the nonaffine steady heat-transfer problem described in Sects. 8.4 and 10.5 of **[QMN16]** *(included in the testsuite)*
+`Test_EIM_DEIM` Test and compare EIM and DEIM on the function defined in equation (3.36) of [this paper](http://epubs.siam.org/doi/abs/10.1137/090766498) *(included in the testsuite)*
+`RB_AcousticHorn_Affine` RB approximation of the (affine) Helmholtz equations modeling the propagation of a pressure wave into an acoustic horn. For a detailed description see [[NMA15]](http://www.sciencedirect.com/science/article/pii/S0021999115006543)
 
-RB_AffineDevice
-RB_Beam
-RB_Cookies
-RB_EIM_Gaussian
-RB_Mixer
-Test_EIM_DEIM
+** RB - MDEIM **
+`RB_AcousticHorn_NonAffine` RB approximation of the (nonaffine) Helmholtz equations modeling the propagation of a pressure wave into an acoustic horn. The geometry of the horn is parametrized with a Radial Basis Functions mapping. System approximation is performed via the *Matrix Discrete Empirical Interpolation* method, as detailed in [[NMA15]](http://www.sciencedirect.com/science/article/pii/S0021999115006543)
 
 Download and Installation
 -------

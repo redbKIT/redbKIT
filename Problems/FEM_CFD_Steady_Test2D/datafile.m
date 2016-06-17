@@ -25,7 +25,7 @@ data.density             = 1;
 %% SOLVER OPTIONS
 
 % Nonlinear solver
-data.NonLinearSolver.first       = 'picard';
+data.NonLinearSolver.first       = 'newton';
 data.NonLinearSolver.switch_tol  = 1e-2; 
 data.NonLinearSolver.tol         = 1e-8; 
 data.NonLinearSolver.maxit       = 30;
