@@ -9,6 +9,7 @@ redbKIT is a [MATLAB](http://www.mathworks.com/products/matlab/) library (develo
 #### RB_library
 
 Implements in the MATLAB language many of the algorithms and methods presented in Chapters 3, 6, 7 and 10 of the book **[QMN16]**, such as
+
 - proper orthogonal decomposition
 - greedy algorithm
 - radial basis function interpolation of stability factors
@@ -42,6 +43,32 @@ The default linear solver is Matlab backslash (sparse direct solver). If availab
 #### Problems
 Contains a gallery of examples and applications. Many of them are described in Chapters 8, 9 and 10 of the book **[QMN16]**.
 
+FEM_TestMetis    
+FEM_Test_2DLaplacian
+FEM_Test_3DLaplacian
+FEM_Test_ADRt_2D
+FEM_Test_ADRt_3D
+                 
+FEM_CFD_Steady_Test2D           
+FEM_CFD_Steady_Test3D     
+
+FEM_CFD_Dfg2D                
+FEM_CFD_Dfg3D       
+                       
+FEM_CSM_Test2D                      
+FEM_CSM_Test3D                
+FEM_CSMt_Test2D
+FEM_CSM_ShearCube           
+
+RB_AcousticHorn_Affine
+RB_AcousticHorn_NonAffine
+
+RB_AffineDevice
+RB_Beam
+RB_Cookies
+RB_EIM_Gaussian
+RB_Mixer
+Test_EIM_DEIM
 
 Download and Installation
 -------
@@ -55,26 +82,72 @@ You can directly [**`download the current release`**](https://github.com/redbKIT
 
 [`FEM_library/`](https://github.com/redbKIT/redbKIT/tree/master/FEM_library)  [`LICENSE`](https://github.com/redbKIT/redbKIT/blob/master/LICENSE)  [`Problems/`](https://github.com/redbKIT/redbKIT/tree/master/Problems)  [`RB_library/`](https://github.com/redbKIT/redbKIT/tree/master/RB_library)  [`README.md`](https://github.com/redbKIT/redbKIT/blob/master/README.md)  [`setPath.m`](https://github.com/redbKIT/redbKIT/blob/master/setPath.m)  [`INSTALL`](https://github.com/redbKIT/redbKIT/blob/master/INSTALL)
 
-To check that your operating system and MATLAB installation are supported, and that the code is correctly working, please follow these instructions. Start MATLAB and navigate to the `redbKIT` folder. Then, type in the MATLAB prompt
+To install the library, please follow the instructions contained in the INSTALL file. 
 
-	>> setPath
-	>> cd Problems
-	>> test_all
+**Pre-requisites**
 
-The `test_all.m` functions launches a series of tests and generates a log file `test_log.txt`. If all the tests are marked as *passed*, you can start enjoying `redbKIT`. Otherwise, do not hesitate to contact us by email at <redbkit@gmail.com>.
+For the basic installation, you need:
 
-`redbKIT` has been successfully tested on the following operating systems/MATLAB versions:
+- a reasonably recent version of Matlab
+- a supported C compiler, see e.g. http://it.mathworks.com/support/compilers/R2016a/
+   (gcc on Unix and gcc/clang on Mac OS X work smoothly)
 
-| MATLAB version / OS  |  Linux 64 bit  |  MAC 64 Bit | Windows 64 Bit | Windows 32 Bit |
-|:--------------------:|:--------------:|:-----------:|:--------------:|:--------------:|
-|           **R2015a** |                |      x      |                |                |
-|           **R2014b** |        x       |      x      |       x        |                |
-|           **R2014a** |        x       |             |                |                |
-|           **R2013a** |        x       |             |                |                |
-|           **R2012a** |        x       |             |                |                |
-|           **R2011a** |        x       |             |                |                |
-|           **R2010a** |        x       |             |                |                |
-|           **R2009b** |                |             |                |        x       |
+If you want to speed-up matrix assembly via multithreading, you also need:
+
+- a C compiler with OpenMP support, see e.g. http://it.mathworks.com/support/compilers/R2016a/
+   (gcc is tested for both Unix and Mac OS X)
+
+If you want to speed-up Matlab built-in "sparse" command by installing the FAST package, you also need:
+
+- a supported C compiler for the serial version
+- a C compiler with OpenMP support for the multithreaded version
+
+If you want to use parallel Additive Schwarz preconditioners, you also need:
+
+- MATLAB Parallel Computing Toolbox
+- CMake
+
+
+**Basic Installation**
+
+Open Matlab and navigate to redbKIT root directory. Then type 
+
+	>> make
+
+to compile the C-assembly routines and "mexify" some other files.
+
+
+**Installation with OpenMP enabled**
+
+Open Matlab and navigate to redbKIT root directory. Then type 
+
+	>> make(1)
+
+to compile the C-assembly routines with OpenMP enabled.
+
+
+**Install Metis for Additive Schwarz preconditioners**
+
+Open Matlab and navigate to the redbKIT directory FEM_library/Mesh.
+Then type 
+
+	>> install_metismex
+
+
+**Install FAST to speed-up Matlab "sparse" command**
+
+Open Matlab and navigate to the redbKIT directory FEM_library/Tools.
+
+To install the serial version, type
+
+	>> install_FAST
+
+To install the multithreaded version, type
+
+	>> install_FAST(1)
+
+In both cases you will be required to accept FAST's license.
+See http://user.it.uu.se/~stefane/freeware. 
 
 Usage
 -------
@@ -88,9 +161,8 @@ A welcome message should appear: you can now start using redbKIT!
 
 A gallery of applications is provided in the folder [`Problems/`](https://github.com/redbKIT/redbKIT/tree/master/Problems).
 
-To check that the code is correctly working, please follow these instructions, please type in the MATLAB prompt
+To check that the code is correctly working, please type in the MATLAB prompt
 
-	>> setPath
 	>> cd Problems
 	>> test_all
 
@@ -142,8 +214,8 @@ BibTex entry
   	title   = {Reduced Basis Methods for Partial Differential Equations. An Introduction},
   	year    = {2016},
   	publisher = {Springer},
-      series = {Unitext},
-      volume = {92},
+    series = {Unitext},
+    volume = {92},
 	}
 
 Development
