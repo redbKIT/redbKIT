@@ -240,7 +240,7 @@ classdef CFD_Assembler < handle
 %                 obj.M_density, obj.M_kinematic_viscosity, dt, alpha_BDF);
              
             [rowA, colA, coefA, rowF, coefF] = ...
-                CFD_assembler_C_omp_SUPG('SUPG_SemiImplicit', obj.M_MESH.dim, ... %0 1
+                CFD_assembler_C_omp('SUPG_SemiImplicit', obj.M_MESH.dim, ... %0 1
                 obj.M_MESH.elements,  obj.M_MESH.jac, obj.M_MESH.invjac, ... %2 3 4
                 obj.M_FE_SPACE_v.quad_weights, obj.M_FE_SPACE_v.phi, obj.M_FE_SPACE_v.dphi_ref, ... %5 6 7
                 obj.M_FE_SPACE_v.numElemDof, obj.M_FE_SPACE_p.numElemDof, ... %8 9
@@ -276,7 +276,7 @@ classdef CFD_Assembler < handle
 %                 obj.M_density, obj.M_kinematic_viscosity, dt, alpha_BDF);
             
             [rowA, colA, coefA, rowF, coefF] = ...
-                CFD_assembler_C_omp_SUPG('SUPG_Implicit', obj.M_MESH.dim, ... %0 1
+                CFD_assembler_C_omp('SUPG_Implicit', obj.M_MESH.dim, ... %0 1
                 obj.M_MESH.elements,  obj.M_MESH.jac, obj.M_MESH.invjac, ... %2 3 4
                 obj.M_FE_SPACE_v.quad_weights, obj.M_FE_SPACE_v.phi, obj.M_FE_SPACE_v.dphi_ref, ... %5 6 7
                 obj.M_FE_SPACE_v.numElemDof, obj.M_FE_SPACE_p.numElemDof, ... %8 9
