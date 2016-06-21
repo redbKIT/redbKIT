@@ -17,6 +17,12 @@
 double Mdot(int dim, double X[dim][dim], double Y[dim][dim]);
 
 
+double ScalarProduct(int dim, double x[dim], double y[dim]);
+
+
+void MatrixVector(int dim1, int dim2, double A[dim1][dim2], double x[dim2], double y[dim1]);
+
+
 void MatrixSum(int dim, double X[dim][dim], double Y[dim][dim] );
 
 

@@ -20,6 +20,30 @@ double Mdot(int dim, double X[dim][dim], double Y[dim][dim])
     }
     return Z;
 }
+/*************************************************************************/
+double ScalarProduct(int dim, double x[dim], double y[dim])
+{
+    double result = 0;
+    int d1;
+    for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+    {
+        result += x[d1] * y[d1];
+    }
+    return result;
+}
+/*************************************************************************/
+void MatrixVector(int dim1, int dim2, double A[dim1][dim2], double x[dim2], double y[dim1])
+{
+    int d1, d2;
+    for (d1 = 0; d1 < dim1; d1 = d1 + 1 )
+    {
+        y[d1] = 0;
+        for (d2 = 0; d2 < dim2; d2 = d2 + 1 )
+        {
+            y[d1] += A[d1][d2] * x[d2];
+        }
+    }    
+}
 
 /*************************************************************************/
 void MatrixSum(int dim, double X[dim][dim], double Y[dim][dim] )
