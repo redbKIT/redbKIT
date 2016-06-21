@@ -6,7 +6,8 @@ redbKIT is a [MATLAB](http://www.mathworks.com/products/matlab/) library (develo
 
 `redbKIT` consists of three main packages: [`RB_library`](https://github.com/redbKIT/redbKIT/tree/master/RB_library), [`FEM_library`](https://github.com/redbKIT/redbKIT/tree/master/FEM_library) and [`Problems`](https://github.com/redbKIT/redbKIT/tree/master/Problems), which are briefly described below.
 
-#### RB_library
+RB_library
+-------
 
 Implements in the MATLAB language many of the algorithms and methods presented in Chapters 3, 6, 7 and 10 of the book **[QMN16]**, such as
 
@@ -21,7 +22,9 @@ The implementation is almost independent of the underlying high-fidelity approxi
 As of Release 2.0, an implementation of the Matrix Discrete Empirical Interpolation Method (see [[NMA15]](http://www.sciencedirect.com/science/article/pii/S0021999115006543)) as well as an example of its application to the Helmholtz equation are provided.
 
 
-#### FEM_library
+FEM_library
+-------
+
 Provides a flexible implementation for the following families of problems:
 - 2D/3D steady and unsteady diffusion-transport-reaction equations, with P1/P2 finite elements.
 
@@ -41,45 +44,65 @@ The assembly routines for the FE vectors and matrices are written in C code usin
                   
 The default linear solver is Matlab backslash (sparse direct solver). If available, also [MUMPS](http://mumps.enseeiht.fr/index.php?page=home) can be used in a straightforward fashion.  For moderately large size problems, a One-Level (geometric) Additive Schwarz preconditioner can be employed  in combination with a suitable iterative solver (usually gmres). In this case, mesh partitioning is done through the [Meshpart toolbox](http://www.cerfacs.fr/algor/Softs/MESHPART/) and [Metis library](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview).
 
-#### Problems
+Problems
+-------
+
 The `Problems` contains a gallery of tests, examples and applications which are listed below (if a problem is marked as *included in the testsuite*, it means that is tested by the `test_all.m` function):
 
-** FEM-ADR: Advection-diffusion-reaction equations **
+##### FEM-ADR: Advection-diffusion-reaction equations
 `FEM_TestMetis` test Metis installation (included in the testsuite)
+
 `FEM_Test_2DLaplacian` test convergence of 2D finite element approximation of the Laplacian in a square domain *(included in the testsuite)*
+
 `FEM_Test_3DLaplacian` test convergence of 3D finite element approximation of the Laplacian in a cube *(included in the testsuite)*
+
 `FEM_Test_ADRt_2D` example of 2D finite element approximation of an advection-diffusion problem *(included in the testsuite)*
+
 `FEM_Test_ADRt_3D` example of 3D finite element approximation of an advection-diffusion problem *(included in the testsuite)*
           
-** FEM-CFD: Fluid dynamics**
+##### FEM-CFD: Fluid dynamics
 `FEM_CFD_Steady_Test2D` solution of the steady 2D Navier-Stokes equations in a backward-facing step channel
+
 `FEM_CFD_Steady_Test3D` solution of the steady 3D Navier-Stokes equations around a bluff body (a description of the geometry is given [here](http://www.sciencedirect.com/science/article/pii/S0898122114006075))
+
 `FEM_CFD_Dfg2D` 2D unsteady Navier-Stokes equations: flow around a cylinder benchmark. For a detailed description of this problem see the [FeatFlow website](http://www.featflow.de/en/benchmarks/cfdbenchmarking/flow.html). *(included in the testsuite)*
+
 `FEM_CFD_Dfg3D` 3D unsteady Navier-Stokes equations: flow around a cylinder benchmark. For a detailed description of this problem see the [FeatFlow website](http://www.featflow.de/en/benchmarks/cfdbenchmarking/flow/dfg_flow3d.html). *(included in the testsuite)*
           
-** FEM-CSM: Solid mechanics **
+##### FEM-CSM: Solid mechanics
 
 `FEM_CSM_Test2D` finite element approximation of the 2D steady linear elasticity equations *(included in the testsuite)*
+
 `FEM_CSM_Test3D` finite element approximation of the 3D hyper-elastic equations with Saint Venant-Kirchhoff constitutive law *(included in the testsuite)*
+
 `FEM_CSMt_Test2D` finite element approximation of the 2D nonlinear elastodynamics equations with different constituive laws *(included in the testsuite)*
+
 `FEM_CSM_ShearCube` finite element approximation of a shear test on a cube with Saint Venant-Kirchhoff material model
 
-** Reduced Basis Methods **
+`FEM_MeshMotion_test2D` mesh deformation of a 2D domain (square with a hole) using the harmonic- and solid-extension mesh motion techniques.  
+
+##### Reduced Basis Methods
 `RB_Mixer` RB approximation of the steady heat conduction-convection problem described in Sects. 3.8, 6.6 and 7.2 of **[QMN16]**
+
 `RB_AffineDevice` RB approximation of the steady heat-transfer problem described in Sects. 8.3 and 9.1 of **[QMN16]** *(included in the testsuite)*
+
 `RB_Beam` RB approximation of the linear elasticity problem described in Sect. 9.2 of **[QMN16]**
+
 `RB_Cookies` RB approximation of the steady diffusion problem described in Sect. 7.5 of **[QMN16]**
+
 `RB_EIM_Gaussian` RB approximation of the nonaffine steady heat-transfer problem described in Sects. 8.4 and 10.5 of **[QMN16]** *(included in the testsuite)*
+
 `Test_EIM_DEIM` Test and compare EIM and DEIM on the function defined in equation (3.36) of [this paper](http://epubs.siam.org/doi/abs/10.1137/090766498) *(included in the testsuite)*
+
 `RB_AcousticHorn_Affine` RB approximation of the (affine) Helmholtz equations modeling the propagation of a pressure wave into an acoustic horn. For a detailed description see [[NMA15]](http://www.sciencedirect.com/science/article/pii/S0021999115006543)
 
-** RB - MDEIM **
+##### RB - MDEIM
 `RB_AcousticHorn_NonAffine` RB approximation of the (nonaffine) Helmholtz equations modeling the propagation of a pressure wave into an acoustic horn. The geometry of the horn is parametrized with a Radial Basis Functions mapping. System approximation is performed via the *Matrix Discrete Empirical Interpolation* method, as detailed in [[NMA15]](http://www.sciencedirect.com/science/article/pii/S0021999115006543)
 
 Download and Installation
 -------
 
-You can directly [**`download the current release`**](https://github.com/redbKIT/redbKIT/archive/master.zip) or clone the git repository
+You can directly [**`download the current release`**](https://github.com/redbKIT/redbKIT/archive/dev.zip) or clone the git repository
 
 	$ git clone https://github.com/redbKIT/redbKIT.git /folder_path
 
