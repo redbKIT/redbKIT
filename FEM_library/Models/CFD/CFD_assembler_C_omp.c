@@ -45,8 +45,6 @@ void AssembleStokes(mxArray* plhs[], const mxArray* prhs[])
     double* myAcols    = mxGetPr(plhs[1]);
     double* myAcoef    = mxGetPr(plhs[2]);
     
-    int k,l;
-    int q;
     int NumQuadPoints     = mxGetN(prhs[7]);
     
     double* NumNodes_ptr = mxGetPr(prhs[6]);
@@ -59,19 +57,20 @@ void AssembleStokes(mxArray* plhs[], const mxArray* prhs[])
     double* gradrefphiV = mxGetPr(prhs[11]);
     double* phiP = mxGetPr(prhs[12]);
     
-    double gradphiV[NumQuadPoints][nlnV][dim];
     double* elements  = mxGetPr(prhs[3]);
         
     double* material_param = mxGetPr(prhs[1]);
     double viscosity = material_param[0];
     
     /* Assembly: loop over the elements */
-    int ie, d1, d2;
+    int ie;
     
-#pragma omp parallel for shared(invjac,detjac,elements,myAcols,myArows,myAcoef) private(gradphiV,ie,k,l,q,d1,d2) firstprivate(phiV,phiP,gradrefphiV,w,numRowsElements,local_matrix_size,nlnV,nlnP,NumScalarDofsV,viscosity)
+#pragma omp parallel for shared(invjac,detjac,elements,myAcols,myArows,myAcoef) private(ie) firstprivate(phiV,phiP,gradrefphiV,w,numRowsElements,local_matrix_size,nlnV,nlnP,NumQuadPoints,NumScalarDofsV,viscosity,dim)
     for (ie = 0; ie < noe; ie = ie + 1 )
     {
+        int k, q, d1, d2;
         
+        double gradphiV[NumQuadPoints][nlnV][dim];
         for (q = 0; q < NumQuadPoints; q = q + 1 )
         {
             for (k = 0; k < nlnV; k = k + 1 )
