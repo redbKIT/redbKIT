@@ -677,18 +677,6 @@ void AssembleSUPG_SemiImplicit(mxArray* plhs[], const mxArray* prhs[])
                 aloc = 0;
                 for (q = 0; q < NumQuadPoints; q = q + 1 )
                 {
-                    /*
-                    double uh_gradPHI_trial = 0;
-                    double uh_gradPHI_test = 0;
-                    for (d1 = 0; d1 < dim; d1 = d1 + 1 )
-                    {
-                        uh_gradPHI_trial += U_hq[q][d1] * gradphiV[d1][b][q];
-                        uh_gradPHI_test  += U_hq[q][d1] * gradphiV[d1][a][q];
-                    }
-                    
-                    aloc += tauM[q] * density * uh_gradPHI_test * 
-                            ( density * alpha / dt * phiV[b+q*nlnV] + density*uh_gradPHI_trial ) * w[q];
-                    */
                     aloc += tauM[q] * uh_gradPHI[a][q] * 
                             ( density * alpha / dt * phiV[b+q*nlnV] + uh_gradPHI[b][q] ) * w[q];                    
                 }
@@ -708,14 +696,6 @@ void AssembleSUPG_SemiImplicit(mxArray* plhs[], const mxArray* prhs[])
             
             for (q = 0; q < NumQuadPoints; q = q + 1 )
             {
-                /*
-                double uh_gradPHI_test = 0;
-                for (d1 = 0; d1 < dim; d1 = d1 + 1 )
-                {
-                    uh_gradPHI_test  += U_hq[q][d1] * gradphiV[d1][a][q];
-                }
-                */
-                
                 for (d1 = 0; d1 < dim; d1 = d1 + 1 )
                 {
                     rloc_v[d1] += tauM[q] * uh_gradPHI[a][q] * 
@@ -740,14 +720,6 @@ void AssembleSUPG_SemiImplicit(mxArray* plhs[], const mxArray* prhs[])
                 
                 for (q = 0; q < NumQuadPoints; q = q + 1 )
                 {
-                    /*
-                    double uh_gradPHI_test = 0;
-                    for (d1 = 0; d1 < dim; d1 = d1 + 1 )
-                    {
-                        uh_gradPHI_test  += U_hq[q][d1] * gradphiV[d1][a][q];
-                    }
-                    */
-                    
                     for (d1 = 0; d1 < dim; d1 = d1 + 1 )
                     {
                         aloc_vp[d1] += tauM[q] * uh_gradPHI[a][q] * gradphiP[d1][b][q] * w[q];
@@ -778,14 +750,6 @@ void AssembleSUPG_SemiImplicit(mxArray* plhs[], const mxArray* prhs[])
                 
                 for (q = 0; q < NumQuadPoints; q = q + 1 )
                 {
-                    /*
-                    double uh_gradPHI_trial = 0;
-                    for (d1 = 0; d1 < dim; d1 = d1 + 1 )
-                    {
-                        uh_gradPHI_trial += U_hq[q][d1] * gradphiV[d1][b][q];
-                    }
-                    */
-                    
                     for (d1 = 0; d1 < dim; d1 = d1 + 1 )
                     {
                         aloc_pv[d1] += tauM[q] * ( density * alpha / dt * phiV[b+q*nlnV] + uh_gradPHI[b][q] )
@@ -825,6 +789,374 @@ void AssembleSUPG_SemiImplicit(mxArray* plhs[], const mxArray* prhs[])
                 for (d1 = 0; d1 < dim; d1 = d1 + 1 )
                 {
                     rloc += tauM[q] * ( - density / dt * v_nq[q][d1] ) * gradphiP[d1][a][q] * w[q];
+                }
+            }
+            myRrows[ie*local_rhs_size+ii] = elements[a+ie*numRowsElements] + dim * NumScalarDofsV;
+            myRcoef[ie*local_rhs_size+ii] = rloc*detjac[ie];
+            ii = ii + 1;
+        }
+    }
+    
+}
+/*************************************************************************/
+void AssembleSUPG_Implicit(mxArray* plhs[], const mxArray* prhs[])
+{
+    double* dim_ptr = mxGetPr(prhs[1]);
+    int dim     = (int)(dim_ptr[0]);
+    int noe     = mxGetN(prhs[2]);
+    double* nln_ptrV = mxGetPr(prhs[8]);
+    int nlnV     = (int)(nln_ptrV[0]);
+    double* nln_ptrP = mxGetPr(prhs[9]);
+    int nlnP     = (int)(nln_ptrP[0]);
+    int numRowsElements  = mxGetM(prhs[2]);
+        
+    int nln  = nlnV + nlnP;
+    int nln2 = nln*nln;
+    int local_matrix_size = ( dim*nlnV + nlnP ) * ( dim*nlnV + nlnP );
+    int local_rhs_size = dim*nlnV + nlnP;
+
+    plhs[0] = mxCreateDoubleMatrix(noe*local_matrix_size,1, mxREAL);
+    plhs[1] = mxCreateDoubleMatrix(noe*local_matrix_size,1, mxREAL);
+    plhs[2] = mxCreateDoubleMatrix(noe*local_matrix_size,1, mxREAL);
+    
+    plhs[3] = mxCreateDoubleMatrix(noe*local_rhs_size,1, mxREAL);
+    plhs[4] = mxCreateDoubleMatrix(noe*local_rhs_size,1, mxREAL);
+        
+    double* myArows    = mxGetPr(plhs[0]);
+    double* myAcols    = mxGetPr(plhs[1]);
+    double* myAcoef    = mxGetPr(plhs[2]);
+    
+    double* myRrows    = mxGetPr(plhs[3]);
+    double* myRcoef    = mxGetPr(plhs[4]);
+    
+    int k,l;
+    int q;
+    int NumQuadPoints     = mxGetN(prhs[5]);
+    
+    double* NumNodes_ptr = mxGetPr(prhs[10]);
+    int NumScalarDofsV     = (int)(NumNodes_ptr[0] / dim);
+        
+    double* NumNodes_ptrP  = mxGetPr(prhs[11]);
+    int NumScalarDofsP     = (int)(NumNodes_ptrP[0]);
+        
+    double* w   = mxGetPr(prhs[5]);
+    double* invjac = mxGetPr(prhs[4]);
+    double* detjac = mxGetPr(prhs[3]);
+    double* phiV = mxGetPr(prhs[6]);
+    double* phiP = mxGetPr(prhs[12]);
+    double* gradrefphiV = mxGetPr(prhs[7]);
+    double* gradrefphiP = mxGetPr(prhs[19]);
+    double* U_h   = mxGetPr(prhs[13]);
+    double* v_n   = mxGetPr(prhs[14]);
+    
+    double* elements  = mxGetPr(prhs[2]);
+            
+    double* tmp_ptr1 = mxGetPr(prhs[15]);
+    double density = tmp_ptr1[0];
+    double* tmp_ptr2 = mxGetPr(prhs[16]);
+    double viscosity = tmp_ptr2[0];
+    double* tmp_ptr3 = mxGetPr(prhs[17]);
+    double dt = tmp_ptr3[0];
+    double* tmp_ptr4 = mxGetPr(prhs[18]);
+    double alpha = tmp_ptr4[0];
+        
+    /* Assembly: loop over the elements */
+    int ie, d1, d2;
+    
+    #pragma omp parallel for shared(invjac,detjac,elements,myAcols,myArows,myAcoef,myRrows,myRcoef,U_h,v_n) private(ie,k,l,q,d1,d2) firstprivate(phiV,gradrefphiV,gradrefphiP,w,numRowsElements,local_rhs_size,local_matrix_size,nlnV,nlnP,NumScalarDofsV,density,viscosity,dt,alpha)
+    
+    for (ie = 0; ie < noe; ie = ie + 1 )
+    {
+        double gradphiV[dim][nlnV][NumQuadPoints];
+        double gradphiP[dim][nlnP][NumQuadPoints];
+        double U_hq[NumQuadPoints][dim];
+        double GradPh[NumQuadPoints][dim];
+        double v_nq[NumQuadPoints][dim];
+        double GradUh[NumQuadPoints][dim][dim];
+        
+        for (q = 0; q < NumQuadPoints; q = q + 1 )
+        {
+            /* Compute Gradient of Vel Basis functions*/
+            for (k = 0; k < nlnV; k = k + 1 )
+            {
+                for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+                {
+                    gradphiV[d1][k][q] = 0;
+                    for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+                    {
+                        gradphiV[d1][k][q] = gradphiV[d1][k][q] + INVJAC(ie,d1,d2)*GRADREFPHIV(k,q,d2);
+                    }
+                }
+            }
+
+            /* Compute Gradient of Pressure Basis functions*/
+            for (k = 0; k < nlnP; k = k + 1 )
+            {
+                for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+                {
+                    gradphiP[d1][k][q] = 0;
+                    for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+                    {
+                        gradphiP[d1][k][q] = gradphiP[d1][k][q] + INVJAC(ie,d1,d2)*GRADREFPHIP(k,q,d2);
+                    }
+                }
+            }
+            
+            /* Compute U_h and Grad(U_h) on the quadrature nodes of the current element*/
+            /* Compute Grad( p_h ) on the quadrature nodes of the current element*/
+            for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+            {
+                U_hq[q][d1] = 0;
+                v_nq[q][d1] = 0;
+                for (k = 0; k < nlnV; k = k + 1 )
+                {
+                    int e_k;
+                    e_k = (int)(elements[ie*numRowsElements + k] + d1*NumScalarDofsV - 1);
+                    U_hq[q][d1] = U_hq[q][d1] + U_h[e_k] * phiV[k+q*nlnV];
+                    v_nq[q][d1] = v_nq[q][d1] + v_n[e_k] * phiV[k+q*nlnV];
+                }
+                
+                for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+                {
+                    GradUh[q][d1][d2] = 0;
+                    for (k = 0; k < nlnV; k = k + 1 )
+                    {
+                        int e_k;
+                        e_k = (int)(elements[ie*numRowsElements + k] + d1*NumScalarDofsV - 1);
+                        GradUh[q][d1][d2] = GradUh[q][d1][d2] + U_h[e_k] * gradphiV[d2][k][q];
+                    }
+                }
+                
+                GradPh[q][d1] = 0;
+                for (k = 0; k < nlnP; k = k + 1 )
+                {
+                    int e_k;
+                    e_k = (int)(elements[ie*numRowsElements + k] + dim*NumScalarDofsV - 1);
+                    GradPh[q][d1] = GradPh[q][d1] + U_h[e_k] * gradphiP[d1][k][q];
+                }
+
+            }
+        }
+        
+        double uh_gradPHI[nlnV][NumQuadPoints];
+        for (k = 0; k < nlnV; k = k + 1 )
+        {
+            for (q = 0; q < NumQuadPoints; q = q + 1 )
+            {
+                uh_gradPHI[k][q] = 0;
+                for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+                {
+                    uh_gradPHI[k][q] += density * U_hq[q][d1] * gradphiV[d1][k][q];
+                }
+            }
+        }
+        
+        double Res_M[dim][NumQuadPoints];
+        double Res_C[NumQuadPoints];
+        
+        for (q = 0; q < NumQuadPoints; q = q + 1 )
+        {
+            Res_C[q] = 0.0;
+            for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+            {
+                Res_C[q] += GradUh[q][d1][d1];
+                
+                Res_M[d1][q] =   density / dt * (alpha * U_hq[q][d1] - v_nq[q][d1]) + GradPh[q][d1];
+                for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+                {
+                     Res_M[d1][q] += density * U_hq[q][d2] * GradUh[q][d1][d2];
+                }
+            }
+        }
+        
+        /*  compute metric tensors G and g */
+        double G[dim][dim];
+        double g[dim];
+        for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+        {
+            g[d1] = 0;
+            for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+            {
+                G[d1][d2] = 0.0;
+                int d3;
+                for (d3 = 0; d3 < dim; d3 = d3 + 1 )
+                {
+                    G[d1][d2] += INVJAC(ie,d1,d3) * INVJAC(ie,d2,d3);
+                }
+                g[d1] = g[d1] + INVJAC(ie,d1,d2);
+            }
+        }
+                
+        double traceGtG = Mdot(dim, G, G);
+        double tauM[NumQuadPoints];
+        double tauC[NumQuadPoints];
+        for (q = 0; q < NumQuadPoints; q = q + 1 )
+        {
+            double G_U_hq[dim];
+            MatrixVector(dim, dim, G, U_hq[q], G_U_hq);
+             
+            tauM[q] = pow( 4*density*density/(dt*dt) + density*density*ScalarProduct(dim, U_hq[q], G_U_hq) + 30*viscosity*viscosity*traceGtG, -0.5);
+            tauC[q] = 1 / ( tauM[q] * ScalarProduct(dim, g, g) ) ;
+        }
+        
+        int iii = 0;
+        int ii = 0;
+        int a, b, i_c, j_c;
+        double aloc;
+        double rloc;
+        
+        int tmp_index[dim][dim];
+                
+        /* loop over velocity test functions --> a */
+        for (a = 0; a < nlnV; a = a + 1 )
+        {
+            /* loop over velocity trial functions --> b */
+            for (b = 0; b < nlnV; b = b + 1 )
+            {
+                
+                for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+                {
+                    for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+                    {
+                        aloc = 0;
+                        for (q = 0; q < NumQuadPoints; q = q + 1 )
+                        {
+                            aloc  +=   (   gradphiV[d1][a][q] * gradphiV[d2][b][q] * tauC[q] 
+                                         + density * phiV[b+q*nlnV] * tauM[q] * Res_M[d1][q] * gradphiV[d2][a][q] 
+                                         + density * phiV[b+q*nlnV] * GradUh[q][d1][d2] * uh_gradPHI[a][q] * tauM[q]
+                                       ) 
+                                       * w[q];
+                        }
+                        myArows[ie*local_matrix_size+iii] = elements[a+ie*numRowsElements] + d1 * NumScalarDofsV;
+                        myAcols[ie*local_matrix_size+iii] = elements[b+ie*numRowsElements] + d2 * NumScalarDofsV;
+                        myAcoef[ie*local_matrix_size+iii] = aloc*detjac[ie];
+                        
+                        tmp_index[d1][d2] = iii;
+                        iii = iii + 1;
+                    }
+                }
+                
+                aloc = 0;
+                for (q = 0; q < NumQuadPoints; q = q + 1 )
+                {
+                    aloc += tauM[q] * uh_gradPHI[a][q] * 
+                            ( density * alpha / dt * phiV[b+q*nlnV] + uh_gradPHI[b][q] ) * w[q];                    
+                }
+                
+                for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+                {
+                    myAcoef[ie*local_matrix_size+tmp_index[d1][d1]] += aloc*detjac[ie];
+                }
+
+            }
+            
+            double rloc_v[dim];
+            for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+            {
+                rloc_v[d1] = 0.0;
+            }
+            
+            for (q = 0; q < NumQuadPoints; q = q + 1 )
+            {
+                for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+                {
+                    rloc_v[d1] += (   tauM[q] * uh_gradPHI[a][q] * Res_M[d1][q] 
+                                    + tauC[q] * gradphiV[d1][a][q]  * Res_C[q] 
+                                  ) * w[q];
+                }
+            }
+            
+            for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+            {
+                myRrows[ie*local_rhs_size+ii] = elements[a+ie*numRowsElements] + d1 * NumScalarDofsV;
+                myRcoef[ie*local_rhs_size+ii] = rloc_v[d1]*detjac[ie];
+                ii = ii + 1;
+            }
+            
+            /* loop over pressure trial functions --> b */
+            double aloc_vp[dim];
+            for (b = 0; b < nlnP; b = b + 1 )
+            {
+                for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+                {
+                    aloc_vp[d1] = 0.0;
+                }
+                
+                for (q = 0; q < NumQuadPoints; q = q + 1 )
+                {
+                    for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+                    {
+                        aloc_vp[d1] += tauM[q] * uh_gradPHI[a][q] * gradphiP[d1][b][q] * w[q];
+                    }
+                }
+                for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+                {
+                    myArows[ie*local_matrix_size+iii] = elements[a+ie*numRowsElements] + d1 * NumScalarDofsV;
+                    myAcols[ie*local_matrix_size+iii] = elements[b+ie*numRowsElements] + dim * NumScalarDofsV;
+                    myAcoef[ie*local_matrix_size+iii] = aloc_vp[d1]*detjac[ie];
+                    iii = iii + 1;
+                }
+            }
+           
+        }
+        
+        /* loop over pressure test functions --> a */
+        for (a = 0; a < nlnP; a = a + 1 )
+        {
+            double aloc_pv[dim];
+            /* loop over velocity trial functions --> b */
+            for (b = 0; b < nlnV; b = b + 1 )
+            {
+                for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+                {
+                    aloc_pv[d1] = 0.0;
+                }
+                
+                for (q = 0; q < NumQuadPoints; q = q + 1 )
+                {
+                    for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+                    {
+                        aloc_pv[d1] += tauM[q] * ( density * alpha / dt * phiV[b+q*nlnV] + uh_gradPHI[b][q] )
+                                               * gradphiP[d1][a][q] * w[q];
+                        for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+                        {
+                            aloc_pv[d1] += density * phiV[b+q*nlnV] * GradUh[q][d2][d1] * gradphiP[d2][a][q] * tauM[q] * w[q]; 
+                        }
+                    }
+                }
+                
+                for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+                {
+                    myArows[ie*local_matrix_size+iii] = elements[a+ie*numRowsElements] + dim * NumScalarDofsV;
+                    myAcols[ie*local_matrix_size+iii] = elements[b+ie*numRowsElements] + d1 * NumScalarDofsV;
+                    myAcoef[ie*local_matrix_size+iii] = aloc_pv[d1]*detjac[ie];
+                    iii = iii + 1;
+                }
+            }
+            
+            /* loop over pressure trial functions --> b */
+            for (b = 0; b < nlnP; b = b + 1 )
+            {
+                aloc = 0;
+                for (q = 0; q < NumQuadPoints; q = q + 1 )
+                {
+                    for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+                    {
+                        aloc  += gradphiP[d1][a][q] * gradphiP[d1][b][q] * tauM[q] * w[q];
+                    }
+                }
+                myArows[ie*local_matrix_size+iii] = elements[a+ie*numRowsElements] + dim * NumScalarDofsV;
+                myAcols[ie*local_matrix_size+iii] = elements[b+ie*numRowsElements] + dim * NumScalarDofsV;
+                myAcoef[ie*local_matrix_size+iii] = aloc*detjac[ie];
+                iii = iii + 1;
+            }
+           
+            rloc = 0.0;
+            for (q = 0; q < NumQuadPoints; q = q + 1 )
+            {
+                for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+                {
+                    rloc += tauM[q] * Res_M[d1][q] * gradphiP[d1][a][q] * w[q];
                 }
             }
             myRrows[ie*local_rhs_size+ii] = elements[a+ie*numRowsElements] + dim * NumScalarDofsV;
@@ -887,6 +1219,18 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
         }
         
         AssembleSUPG_SemiImplicit(plhs, prhs);
+    }
+    
+    if (strcmp(Assembly_name, "SUPG_Implicit")==0)
+    {
+        /* Check for proper number of arguments */
+        if(nrhs!=20) {
+            mexErrMsgTxt("20 inputs are required.");
+        } else if(nlhs>5) {
+            mexErrMsgTxt("Too many output arguments.");
+        }
+        
+        AssembleSUPG_Implicit(plhs, prhs);
     }
     
     mxFree(Assembly_name);

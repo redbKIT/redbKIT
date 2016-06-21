@@ -225,7 +225,7 @@ classdef CFD_Assembler < handle
         end
         
         %==========================================================================
-        %% compute_convective_matrix
+        %% compute_SUPG_semiimplicit
         function [A_SUPG, F_SUPG] = compute_SUPG_semiimplicit(obj, conv_velocity, v_n, dt, alpha_BDF)
 
             if ~strcmp(obj.M_FE_SPACE_v.fem, 'P1') || ~strcmp(obj.M_FE_SPACE_p.fem, 'P1')
@@ -261,23 +261,38 @@ classdef CFD_Assembler < handle
         end
         
         %==========================================================================
-        %% compute_convective_matrix
+        %% compute_SUPG_implicit
         function [dG_SUPG, G_SUPG] = compute_SUPG_implicit(obj, U_k, v_n, dt, alpha_BDF)
 
             if ~strcmp(obj.M_FE_SPACE_v.fem, 'P1') || ~strcmp(obj.M_FE_SPACE_p.fem, 'P1')
                 error('SUPG stabilization only available for P1-P1 finite elements')
             end
             
+%             [rowA2, colA2, coefA2, rowF2, coefF2] = ...
+%                 CFD_Assemble_SUPG_Impl_mex(obj.M_MESH.dim, ...
+%                 obj.M_MESH.elements,  obj.M_MESH.jac, obj.M_MESH.invjac, ...
+%                 obj.M_FE_SPACE_v.quad_weights, obj.M_FE_SPACE_v.phi, obj.M_FE_SPACE_v.dphi_ref, ...
+%                 obj.M_FE_SPACE_v.numElemDof, U_k, v_n, ...
+%                 obj.M_density, obj.M_kinematic_viscosity, dt, alpha_BDF);
+            
             [rowA, colA, coefA, rowF, coefF] = ...
-                CFD_Assemble_SUPG_Impl_mex(obj.M_MESH.dim, ...
-                obj.M_MESH.elements,  obj.M_MESH.jac, obj.M_MESH.invjac, ...
-                obj.M_FE_SPACE_v.quad_weights, obj.M_FE_SPACE_v.phi, obj.M_FE_SPACE_v.dphi_ref, ...
-                obj.M_FE_SPACE_v.numElemDof, U_k, v_n, ...
-                obj.M_density, obj.M_kinematic_viscosity, dt, alpha_BDF);
+                CFD_assembler_C_omp_SUPG('SUPG_Implicit', obj.M_MESH.dim, ... %0 1
+                obj.M_MESH.elements,  obj.M_MESH.jac, obj.M_MESH.invjac, ... %2 3 4
+                obj.M_FE_SPACE_v.quad_weights, obj.M_FE_SPACE_v.phi, obj.M_FE_SPACE_v.dphi_ref, ... %5 6 7
+                obj.M_FE_SPACE_v.numElemDof, obj.M_FE_SPACE_p.numElemDof, ... %8 9
+                obj.M_FE_SPACE_v.numDof, obj.M_FE_SPACE_p.numDof,  obj.M_FE_SPACE_p.phi, ... %10 11 12
+                U_k, v_n, ... %13 14
+                obj.M_density, obj.M_kinematic_viscosity, dt, alpha_BDF,... %15 16 17 18
+                obj.M_FE_SPACE_p.dphi_ref); % 19
             
             % Build sparse matrix
             dG_SUPG   = GlobalAssemble(rowA, colA, coefA, obj.M_totSize, obj.M_totSize);
             G_SUPG    = GlobalAssemble(rowF, 1,    coefF, obj.M_totSize, 1);
+            
+            %dG_SUPG2  = GlobalAssemble(rowA2, colA2, coefA2, obj.M_totSize, obj.M_totSize);
+            %G_SUPG2   = GlobalAssemble(rowF2, 1,    coefF2, obj.M_totSize, 1);
+            %max(max(abs(dG_SUPG2-dG_SUPG)))
+            %norm(G_SUPG2 - G_SUPG)
             
         end
         

@@ -134,7 +134,7 @@ for ie = 1 : noe
       
       % compute tabilization parameters tauM and tuaC in the quadratures
       % nodes
-      tauM  =  ( 4*rho^2/dt^2 + diag(u_f'*(G*u_f))' + 30*viscosity^2*trace(G'*G)).^(-0.5);
+      tauM  =  ( 4*rho^2/dt^2 + rho^2 * diag(u_f'*(G*u_f))' + 30*viscosity^2*trace(G'*G)).^(-0.5);
       
       tauC  =  1./(tauM * (g'*g)); 
       
@@ -159,6 +159,7 @@ for ie = 1 : noe
       aloc_MtauM12  = tmp*grady' + ...
                         (rho*phi.*uhdy)*uh_gradPHI_tauM';
       
+      tmp = rho*phi.*(tauM.*R_M2);
       aloc_MtauM21  = tmp*gradx' + ...
                         (rho*phi.*vhdx)*uh_gradPHI_tauM';
       
@@ -342,7 +343,7 @@ for ie = 1 : noe
       % compute tabilization parameters tauM and tuaC in the quadratures
       % nodes
       
-      tauM  =  ( 4*rho^2/dt^2 + diag(u_f'*(G*u_f))' + 9*viscosity^2*trace(G'*G)).^(-0.5);
+      tauM  =  ( 4*rho^2/dt^2 + rho^2*diag(u_f'*(G*u_f))' + 30*viscosity^2*trace(G'*G)).^(-0.5);
       
       tauC  =  1./(tauM * (g'*g));
       
