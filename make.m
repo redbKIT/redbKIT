@@ -90,22 +90,22 @@ end
 
 %% Mexify some Matlab codes
 
-here = pwd;
-%source_files_M{1} = {'FEM_library/Models/CSM/','mexify_CSM_Assembly_M'};
-source_files_M{1} = {'FEM_library/Models/CFD/','mexify_SUPG'};
-
-if Mexify
-    for i = 1 : length(source_files_M)
-        
-        file_path = [pwd, '/', source_files_M{i}{1}];
-        file_name = source_files_M{i}{2};
-        
-        eval(['cd ', file_path]);
-        eval( file_name );
-        rmdir('codegen', 's');
-        eval(['cd ', here]);
-        
-    end
-end
+% here = pwd;
+% %source_files_M{1} = {'FEM_library/Models/CSM/','mexify_CSM_Assembly_M'};
+% %source_files_M{2} = {'FEM_library/Models/CFD/','mexify_SUPG'};
+% 
+% if Mexify
+%     for i = 1 : length(source_files_M)
+%         
+%         file_path = [pwd, '/', source_files_M{i}{1}];
+%         file_name = source_files_M{i}{2};
+%         
+%         eval(['cd ', file_path]);
+%         eval( file_name );
+%         rmdir('codegen', 's');
+%         eval(['cd ', here]);
+%         
+%     end
+% end
 
 end
