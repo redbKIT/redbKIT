@@ -51,6 +51,7 @@ plot(csm3_l4_t0p005(:,1),csm3_l4_t0p005(:,11),'--r')
 legend('Test', 'Reference value')
 xlabel('time [s]')
 ylabel('x-Displacement [m]')
+grid on
 
 
 subplot(2,1,2)
@@ -61,6 +62,8 @@ legend('Test', 'Reference value')
 xlabel('time [s]')
 ylabel('y-Displacement [m]')
 hold on
+grid on
+
 
 saveas(handle,'Figures/CSM3_Adisplacement','epsc');
 saveas(handle,'Figures/CSM3_Adisplacement','fig');
