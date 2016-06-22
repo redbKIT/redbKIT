@@ -81,10 +81,12 @@ classdef Newmark_TimeAdvance < handle
         %% PrintCoefficients
         function obj = PrintCoefficients( obj )
             
+            fprintf('\n=======================================');
             fprintf('\nNewmark Time Advance Class');
-            fprintf('\n  beta = %2.2f', obj.M_beta);
-            fprintf('\n  gamma = %2.2f', obj.M_gamma);
-            fprintf('\n  timestep = %1.3e\n', obj.M_timestep);
+            fprintf('\n  beta     = %1.3f', obj.M_beta);
+            fprintf('\n  gamma    = %2.3f', obj.M_gamma);
+            fprintf('\n  timestep = %1.3e', obj.M_timestep);
+            fprintf('\n=======================================\n');
             
         end
     end

@@ -16,7 +16,8 @@ end
 for d = 1 : dim
     DATA.flag_dirichlet{d} = [];
     DATA.flag_neumann{d}   = [];
-    DATA.flag_pressure{d}     = [];
+    DATA.flag_pressure{d}    = [];
+    DATA.flag_ring{d}        = [];
 end
         
 switch dim

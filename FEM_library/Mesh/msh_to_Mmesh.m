@@ -1,4 +1,4 @@
-function [vertices, boundaries, elements] = msh_to_Mmesh(filename, dimension)
+function [vertices, boundaries, elements, rings] = msh_to_Mmesh(filename, dimension)
 %GMSH_TO_MMESH import a msh mesh file .msh and transform it to a 'pdetool'
 %like Matlab format
 %
@@ -22,6 +22,7 @@ if dimension == 2
       vertices         =  mesh.NODES(1:2,:);
       elements         =  mesh.ELEMENTS{2};
       tmp_boundaries   =  mesh.ELEMENTS{1};
+      tmp_rings        =  mesh.ELEMENTS{15};
       
       boundaries(1:2,:)  = tmp_boundaries(1:2,:);
       boundaries(3:4,:)  = 0*tmp_boundaries(1:2,:);
@@ -29,14 +30,18 @@ if dimension == 2
       boundaries(6,:)    = ones(size(tmp_boundaries(3,:)));
       boundaries(7,:)    = 0*tmp_boundaries(1,:);
       
+      rings([1 5],:)     = tmp_rings;
+      
 elseif dimension == 3  
       mesh_filename    =  strcat(filename,'.msh');
       mesh             =  read_msh(mesh_filename);
       vertices         =  mesh.NODES;
       elements         =  mesh.ELEMENTS{4};
       tmp_boundaries   =  mesh.ELEMENTS{2};
+      tmp_rings        =  mesh.ELEMENTS{1};
       
       boundaries([1 2 3 12],:)   = tmp_boundaries([1 2 3 4],:);
+      rings([1 2 12],:)          = tmp_rings;
 end
 
 time_load = toc(time_load);

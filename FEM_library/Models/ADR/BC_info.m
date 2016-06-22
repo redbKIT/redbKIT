@@ -201,6 +201,7 @@ switch model
             type_Dirichlet = DATA.flag_dirichlet{d};
             type_Neumann   = DATA.flag_neumann{d};
             type_Pressure  = DATA.flag_pressure{d};
+            type_rings     = DATA.flag_ring{d};
             
             if isempty(type_Dirichlet) && isempty(type_Neumann) && isempty(type_Pressure)
                 error(['No boundary conditions are imposed on component ', num2str(d)]);
@@ -219,7 +220,22 @@ switch model
                 end
                 Dirichlet_side             = unique(Dirichlet_side);
                 Dirichlet_dof              = MESH.boundaries(1:MESH.numBoundaryDof,Dirichlet_side);
-                MESH.Dirichlet_dof_c{d}    = unique(Dirichlet_dof(:));
+            else
+                Dirichlet_dof = [];
+            end
+                
+            nRings = length(type_rings);
+            dir_ringDofs = [];
+            for j = 1 : nRings
+                index        = find(MESH.rings(bc_flag_row,:) == type_rings(j));
+                tmp          = MESH.rings(1:MESH.numRingsDof, index);
+                dir_ringDofs = [dir_ringDofs unique(tmp(:))];
+            end
+            MESH.ringDofs{d} = dir_ringDofs;
+                            
+            if ~isempty(type_Dirichlet) || ~isempty(dir_ringDofs)  
+                
+                MESH.Dirichlet_dof_c{d}    = unique([Dirichlet_dof(:); dir_ringDofs]);
                 MESH.internal_dof_c{d}     = setdiff([1:MESH.numNodes]',MESH.Dirichlet_dof_c{d});
                 
             else

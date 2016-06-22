@@ -1,4 +1,4 @@
-function [ MESH ] = buildMESH( dim, elements, vertices, boundaries, fem, quad_order, DATA, model )
+function [ MESH ] = buildMESH( dim, elements, vertices, boundaries, fem, quad_order, DATA, model, rings )
 %BUILDMESH generates MESH struct
 
 %   This file is part of redbKIT.
@@ -13,12 +13,21 @@ MESH.boundaries  = boundaries;
 MESH.elements    = elements;
 MESH.numVertices = size(vertices,2);
 
+if nargin > 8
+    MESH.rings    = rings;
+end
+
 %% Build higher order (P2 or P3) mesh if required
 if ~strcmp(fem,'P1')
     fprintf('\n Generating %s mesh ... ', fem)
     time_mesh = tic;
-    [MESH.elements, MESH.nodes, MESH.boundaries] = ...
+    if nargin > 8
+        [MESH.elements, MESH.nodes, MESH.boundaries, MESH.rings] = ...
+        feval(['P1to',fem,'mesh',num2str(dim),'D'],elements, vertices, boundaries, rings);
+    else
+        [MESH.elements, MESH.nodes, MESH.boundaries] = ...
         feval(['P1to',fem,'mesh',num2str(dim),'D'],elements, vertices, boundaries);
+    end
     time_mesh = toc(time_mesh);
     fprintf('done in %f s\n', time_mesh)
 else
@@ -27,7 +36,7 @@ end
 
 
 %% Update Mesh data with BC information and geometrical maps
-[MESH.numElemDof,MESH.numBoundaryDof]    = select(fem, dim);
+[MESH.numElemDof,MESH.numBoundaryDof,MESH.numRingsDof]    = select(fem, dim);
 MESH.numNodes                = size(MESH.nodes,2);
 MESH.numElem                 = size(MESH.elements,2);
 

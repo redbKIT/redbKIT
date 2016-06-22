@@ -1,4 +1,4 @@
-function [elements, vertices, boundaries] = P1toP2mesh2D(elements,vertices,boundaries)
+function [elements, vertices, boundaries, rings] = P1toP2mesh2D(elements,vertices,boundaries, rings)
 %P1TOP2MESH1D builds a P2 mesh in 2D.
 %       F. Saleri 9-20-01.
 %       F. Negri 2016, Add mesh Graph to speedup computations (still inefficient)
