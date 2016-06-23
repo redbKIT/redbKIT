@@ -104,5 +104,14 @@ end
 if ~isfield(DATA.NonLinearSolver,'maxit')
     DATA.NonLinearSolver.maxit         =  15;
 end
+
+if ~isfield(DATA.NonLinearSolver,'backtrackIter')
+    DATA.NonLinearSolver.backtrackIter         =  0;
+end
+
+if ~isfield(DATA.NonLinearSolver,'backtrackFactor')
+    DATA.NonLinearSolver.backtrackFactor       =  1.0;
+end
+
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,4 +1,4 @@
-function [u, FE_SPACE, MESH, DATA] = CSM_Solver(dim, elements, vertices, boundaries, fem, data_file, param, vtk_filename)
+function [u, FE_SPACE, MESH, DATA] = CSM_Solver(dim, elements, vertices, boundaries, fem, data_file, param, vtk_filename, InitialGuess)
 %CSM_SOLVER Static Structural Finite Element Solver
 
 %   This file is part of redbKIT.
@@ -21,6 +21,9 @@ if nargin < 8
     vtk_filename = [];
 end
 
+if nargin < 9
+    InitialGuess = [];
+end
 
 %% Read problem parameters and BCs from data_file
 DATA   = CSM_read_DataFile(data_file, dim, param);
@@ -62,16 +65,28 @@ end
 
 %% Newton Method
 
-tol        = DATA.NonLinearSolver.tol;
-resRelNorm = tol + 1;
-incrNorm   = tol + 1;
+tolNewton  = DATA.NonLinearSolver.tol;
+resRelNorm = tolNewton + 1;
+incrNorm   = tolNewton + 1;
 maxIter    = DATA.NonLinearSolver.maxit;
 k          = 1;
+backtrackMaxIter   = DATA.NonLinearSolver.backtrackIter;
+backtrackFactor    = DATA.NonLinearSolver.backtrackFactor;
 
 [~, ~, u_D]   =  CSM_ApplyBC([], [], FE_SPACE, MESH, DATA);
-dU             = zeros(MESH.numNodes*MESH.dim,1);
-U_k            = zeros(MESH.numNodes*MESH.dim,1);
-U_k(MESH.Dirichlet_dof) = u_D;
+dU             = zeros(FE_SPACE.numDof,1);
+
+% Initial Guess
+if isempty( InitialGuess )
+    U_k            = zeros(FE_SPACE.numDof,1);
+    U_k(MESH.Dirichlet_dof) = u_D;
+else
+    if size(InitialGuess,1 ) == FE_SPACE.numDof && size(InitialGuess,2 ) == 1
+        U_k = InitialGuess;
+    else
+        error('InitialGuess should be of size FE_SPACE.numDofs x 1')
+    end
+end
 
 SolidModel = CSM_Assembler( MESH, DATA, FE_SPACE );
 
@@ -96,7 +111,7 @@ resNorm_old = norm(Residual);
 LinSolver = LinearSolver( DATA.LinearSolver );
 
 fprintf('\n============ Start Newton Iterations ============\n\n');
-while (k <= maxIter && incrNorm > tol && resRelNorm > tol)
+while (k <= maxIter && incrNorm > tolNewton && resRelNorm > tolNewton)
     
     fprintf('\n -- Assembling jacobian matrix... ');
     t_assembly = tic;
@@ -137,9 +152,9 @@ while (k <= maxIter && incrNorm > tol && resRelNorm > tol)
     alpha          = 1;
     backtrack_iter = 0;
     
-    while ((norm(Residual) > 2 * resNorm_old || isnan( norm(Residual) )) && backtrack_iter < 8 )
+    while ((norm(Residual) > 2 * resNorm_old || isnan( norm(Residual) )) && backtrack_iter < backtrackMaxIter )
     
-        alpha = alpha * 0.6;
+        alpha = alpha * backtrackFactor;
         backtrack_iter = backtrack_iter + 1;
         
         % update solution

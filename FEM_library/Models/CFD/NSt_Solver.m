@@ -142,7 +142,7 @@ if compute_AerodynamicForces
         Dirichlet_side         = find(MESH.boundaries(MESH.bc_flag_row,:) == DATA.Output.DragLift.flag(j));
         Dirichlet_side         = unique(Dirichlet_side);
         Dirichlet_dof          = MESH.boundaries(1:MESH.numBoundaryDof,Dirichlet_side);
-        dofs_drag              = [dofs_drag; Dirichlet_dof];
+        dofs_drag              = [dofs_drag; Dirichlet_dof(:)];
     end
     dofs_drag = unique(dofs_drag);
     
