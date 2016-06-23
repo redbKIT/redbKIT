@@ -1,8 +1,13 @@
 function [vertices, boundaries, elements, rings] = msh_to_Mmesh(filename, dimension)
-%GMSH_TO_MMESH import a msh mesh file .msh and transform it to a 'pdetool'
+%MSH_TO_MMESH import a msh mesh file .msh and transform it to a 'pdetool'
 %like Matlab format
 %
-%   [VERTICES, BOUNDARIES, ELEMENTS] = GMSH_TO_MMESH(FILENAME, DIMENSION)
+%   [VERTICES, BOUNDARIES, ELEMENTS] = MSH_TO_MMESH(FILENAME, DIMENSION)
+%   returns VERTICES, internal ELEMENTS and boundary elements (BOUNDARIES)
+%
+%   [VERTICES, BOUNDARIES, ELEMENTS, RINGS] = MSH_TO_MMESH(FILENAME, DIMENSION)
+%   if available, returns also RINGS "elements", i.e. points in 2D and
+%   lines in 3D.
 
 %   This file is part of redbKIT.
 %   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
@@ -30,9 +35,16 @@ if dimension == 2
       boundaries(6,:)    = ones(size(tmp_boundaries(3,:)));
       boundaries(7,:)    = 0*tmp_boundaries(1,:);
       
-      rings([1 5],:)     = tmp_rings;
+      if nargout > 3
+          if ~isempty(tmp_rings)
+              rings([1 5],:)     = tmp_rings;
+          else
+              rings = [];
+          end
+      end
       
 elseif dimension == 3  
+    
       mesh_filename    =  strcat(filename,'.msh');
       mesh             =  read_msh(mesh_filename);
       vertices         =  mesh.NODES;
@@ -41,7 +53,14 @@ elseif dimension == 3
       tmp_rings        =  mesh.ELEMENTS{1};
       
       boundaries([1 2 3 12],:)   = tmp_boundaries([1 2 3 4],:);
-      rings([1 2 12],:)          = tmp_rings;
+
+      if nargout > 3
+          if ~isempty(tmp_rings)
+              rings([1 2 12],:)          = tmp_rings;
+          else
+              rings = [];
+          end
+      end
 end
 
 time_load = toc(time_load);
