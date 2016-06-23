@@ -19,20 +19,24 @@ for d = 1 : dim
     DATA.flag_pressure{d}    = [];
     DATA.flag_ring{d}        = [];
 end
-        
+
 switch dim
     
     case 2
         
-        DATA.bcDir          = @(x,y,t,param)(0.*x.*y);
-        DATA.bcNeu          = @(x,y,t,param)(0.*x.*y);
-        DATA.force          = @(x,y,t,param)(0.*x.*y);
-                            
+        for d = 1 : dim
+            DATA.bcDir{d}          = @(x,y,t,param)(0.*x.*y);
+            DATA.bcNeu{d}          = @(x,y,t,param)(0.*x.*y);
+            DATA.force{d}          = @(x,y,t,param)(0.*x.*y);
+        end
+        
     case 3
         
-        DATA.bcDir          = @(x,y,z,t,param)(0.*x.*y);
-        DATA.bcNeu          = @(x,y,z,t,param)(0.*x.*y);
-        DATA.force          = @(x,y,z,t,param)(0.*x.*y);
+        for d = 1 : dim
+            DATA.bcDir{d}          = @(x,y,z,t,param)(0.*x.*y);
+            DATA.bcNeu{d}          = @(x,y,z,t,param)(0.*x.*y);
+            DATA.force{d}          = @(x,y,z,t,param)(0.*x.*y);
+        end
 end
 
 DATA.kinematic_viscosity  = 1;

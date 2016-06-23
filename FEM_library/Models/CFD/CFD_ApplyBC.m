@@ -93,6 +93,7 @@ switch MESH.dim
         end
         
         %% Dirichlet condition
+        if size(DATA.bcDir,1) == 1
         for k = 1 : 2
             if ~isempty(MESH.Dirichlet_dof_c{k})
                 x           = MESH.nodes(1,MESH.Dirichlet_dof_c{k});
@@ -104,6 +105,30 @@ switch MESH.dim
             end
             u_D = [u_D; u_Dirichlet{k}'];
         end
+        
+        else
+            v_D    = zeros(FE_SPACE.numDof,1);
+            % loop over components
+            for k = 1 : 2
+                if ~isempty(MESH.Dirichlet_dof_c{k})
+                    
+                    % loop over dirichlet boundaries
+                    for f = 1 : length(DATA.flag_dirichlet{k})
+                        
+                        x           = MESH.nodes(1,MESH.DiriDof_CompFlag{k,f});
+                        y           = MESH.nodes(2,MESH.DiriDof_CompFlag{k,f});
+                        
+                        u_Dirichlet = DATA.bcDir{k,DATA.flag_dirichlet{k}(f)}(x,y,t,param);
+                        
+                        v_D(MESH.DiriDof_CompFlag{k,f}+(k-1)*FE_SPACE.numDofScalar) = u_Dirichlet';
+                        
+                    end
+                end
+                
+                u_D = v_D(MESH.Dirichlet_dof);
+            end
+        end
+        
         
     case 3
         
@@ -224,20 +249,45 @@ switch MESH.dim
         end
         
         %% Dirichlet condition
-        for k = 1 : 3
-            if ~isempty(MESH.Dirichlet_dof_c{k})
-                
-                x           = MESH.nodes(1,MESH.Dirichlet_dof_c{k});
-                y           = MESH.nodes(2,MESH.Dirichlet_dof_c{k});
-                z           = MESH.nodes(3,MESH.Dirichlet_dof_c{k});
-                u_Dirichlet{k} = DATA.bcDir{k}(x,y,z,t,param);
-                
-            else
-                u_Dirichlet{k}        = [];
+        if size(DATA.bcDir,1) == 1
+            
+            for k = 1 : 3
+                if ~isempty(MESH.Dirichlet_dof_c{k})
+                    
+                    x           = MESH.nodes(1,MESH.Dirichlet_dof_c{k});
+                    y           = MESH.nodes(2,MESH.Dirichlet_dof_c{k});
+                    z           = MESH.nodes(3,MESH.Dirichlet_dof_c{k});
+                    u_Dirichlet{k} = DATA.bcDir{k}(x,y,z,t,param);
+                else
+                    u_Dirichlet{k}        = [];
+                end
+                u_D = [u_D; u_Dirichlet{k}'];
             end
-            u_D = [u_D; u_Dirichlet{k}'];
+            
+        else
+            
+            v_D    = zeros(FE_SPACE.numDof,1);
+            % loop over components
+            for k = 1 : 3
+                if ~isempty(MESH.Dirichlet_dof_c{k})
+                    
+                    % loop over dirichlet boundaries
+                    for f = 1 : length(DATA.flag_dirichlet{k})
+                        
+                        x           = MESH.nodes(1,MESH.DiriDof_CompFlag{k,f});
+                        y           = MESH.nodes(2,MESH.DiriDof_CompFlag{k,f});
+                        z           = MESH.nodes(3,MESH.DiriDof_CompFlag{k,f});
+                        
+                        u_Dirichlet = DATA.bcDir{k,DATA.flag_dirichlet{k}(f)}(x,y,z,t,param);
+                        
+                        v_D(MESH.DiriDof_CompFlag{k,f}+(k-1)*FE_SPACE.numDofScalar) = u_Dirichlet';
+                        
+                    end
+                end
+                
+                u_D = v_D(MESH.Dirichlet_dof);
+            end
         end
-        
 end
 
 u_D  = u_D * (1 - zero_Dirichlet);

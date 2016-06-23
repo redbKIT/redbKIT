@@ -213,13 +213,15 @@ switch model
                 % Computes the Dirichlet dof of the domain
                 nDir                    = length(type_Dirichlet);
                 Dirichlet_side          = [];
-                flag_Dirichlet_vertices = [];
                 for kk = 1 : nDir
-                    Dirichlet_side          = [Dirichlet_side,find(MESH.boundaries(bc_flag_row,:) == type_Dirichlet(kk))];
-                    flag_Dirichlet_vertices = [flag_Dirichlet_vertices,type_Dirichlet(kk)];
+                    this_Dirichlet_side     = find(MESH.boundaries(bc_flag_row,:) == type_Dirichlet(kk));
+                    this_Dirichlet_dof      = MESH.boundaries(1:MESH.numBoundaryDof, unique( this_Dirichlet_side ) );
+                    MESH.DiriDof_CompFlag{d,kk}  = unique(this_Dirichlet_dof(:));
+                    Dirichlet_side          = [Dirichlet_side, this_Dirichlet_side];
                 end
                 Dirichlet_side             = unique(Dirichlet_side);
                 Dirichlet_dof              = MESH.boundaries(1:MESH.numBoundaryDof,Dirichlet_side);
+                Dirichlet_dof              = unique( Dirichlet_dof(:) );
             else
                 Dirichlet_dof = [];
             end
@@ -235,7 +237,7 @@ switch model
                             
             if ~isempty(type_Dirichlet) || ~isempty(dir_ringDofs)  
                 
-                MESH.Dirichlet_dof_c{d}    = unique([Dirichlet_dof(:); dir_ringDofs]);
+                MESH.Dirichlet_dof_c{d}    = unique([Dirichlet_dof; dir_ringDofs]);
                 MESH.internal_dof_c{d}     = setdiff([1:MESH.numNodes]',MESH.Dirichlet_dof_c{d});
                 
             else
