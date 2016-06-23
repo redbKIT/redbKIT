@@ -268,7 +268,9 @@ switch model
                 nPrex       = length(type_Pressure);
                 Pressure_side = [];
                 for kk = 1 : nPrex
-                    Pressure_side = [Pressure_side,find(MESH.boundaries(bc_flag_row,:) == type_Pressure(kk))];
+                    this_Pressure_side = find(MESH.boundaries(bc_flag_row,:) == type_Pressure(kk));
+                    MESH.Pressure_side_CompFlag{d,kk} = unique(this_Pressure_side);
+                    Pressure_side = [Pressure_side, this_Pressure_side];
                 end
                 MESH.Pressure_side{d} = unique(Pressure_side);
             else
