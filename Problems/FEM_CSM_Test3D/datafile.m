@@ -39,7 +39,9 @@ data.Density = 1;
 
 % NonLinear Solver
 data.NonLinearSolver.tol               = 1e-6;
-data.NonLinearSolver.maxit             = 15;
+data.NonLinearSolver.maxit             = 25;
+% data.NonLinearSolver.backtrackIter     = 3;
+% data.NonLinearSolver.backtrackFactor   = 0.75;
 
 % Solver and Preconditioner
 %   If parallel pool available, use gmres with AdditiveSchwarz preconditioner
