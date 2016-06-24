@@ -1,5 +1,11 @@
-function [d_F] = FSI_harmonicExtension(MESH, Displacement, HE_matrix)
+function [d_F] = FSI_SolidExtension(MESH, Displacement, HE_matrix)
+%FSI_SOLIDEXTENSION solve mesh motion problem for FSI
+%
+%   This function will be replaced by a class in the future.
 
+%   This file is part of redbKIT.
+%   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
+%   Author: Federico Negri <federico.negri at epfl.ch>
 
 d_F = zeros(MESH.Fluid.numNodes * MESH.dim, 1);
 

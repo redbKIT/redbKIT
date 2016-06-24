@@ -1,5 +1,19 @@
 function [X, MESH, DATA] = FSIt_Solver(dim, meshFluid, meshSolid, fem_F, fem_S, data_file_F, data_file_S, param, vtk_filename)
 %FSIT_SOLVER solves Fluid-Structure Interaction problems in 2D/3D
+%
+%   The solver implements the following numerical approximation of the FSI
+%   problem:
+%   - the geometry is trated using the Geometric Convective Explicit (GCE)
+%   approach; as a result, the mesh motion problem is uncoupled from the
+%   other equations.
+%   - a condensed formulation is employed, i.e. only internal and interface
+%   fluid velocity, fluid pressure, and internal solid displacement are
+%   considered as degrees of freedom
+%   - the fluid equations are approximated in time by means of a
+%   semi-implicit BDF scheme
+%   - the structure can be either linear or nonlinear; time discretization
+%   is performed via the Newmark scheme. In case of nonlinearities, Newton
+%   method is employed
 
 %   This file is part of redbKIT.
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
@@ -494,13 +508,14 @@ while ( t < tf )
     end
     
     %% Deform Fluid mesh by Solid-Extension
-    d_F = FSI_harmonicExtension(MESH, Displacement_np1, Harmonic_Ext_Matrix);
+    d_F = FSI_SolidExtension(MESH, Displacement_np1, Harmonic_Ext_Matrix);
     Fluid_def_nodes    = Fluid_ReferenceNodes + d_F;
     Fluid_def_vertices = Fluid_def_nodes(1:dim, 1:MESH.Fluid.numVertices);
         
     d_F      = reshape(d_F',dim*MESH.Fluid.numNodes,1);
     
     %% Compute Fluid mesh velocity: w = 1/dt * ( d_f^(n+1) - d_f^n )
+    % This part should be checked! inconsistent with BDF integrator
     ALE_velocity  =  1/dt * ( d_F - d_Fn );
     d_Fn          =  d_F;
     

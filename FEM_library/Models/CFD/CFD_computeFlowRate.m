@@ -1,5 +1,8 @@
 function [Q, Area] = CFD_computeFlowRate(u_n, MESH, FE_SPACE_v, boundary_flag)
 
+%   This file is part of redbKIT.
+%   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
+%   Author: Federico Negri <federico.negri at epfl.ch>
 
 nflags = length(boundary_flag);
 face_list = [];
@@ -89,7 +92,5 @@ switch MESH.dim
             
         end
 end
-
-
 
 end

@@ -1,13 +1,14 @@
 function [MESH] = FSI_InterfaceMap(DATA, MESH)
- 
-%function [interfaceS_dofs, interfaceF_dofs, Interface_SFmap, Interface_FSmap, ALE_dirichlet]  = FSI_InterfaceMap(verticesS, ...
-%    boundariesS, verticesF, boundariesF, flag_interface, bcrow, nbn, dirichletF, dirichletS, dim, flag_ALE)
+%FSI_INTERFACEMAP preprocessing function for FSI solver
+%
+%   Generates mappings from solid to fluid interface dofs and viceversa.
 
-%   Author: F. Negri (federico.negri@epfl.ch) 2014-2016
-%   Copyright (C) Federico Negri, CMCS, EPFL
+%   This file is part of redbKIT.
+%   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
+%   Author: Federico Negri <federico.negri at epfl.ch>
 
 dim            = MESH.dim;
-nodesS          = MESH.Solid.nodes;
+nodesS         = MESH.Solid.nodes;
 boundariesS    = MESH.Solid.boundaries;
 nodesF          = MESH.Fluid.nodes;
 boundariesF    = MESH.Fluid.boundaries;
