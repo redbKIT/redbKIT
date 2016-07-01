@@ -33,7 +33,7 @@ t      = [];
 
 use_SUPG = false;
 if isfield(DATA, 'Stabilization')
-    if strcmp( DATA.Stabilization, 'SUPG' )
+    if strcmp( DATA.Stabilization, 'SUPG' ) && strcmp(fem{1}, 'P1')
         use_SUPG = true;
     end
 end
@@ -210,6 +210,8 @@ while ( t < tf )
             U_k(MESH.internal_dof) = LinSolver.Solve( A, b, u );
             fprintf('\n      time to solve the linear system in %3.3f s \n', LinSolver.GetSolveTime());
             U_k(MESH.Dirichlet_dof) = u_D;
+            
+            fprintf('\n -- Norm(U_np1 - U_n) / Norm( U_n ) = %1.2e \n', norm(U_k - u) / norm(u));
             
         case 'implicit'
             
