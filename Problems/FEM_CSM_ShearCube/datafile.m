@@ -19,16 +19,16 @@ data.bcNeu{3} = @(x, y, z, t, param)(1685.43 + 0.*x.*y.*z);
 data.bcPrex   = @(x, y, z, t, param)(0*x.*y.*z);
 
 % BC flag
-data.flag_dirichlet{1} = [1];
-data.flag_neumann{1}   = [2];
+data.flag_dirichlet{1} = [3];
+data.flag_neumann{1}   = [4];
 data.flag_pressure{1}  = [];
 
-data.flag_dirichlet{2} = [1];
-data.flag_neumann{2}   = [2];
+data.flag_dirichlet{2} = [3];
+data.flag_neumann{2}   = [4];
 data.flag_pressure{2}  = [];
 
-data.flag_dirichlet{3} = [1];
-data.flag_neumann{3}   = [2];
+data.flag_dirichlet{3} = [3];
+data.flag_neumann{3}   = [4];
 data.flag_pressure{3}  = [];
 
 % material parameters 
