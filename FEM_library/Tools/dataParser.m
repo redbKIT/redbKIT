@@ -77,11 +77,11 @@ if ~isfield(DATA.Preconditioner,'num_subdomains')
     DATA.Preconditioner.num_subdomains              =  poolsize;
 end
 
-if ~isfield(DATA.Preconditioner,'mumps_reordering')
+if ~isfield(DATA.Preconditioner,'ILU_type')
     DATA.Preconditioner.ILU_type            =  'ilutp';
 end
 
-if ~isfield(DATA.Preconditioner,'mumps_reordering')
+if ~isfield(DATA.Preconditioner,'ILU_droptol')
     DATA.Preconditioner.ILU_droptol         =  1e-2;
 end
 

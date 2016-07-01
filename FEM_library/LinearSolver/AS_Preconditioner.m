@@ -80,6 +80,7 @@ classdef AS_Preconditioner < Preconditioner & handle
                         obj.M_A_DD     = A_DD;
                         obj.M_mumps_ID = mumps_ID;
                         obj.M_isBuilt  = true;
+                        clear mumps_ID;
                     end
                     
             end
@@ -136,6 +137,27 @@ classdef AS_Preconditioner < Preconditioner & handle
                         z = z + zi{i};
                     end
                     
+                    clear mumps_ID;
+                    
+            end
+            
+        end
+        
+        %% Clean preconditioner
+        function obj = Clean( obj )
+            
+            switch obj.M_options.local_solver
+                
+                case 'MUMPS'
+                    mumps_ID = obj.M_mumps_ID;
+                    num_local = length(obj.M_Restrictions);
+                    spmd(0,num_local)
+                        mumps_ID.JOB    = -2;
+                        mumps_ID        = dmumps(mumps_ID);
+                    end
+                    
+                otherwise
+                    % do nothing
             end
             
         end

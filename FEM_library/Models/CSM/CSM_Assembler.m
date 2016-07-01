@@ -145,6 +145,87 @@ classdef CSM_Assembler < handle
         end
         
         %==========================================================================
+        %% Compute Surface Forces
+        function F = compute_follower_Pload( obj, U_h, t )
+            
+            % only for Dim = 2
+            
+            if nargin < 3 || isempty(t)
+                t = [];
+            end
+            
+            F = sparse(obj.M_MESH.numNodes*obj.M_MESH.dim, 1);
+           
+            disp_nodes = [];
+            for hh = 1 : obj.M_MESH.dim
+               disp_nodes = [disp_nodes; U_h(1+(hh-1)*obj.M_FE_SPACE.numDofScalar:hh*obj.M_FE_SPACE.numDofScalar)']; 
+            end
+            def_nodes = obj.M_MESH.nodes + disp_nodes;
+            def_vertices = def_nodes(:, 1:obj.M_MESH.numVertices);
+            
+            Normal_Faces =  ComputeSurfaceNormals3D(obj.M_MESH.boundaries(1:3,:),def_vertices, obj.M_MESH.elements(1:4,:));
+            
+            for k = 1 : obj.M_MESH.dim
+                if ~isempty(obj.M_MESH.Pressure_side{k})
+                    
+                    [quad_points, wi] = quadrature(obj.M_MESH.dim-1, obj.M_FE_SPACE.quad_order);
+                    csi = quad_points(1,:);
+                    eta = quad_points(2,:);
+                    [phi]          =  fem_basis(obj.M_MESH.dim, obj.M_FE_SPACE.fem, [csi; eta; 0*eta], 1);
+                    eta1           =  1-csi-eta;
+                    nqn            =  length(wi);
+                    
+                    nof         = length(obj.M_MESH.Pressure_side{k});
+                    nbn         = obj.M_MESH.numBoundaryDof;
+                    
+                    Rrows       = zeros(nbn*nof,1);
+                    Rcoef       = Rrows;
+                    
+                    xlt = zeros(nof,nqn); ylt = xlt; zlt = xlt;
+                    coord_ref = [eta1; csi; eta];
+                    for j = 1 : 2
+                        dof = obj.M_MESH.boundaries(j,obj.M_MESH.Pressure_side{k});
+                        vtemp = def_vertices(1,dof);
+                        xlt = xlt + vtemp'*coord_ref(j,:);
+                        vtemp = def_vertices(2,dof);
+                        ylt = ylt + vtemp'*coord_ref(j,:);
+                        vtemp = def_vertices(3,dof);
+                        zlt = zlt + vtemp'*coord_ref(j,:);
+                    end
+                    
+                    pressure = obj.M_DATA.bcPrex(xlt,ylt,zlt,t,obj.M_DATA.param);
+                    one       = ones(nof,nqn);
+                    pressure = pressure.*one;
+                    
+                    x    =  def_vertices(1,obj.M_MESH.boundaries(1:3, obj.M_MESH.Pressure_side{k}));
+                    y    =  def_vertices(2,obj.M_MESH.boundaries(1:3, obj.M_MESH.Pressure_side{k}));
+                    z    =  def_vertices(3,obj.M_MESH.boundaries(1:3, obj.M_MESH.Pressure_side{k}));
+                    
+                    areav = cross(  [x(2:3:end)-x(1:3:end);  y(2:3:end)-y(1:3:end);  z(2:3:end)-z(1:3:end)], ...
+                        [x(3:3:end)-x(1:3:end);  y(3:3:end)-y(1:3:end);  z(3:3:end)-z(1:3:end)]);
+                    
+                    for l = 1 : nof
+                        
+                        area   = 0.5*norm(areav(:,l));
+                        detjac = 2*area;
+                        
+                        face = obj.M_MESH.Pressure_side{k}(l);
+                        
+                        pressure_loc  = pressure(l,:).*wi;
+                        pressure_loc  = pressure_loc(1,:)';
+                        
+                        Rrows(1+(l-1)*nbn:l*nbn)    = obj.M_MESH.boundaries(1:nbn,face);
+                        Rcoef(1+(l-1)*nbn:l*nbn)    = Normal_Faces(k,face)*detjac*phi*pressure_loc;
+                        
+                    end
+                    F = F + sparse(Rrows+(k-1)*obj.M_MESH.numNodes,1,Rcoef,obj.M_MESH.dim*obj.M_MESH.numNodes,1);
+                    
+                end
+            end
+            
+        end
+        
+        %==========================================================================
         %% Compute External Forces
         function F_ext = compute_external_forces( obj, t )
             
