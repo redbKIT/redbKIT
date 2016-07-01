@@ -157,6 +157,8 @@ classdef LinearSolver < handle
                     
                     obj.M_solveTime = toc(time_solve);
                     
+                    obj.M_precon.Clean();
+                    
                     if flagITER == 0
                         fprintf('\nGmres converged in %d iterations\n',length(resvec));
                     else

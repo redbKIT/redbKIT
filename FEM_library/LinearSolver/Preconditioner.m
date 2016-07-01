@@ -46,6 +46,11 @@ classdef Preconditioner < handle
         function z = Apply(obj, r)
             z = r;
         end
+        
+        %% Clean preconditioner
+        function obj = Clean( obj )
+                       
+        end
  
     end
         
