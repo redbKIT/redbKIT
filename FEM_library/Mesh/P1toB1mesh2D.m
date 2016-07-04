@@ -1,4 +1,4 @@
-function [elements,vertices,boundaries]=P1toB1mesh2D(elements,vertices,boundaries)
+function [elements,vertices,boundaries,rings]=P1toB1mesh2D(elements,vertices,boundaries,rings)
 %P1TOB1MESH2D computes a B1 grid
 %  [EB1,VB1,BP1]=P1TOP2MESH2D(EP1,VP1,BP1) computes a mesh for B1
 %  finite elements starting from a P1 finite elements mesh.

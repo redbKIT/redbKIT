@@ -457,10 +457,8 @@ while ( t < tf )
                     u_nk(MESH.Fluid.Dirichlet_dof) = v_D;
                     
                     % solid current iteration
-                    d_nk                             = zeros(FE_SPACE_s.numDof,1);
-                    d_nk(MESH.Solid.II_global)       = X_nk(1+length(MESH.Fluid.internal_dof):end);
-                    d_nk(MESH.Solid.Dirichlet_dof)   = DisplacementDir_np1;
-                    d_nk(MESH.Solid.internal_dof(MESH.Solid.Gamma))    = 1/alpha * ( IdGamma_FS*X_nk(MESH.Fluid.Gamma) -  F_L);
+                    d_nk                               = TimeAdvanceS.M_U;
+                    d_nk(MESH.Solid.Dirichlet_dof)     = DisplacementDir_np1;
                     
                     k                         = 1;
                     norm_k                    = tol + 1;

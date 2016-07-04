@@ -65,7 +65,7 @@ void RaghavanVorpMaterial_forces(mxArray* plhs[], const mxArray* prhs[])
     /* Assembly: loop over the elements */
     int ie;
     
-#pragma omp parallel for shared(invjac,detjac,elements,myRrows,myRcoef,U_h) private(ie,k,l,q,d1,d2) firstprivate(phi,gradrefphi,w,numRowsElements,nln2,nln,NumNodes,Id,alpha,beta,bulk)
+#pragma omp parallel for shared(invjac,detjac,elements,myRrows,myRcoef,U_h) private(ie,k,l,q,d1,d2) firstprivate(phi,gradrefphi,w,NumQuadPoints,numRowsElements,nln2,nln,NumNodes,Id,alpha,beta,bulk,noe,dim)
     
     for (ie = 0; ie < noe; ie = ie + 1 )
     {             

@@ -60,7 +60,7 @@ classdef CSM_Assembler < handle
                 case {'NeoHookean','NeoHookean2'}
                     obj.M_MaterialParam = [obj.M_DATA.Young obj.M_DATA.Poisson];%[DATA.Shear DATA.Poisson];
                 
-                case {'RaghavanVorp',}
+                case {'RaghavanVorp'}
                     obj.M_MaterialParam = [obj.M_DATA.Alpha obj.M_DATA.Beta obj.M_DATA.Bulk];
                      
                 case 'SEMMT'
