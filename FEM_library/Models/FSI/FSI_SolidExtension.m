@@ -1,4 +1,4 @@
-function [d_F] = FSI_SolidExtension(MESH, Displacement, HE_matrix)
+function [d_F] = FSI_SolidExtension(MESH, Displacement, Solid_Extension)
 %FSI_SOLIDEXTENSION solve mesh motion problem for FSI
 %
 %   This function will be replaced by a class in the future.
@@ -9,7 +9,7 @@ function [d_F] = FSI_SolidExtension(MESH, Displacement, HE_matrix)
 
 d_F = zeros(MESH.Fluid.numNodes * MESH.dim, 1);
 
-internal_dofs = HE_matrix.internal_dofs;
+internal_dofs = Solid_Extension.internal_dofs;
 
 interface_dofs  = [];
 d_S             = [];
@@ -22,11 +22,11 @@ for k = 1 : MESH.dim
 end
 
 
-F   = - HE_matrix.HE(internal_dofs,interface_dofs) * d_S;
+F   = - Solid_Extension.matrix(internal_dofs,interface_dofs) * d_S;
 
-x   = HE_matrix.U \ (HE_matrix.L \ F(HE_matrix.perm));
+x   = Solid_Extension.U \ (Solid_Extension.L \ F(Solid_Extension.perm));
 
-d_F(internal_dofs) = x(HE_matrix.invp);
+d_F(internal_dofs) = x(Solid_Extension.invp);
 
 for k = 1 : MESH.dim
     
