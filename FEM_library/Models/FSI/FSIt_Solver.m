@@ -207,10 +207,10 @@ d_Fn         = zeros(MESH.Fluid.numNodes*dim, 1);
 PreconFactory = PreconditionerFactory( );
 Precon        = PreconFactory.CreatePrecon(DATA.Fluid.Preconditioner.type, DATA.Fluid);
 
-% if isfield(DATA.Preconditioner, 'type') && strcmp( DATA.Preconditioner.type, 'AdditiveSchwarz')
-%     R      = FSI_overlapping_DD(MESH, FE_SPACE_v, FE_SPACE_p, DATA.Preconditioner.num_subdomains,  DATA.Preconditioner.overlap_level);
-%     Precon.SetRestrictions( R );
-% end
+if isfield(DATA.Fluid.Preconditioner, 'type') && strcmp( DATA.Fluid.Preconditioner.type, 'AdditiveSchwarz')
+    R      = FSI_overlapping_DD(MESH, DATA.Fluid.Preconditioner.num_subdomains,  DATA.Fluid.Preconditioner.overlap_level);
+    Precon.SetRestrictions( R );
+end
 
 %% Assemble Solid-Extension matrix
 fprintf('\n Assemble Solid Extension matrix and store LU factors ... '); 

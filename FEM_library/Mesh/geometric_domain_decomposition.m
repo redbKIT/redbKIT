@@ -20,8 +20,14 @@ end
 
 if nargin < 8 || isempty(elements_fem)
     elements_fem = elements;
-    nln          = 3 + (dim - 2);% for P1 FEM in dim=2,3
+    nln          = dim + 1;% for P1 FEM in dim=2,3
     elements_fem = elements_fem(1:nln,:);
+end
+
+if n_subdom == 1
+    subdom{1} = [1:size(vertices,2)]';
+    subdom_noOverlap{1} = 1:size(vertices,2);
+    return;
 end
 
 %% compute adjacency matrix
