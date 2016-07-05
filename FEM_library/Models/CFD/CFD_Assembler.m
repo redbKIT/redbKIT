@@ -196,6 +196,35 @@ classdef CFD_Assembler < handle
         end
         
         %==========================================================================
+        %% compute_convective_matrix_ALE
+        function [C1, C2] = compute_convective_matrix_ALE(obj, U_h, ALE_velocity)
+            
+            if nargin < 2 || isempty(U_h)
+                U_h = zeros(obj.M_totSize,1);
+            end
+            
+            if nargin < 3 || isempty(ALE_velocity)
+                ALE_velocity = zeros(obj.M_totSize,1);
+            end
+            
+            convective_velocity = U_h - ALE_velocity;
+            
+            % C_OMP assembly, returns matrices in sparse vector format
+            [rowA, colA, coefA, rowB, colB, coefB] = ...
+                CFD_assembler_C_omp('convectiveALE', 1.0, obj.M_MESH.dim, obj.M_MESH.elements, ...
+                obj.M_FE_SPACE_v.numElemDof, obj.M_FE_SPACE_v.numDof, ...
+                obj.M_FE_SPACE_v.quad_weights, obj.M_MESH.invjac, obj.M_MESH.jac, ...
+                obj.M_FE_SPACE_v.phi, obj.M_FE_SPACE_v.dphi_ref, U_h, convective_velocity);
+            
+            % Build sparse matrix
+            C1   = GlobalAssemble(rowA, colA, coefA, obj.M_totSize, obj.M_totSize);
+            C2   = GlobalAssemble(rowB, colB, coefB, obj.M_totSize, obj.M_totSize);
+
+            C1   = obj.M_density * C1;
+            C2   = obj.M_density * C2;
+        end
+        
+        %==========================================================================
         %% compute_mass_velocity
         function [M] = compute_mass(obj, FE_SPACE)
             
@@ -231,14 +260,7 @@ classdef CFD_Assembler < handle
             if ~strcmp(obj.M_FE_SPACE_v.fem, 'P1') || ~strcmp(obj.M_FE_SPACE_p.fem, 'P1')
                 error('SUPG stabilization only available for P1-P1 finite elements')
             end
-            
-%             [rowA2, colA2, coefA2, rowF2, coefF2] = ...
-%                 CFD_Assemble_SUPG_SemiImpl_mex(obj.M_MESH.dim, ...
-%                 obj.M_MESH.elements,  obj.M_MESH.jac, obj.M_MESH.invjac, ...
-%                 obj.M_FE_SPACE_v.quad_weights, obj.M_FE_SPACE_v.phi, obj.M_FE_SPACE_v.dphi_ref, ...
-%                 obj.M_FE_SPACE_v.numElemDof, conv_velocity, v_n, ...
-%                 obj.M_density, obj.M_kinematic_viscosity, dt, alpha_BDF);
-             
+
             [rowA, colA, coefA, rowF, coefF] = ...
                 CFD_assembler_C_omp('SUPG_SemiImplicit', obj.M_MESH.dim, ... %0 1
                 obj.M_MESH.elements,  obj.M_MESH.jac, obj.M_MESH.invjac, ... %2 3 4
@@ -253,11 +275,6 @@ classdef CFD_Assembler < handle
             A_SUPG   = GlobalAssemble(rowA, colA, coefA, obj.M_totSize, obj.M_totSize);
             F_SUPG   = GlobalAssemble(rowF, 1,    coefF, obj.M_totSize, 1);
             
-            %A_SUPG2   = GlobalAssemble(rowA2, colA2, coefA2, obj.M_totSize, obj.M_totSize);
-            %F_SUPG2   = GlobalAssemble(rowF2, 1,    coefF2, obj.M_totSize, 1);
-            %max(max(abs(A_SUPG2-A_SUPG)))
-            %norm(F_SUPG - F_SUPG2)
-            
         end
         
         %==========================================================================
@@ -267,14 +284,7 @@ classdef CFD_Assembler < handle
             if ~strcmp(obj.M_FE_SPACE_v.fem, 'P1') || ~strcmp(obj.M_FE_SPACE_p.fem, 'P1')
                 error('SUPG stabilization only available for P1-P1 finite elements')
             end
-            
-%             [rowA2, colA2, coefA2, rowF2, coefF2] = ...
-%                 CFD_Assemble_SUPG_Impl_mex(obj.M_MESH.dim, ...
-%                 obj.M_MESH.elements,  obj.M_MESH.jac, obj.M_MESH.invjac, ...
-%                 obj.M_FE_SPACE_v.quad_weights, obj.M_FE_SPACE_v.phi, obj.M_FE_SPACE_v.dphi_ref, ...
-%                 obj.M_FE_SPACE_v.numElemDof, U_k, v_n, ...
-%                 obj.M_density, obj.M_kinematic_viscosity, dt, alpha_BDF);
-            
+
             [rowA, colA, coefA, rowF, coefF] = ...
                 CFD_assembler_C_omp('SUPG_Implicit', obj.M_MESH.dim, ... %0 1
                 obj.M_MESH.elements,  obj.M_MESH.jac, obj.M_MESH.invjac, ... %2 3 4
@@ -288,12 +298,36 @@ classdef CFD_Assembler < handle
             % Build sparse matrix
             dG_SUPG   = GlobalAssemble(rowA, colA, coefA, obj.M_totSize, obj.M_totSize);
             G_SUPG    = GlobalAssemble(rowF, 1,    coefF, obj.M_totSize, 1);
+
+        end
+        
+        %==========================================================================
+        %% compute_SUPG_implicit_ALE
+        function [dG_SUPG, G_SUPG] = compute_SUPG_implicit_ALE(obj, U_k, ALE_velocity, v_n, dt, alpha_BDF)
+
+            if ~strcmp(obj.M_FE_SPACE_v.fem, 'P1') || ~strcmp(obj.M_FE_SPACE_p.fem, 'P1')
+                error('SUPG stabilization only available for P1-P1 finite elements')
+            end
             
-            %dG_SUPG2  = GlobalAssemble(rowA2, colA2, coefA2, obj.M_totSize, obj.M_totSize);
-            %G_SUPG2   = GlobalAssemble(rowF2, 1,    coefF2, obj.M_totSize, 1);
-            %max(max(abs(dG_SUPG2-dG_SUPG)))
-            %norm(G_SUPG2 - G_SUPG)
+            if isempty(ALE_velocity)
+                ALE_velocity = zeros(obj.M_totSize,1);
+            end
+            convective_velocity = U_k(1:obj.M_FE_SPACE_v.numDof) - ALE_velocity;
+
+            [rowA, colA, coefA, rowF, coefF] = ...
+                CFD_assembler_C_omp('SUPG_ImplicitALE', obj.M_MESH.dim, ... %0 1
+                obj.M_MESH.elements,  obj.M_MESH.jac, obj.M_MESH.invjac, ... %2 3 4
+                obj.M_FE_SPACE_v.quad_weights, obj.M_FE_SPACE_v.phi, obj.M_FE_SPACE_v.dphi_ref, ... %5 6 7
+                obj.M_FE_SPACE_v.numElemDof, obj.M_FE_SPACE_p.numElemDof, ... %8 9
+                obj.M_FE_SPACE_v.numDof, obj.M_FE_SPACE_p.numDof,  obj.M_FE_SPACE_p.phi, ... %10 11 12
+                U_k, v_n, ... %13 14
+                obj.M_density, obj.M_kinematic_viscosity, dt, alpha_BDF,... %15 16 17 18
+                obj.M_FE_SPACE_p.dphi_ref, convective_velocity); % 19, 20
             
+            % Build sparse matrix
+            dG_SUPG   = GlobalAssemble(rowA, colA, coefA, obj.M_totSize, obj.M_totSize);
+            G_SUPG    = GlobalAssemble(rowF, 1,    coefF, obj.M_totSize, 1);
+
         end
         
     end

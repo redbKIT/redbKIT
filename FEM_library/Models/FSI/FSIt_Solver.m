@@ -202,6 +202,9 @@ Coef_MassS = TimeAdvanceS.MassCoefficient( );
 %% Initalize Geometry Time Advance
 ALE_velocity = zeros(MESH.Fluid.numNodes*dim, 1);
 d_Fn         = zeros(MESH.Fluid.numNodes*dim, 1);
+TimeAdvanceG = BDF_TimeAdvance( BDF_orderF );
+TimeAdvanceG.Initialize( d_Fn );
+
 
 %% Generate Domain Decomposition (if required)
 PreconFactory = PreconditionerFactory( );
@@ -338,7 +341,7 @@ while ( t < tf )
     
     v_BDF = TimeAdvanceF.RhsContribute( );
     u_BDF = [v_BDF; zeros(FE_SPACE_p.numDof,1)];
-    alpha = TimeAdvanceF.GetCoefficientDerivative();
+    alphaF = TimeAdvanceF.GetCoefficientDerivative();
     
     switch DATA.Fluid.time.nonlinearity
         
@@ -370,13 +373,13 @@ while ( t < tf )
             fprintf('done in %3.3f s\n', t_assembly);
             
             F_NS = 1/dt * M * u_BDF;
-            C_NS = alpha/dt * M + A_Stokes + C1;
+            C_NS = alphaF/dt * M + A_Stokes + C1;
             
             % Assemble SUPG contributes
             if use_SUPG
                 fprintf('\n   -- Fluid_Assembling SUPG Terms ... ');
                 t_assembly = tic;
-                [A_SUPG, F_SUPG] = FluidModel.compute_SUPG_semiimplicit( v_extrapolated - ALE_velocity, v_BDF, dt, alpha);
+                [A_SUPG, F_SUPG] = FluidModel.compute_SUPG_semiimplicit( v_extrapolated - ALE_velocity, v_BDF, dt, alphaF);
                 t_assembly = toc(t_assembly);
                 fprintf('done in %3.3f s\n', t_assembly);
                 
@@ -523,6 +526,155 @@ while ( t < tf )
                         
                     end
             end
+            
+        case 'implicit'
+            
+            % get lifting
+            [~, ~, v_D]                 = CFD_ApplyBC([], [], FE_SPACE_v, FE_SPACE_p, MESH.Fluid, DATA.Fluid, t);            
+            [~, ~, DisplacementDir_np1] = CSM_ApplyBC([], [], FE_SPACE_s, MESH.Solid, DATA.Solid, t);
+            
+            Csi           = TimeAdvanceS.RhsContribute( );
+            F_ext         = SolidModel.compute_volumetric_forces( t );
+            F_S           = F_ext + M_s * Csi;
+            
+            % Get displacment d^alpha on the interface
+            d_alpha = TimeAdvanceS.M_dU - dt * DATA.Solid.time.gamma * Csi ...
+                + dt* (1-DATA.Solid.time.gamma)*TimeAdvanceS.M_d2U;
+            F_L     = d_alpha(MESH.Solid.internal_dof(MESH.Solid.Gamma));
+            
+            alpha   = DATA.Solid.time.gamma / (dt * DATA.Solid.time.beta);
+            
+            % Prepare for Newton's method
+            X_nk                          = X_n;
+            dX                            = 0*X_n;
+            
+            % fluid current iteration
+            u_nk                           = 0*u;
+            u_nk(MESH.Fluid.internal_dof)  = X_nk(1:length(MESH.Fluid.internal_dof));
+            u_nk(MESH.Fluid.Dirichlet_dof) = v_D;
+            
+            % solid current iteration
+            d_nk                               = TimeAdvanceS.M_U;
+            d_nk(MESH.Solid.Dirichlet_dof)     = DisplacementDir_np1;
+            
+            ALE_rhsBDF = TimeAdvanceG.RhsContribute( );
+            
+            k                         = 1;
+            norm_k                    = tol + 1;
+            
+            % Start Newton's method
+            while( k <= maxIter && (norm_k > tol || isnan(norm_k) ) )
+                
+                % Assemble Solid Tangent matrix and internal forces vector
+                fprintf('\n   -- Solid_Assembling Residual and Jacobian ... ');
+                t_assembly = tic;
+                dA = SolidModel.compute_jacobian(  d_nk  );
+                GS = SolidModel.compute_internal_forces( d_nk );
+                t_assembly = toc(t_assembly);
+                fprintf('done in %3.3f s\n', t_assembly);
+                
+                dG_STR    = Coef_MassS * M_s + dA;
+                G_S       = Coef_MassS * M_s * d_nk + GS - F_S;
+                
+                % Apply Solid boundary conditions
+                [dG_STR, G_S] = CSM_ApplyBC(dG_STR, -G_S, FE_SPACE_s, MESH.Solid, DATA.Solid, t, 1);
+                
+                %% Update Fluid Matrices
+                FluidModel = CFD_Assembler( MESH.Fluid, DATA.Fluid, FE_SPACE_v, FE_SPACE_p );
+                
+                fprintf('\n   -- Fluid_Assembling Stokes terms... ');
+                t_assembly = tic;
+                [A_Stokes] = FluidModel.compute_Stokes_matrix();
+                t_assembly = toc(t_assembly);
+                fprintf('done in %3.3f s\n', t_assembly);
+                
+                fprintf('\n   -- Fluid_Assembling mass matrix... ');
+                t_assembly = tic;
+                Mv = FluidModel.compute_mass_velocity();
+                Mp = FluidModel.compute_mass_pressure();
+                M  = blkdiag(DATA.Fluid.density * Mv, 0*Mp);
+                t_assembly = toc(t_assembly);
+                fprintf('done in %3.3f s\n', t_assembly);
+                                
+                fprintf('\n   -- Fluid_Assembling Convective Term... ');
+                t_assembly = tic;
+                [C1, C2]    = FluidModel.compute_convective_matrix_ALE( u_nk(1:FE_SPACE_v.numDof),  ALE_velocity);
+                t_assembly = toc(t_assembly);
+                fprintf('done in %3.3f s\n', t_assembly);
+                
+                F_NS = 1/dt * M * (alphaF*u_nk - u_BDF) + A_Stokes * u_nk + C1 * u_nk;
+                C_NS = alphaF/dt * M + A_Stokes + C1 + C2;
+                
+                % Assemble SUPG contributes
+                if use_SUPG
+                    fprintf('\n   -- Fluid_Assembling SUPG Terms ... ');
+                    t_assembly = tic;
+                    [A_SUPG, F_SUPG] = FluidModel.compute_SUPG_implicit_ALE( u_nk, ALE_velocity, v_BDF, dt, alphaF);
+                    t_assembly = toc(t_assembly);
+                    fprintf('done in %3.3f s\n', t_assembly);
+                    
+                    C_NS             = C_NS + A_SUPG;
+                    F_NS             = F_NS + F_SUPG;
+                end
+                
+                % Apply Fluid boundary conditions
+                [dG_NS, G_NS]   =  CFD_ApplyBC(C_NS, -F_NS, FE_SPACE_v, FE_SPACE_p, MESH.Fluid, DATA.Fluid, t, 1);
+                
+                % Interface Solid Stiffness expressed in the fluid numbering
+                S_GG     = IdGamma_SF * (dG_STR(MESH.Solid.Gamma,MESH.Solid.Gamma) * IdGamma_FS);
+                
+                % Interface/Internal Solid Stiffness expressed in fluid/solid numbering
+                S_GI     = IdGamma_SF *  dG_STR(MESH.Solid.Gamma,MESH.Solid.II);
+                F_L2     = F_L - IdGamma_FS*X_nk(MESH.Fluid.Gamma) + alpha*d_nk(MESH.Solid.internal_dof(MESH.Solid.Gamma));
+                
+                % Form Monolothic System
+                dG_FSI    = [dG_NS(MESH.Fluid.II,MESH.Fluid.II)                      dG_NS(MESH.Fluid.II,MESH.Fluid.Gamma)                    Z_FS ;...
+                    dG_NS(MESH.Fluid.Gamma,MESH.Fluid.II)      dG_NS(MESH.Fluid.Gamma,MESH.Fluid.Gamma)+1/alpha*S_GG               S_GI  ;...
+                    Z_SF                                                    1/alpha*dG_STR(MESH.Solid.II,MESH.Solid.Gamma)*IdGamma_FS   dG_STR(MESH.Solid.II,MESH.Solid.II)   ];
+                
+                G_FSI    = [G_NS(MESH.Fluid.II); ...
+                    G_NS(MESH.Fluid.Gamma)+IdGamma_SF*G_S(MESH.Solid.Gamma)+1/alpha*(IdGamma_SF*(dG_STR(MESH.Solid.Gamma,MESH.Solid.Gamma)*F_L2)); ...
+                    G_S(MESH.Solid.II)+1/alpha*dG_STR(MESH.Solid.II,MESH.Solid.Gamma)*F_L2];
+                
+                % Solve Monolothic System
+                fprintf('\n -- Solve J x = -R ... ');
+                Precon.Build( dG_FSI );
+                fprintf('\n      time to build the preconditioner %3.3f s \n', Precon.GetBuildTime());
+                LinSolver.SetPreconditioner( Precon );
+                dX(MESH.internal_dof) = LinSolver.Solve( dG_FSI, G_FSI );
+                fprintf('\n      time to solve the linear system in %3.3f s \n', LinSolver.GetSolveTime());
+                
+                % Update solution
+                norm_k   = norm(dX)/norm(X_nk);
+                X_nk     = X_nk + dX;
+                
+                u_nk(MESH.Fluid.internal_dof)             = X_nk(1:length(MESH.Fluid.internal_dof));
+                u_nk(MESH.Fluid.Dirichlet_dof) = v_D;
+                
+                d_nk(MESH.Solid.II_global)              = X_nk(1+length(MESH.Fluid.internal_dof):end);
+                d_nk(MESH.Solid.Dirichlet_dof)          = DisplacementDir_np1;
+                d_nk(MESH.Solid.internal_dof(MESH.Solid.Gamma))     = 1/alpha * ( IdGamma_FS*X_nk(MESH.Fluid.Gamma) -  F_L);
+                
+                %% Deform Fluid mesh by Solid-Extension Mesh Motion technique
+                d_F = FSI_SolidExtension(MESH, d_nk, Solid_Extension);
+                Fluid_def_nodes    = Fluid_ReferenceNodes + d_F;
+                Fluid_def_vertices = Fluid_def_nodes(1:dim, 1:MESH.Fluid.numVertices);
+                
+                d_F      = reshape(d_F',dim*MESH.Fluid.numNodes,1);
+                
+                %% Compute Fluid mesh velocity
+                ALE_velocity  =  1/dt * ( alphaF*d_F - ALE_rhsBDF );
+                
+                %% Update Fluid MESH
+                MESH.Fluid.vertices = Fluid_def_vertices;
+                MESH.Fluid.nodes    = Fluid_def_nodes;
+                [MESH.Fluid.jac, MESH.Fluid.invjac, MESH.Fluid.h] = geotrasf(dim, MESH.Fluid.vertices, MESH.Fluid.elements);
+                
+                fprintf('\n   Iteration  k= %d;  norm(dX)/norm(Xk) = %1.2e, normRES = %1.2e \n',k,full(norm_k), full(norm(G_FSI)))
+                k = k + 1;
+                
+            end
+                
     end
     
     norm_n   = norm(X_nk - X_n) / norm(X_n);
@@ -543,24 +695,31 @@ while ( t < tf )
     % update time advance
     TimeAdvanceS.Update( Displacement_np1 );
     
-    %% Deform Fluid mesh by Solid-Extension Mesh Motion technique
-    d_F = FSI_SolidExtension(MESH, Displacement_np1, Solid_Extension);
-    Fluid_def_nodes    = Fluid_ReferenceNodes + d_F;
-    Fluid_def_vertices = Fluid_def_nodes(1:dim, 1:MESH.Fluid.numVertices);
+    if strcmp(DATA.Fluid.time.nonlinearity, 'semi-implicit')
+        %% Deform Fluid mesh by Solid-Extension Mesh Motion technique
+        d_F = FSI_SolidExtension(MESH, Displacement_np1, Solid_Extension);
+        Fluid_def_nodes    = Fluid_ReferenceNodes + d_F;
+        Fluid_def_vertices = Fluid_def_nodes(1:dim, 1:MESH.Fluid.numVertices);
         
-    d_F      = reshape(d_F',dim*MESH.Fluid.numNodes,1);
+        d_F      = reshape(d_F',dim*MESH.Fluid.numNodes,1);
+        
+        %% Compute Fluid mesh velocity: w = 1/dt * ( d_f^(n+1) - d_f^n )
+        % This part should be checked! inconsistent with BDF integrator
+        ALE_velocity  =  1/dt * ( d_F - d_Fn );
+        d_Fn          =  d_F;
+        
+        
+        %% Update Fluid MESH
+        MESH.Fluid.vertices = Fluid_def_vertices;
+        MESH.Fluid.nodes    = Fluid_def_nodes;
+        % update mesh jacobian, determinant and inverse
+        [MESH.Fluid.jac, MESH.Fluid.invjac, MESH.Fluid.h] = geotrasf(dim, MESH.Fluid.vertices, MESH.Fluid.elements);
+    end
     
-    %% Compute Fluid mesh velocity: w = 1/dt * ( d_f^(n+1) - d_f^n )
-    % This part should be checked! inconsistent with BDF integrator
-    ALE_velocity  =  1/dt * ( d_F - d_Fn );
+    % Update geometry time advance
+    TimeAdvanceG.Append( d_F );
     d_Fn          =  d_F;
-    
-    %% Update Fluid MESH
-    MESH.Fluid.vertices = Fluid_def_vertices;
-    MESH.Fluid.nodes    = Fluid_def_nodes;
-    % update mesh jacobian, determinant and inverse
-    [MESH.Fluid.jac, MESH.Fluid.invjac, MESH.Fluid.h] = geotrasf(dim, MESH.Fluid.vertices, MESH.Fluid.elements);
-    
+
     %% Export Fluid velocity and pressure on deformed mesh
     u(MESH.Fluid.internal_dof)  = X_n(1:length(MESH.Fluid.internal_dof));
     u(MESH.Fluid.Dirichlet_dof) = v_D;
@@ -578,9 +737,8 @@ while ( t < tf )
     if compute_AerodynamicForces
         
         if strcmp(DATA.Fluid.time.nonlinearity,'implicit')
-            %C_NS = 0*Jacobian;
-            %F_NS = -Residual;
-            error('Areo Forces computation to be coded')
+            C_NS = 0*C_NS;
+            F_NS = -F_NS;
         end
         Z              = zeros(FE_SPACE_v.numDofScalar,1);
         Z(dofs_drag)   = 1;
