@@ -1,9 +1,14 @@
 function [X, MESH, DATA] = FSIt_Solver(dim, meshFluid, meshSolid, fem_F, fem_S, data_file_F, data_file_S, param, vtk_filename)
 %FSIT_SOLVER solves Fluid-Structure Interaction problems in 2D/3D
 %
-%   The solver implements the following numerical approximation of the FSI
+%   The solver implements the following numerical approximations of the FSI
 %   problem:
-%   - the geometry is trated using the Geometric Convective Explicit (GCE)
+%
+%   ======================================================================
+%   ** OPT1: monolithic GCE with semi-implicit fluid and 
+%            linear/nonlinear structure **
+%
+%   - the geometry is treated using the Geometric Convective Explicit (GCE)
 %   approach; as a result, the mesh motion problem is uncoupled from the
 %   fluid and solid equations. See, e.g., the following paper
 %    "Crosetto, et al., Parallel algorithms for fluid-structure interaction 
@@ -15,10 +20,32 @@ function [X, MESH, DATA] = FSIt_Solver(dim, meshFluid, meshSolid, fem_F, fem_S, 
 %     interaction, IJNME 2011."
 %   - the coupling is treated in a monolithic way
 %   - the fluid equations are approximated in time by means of a
-%   semi-implicit BDF scheme
+%   semi-implicit BDF scheme. Space discretization can be either P2,
+%   P2Bubble (B1) or P1 with SUPG stabilization.
 %   - the structure can be either linear or nonlinear; time discretization
 %   is performed via the Newmark scheme. In case of nonlinearities, Newton
 %   method is employed
+%   ======================================================================
+%
+%   ======================================================================
+%   ** OPT2: monolithic fully-implicit **
+%
+%   - the geometry is treated implicitly, however shape derivatives in the 
+%   Jacobian matrix are not taken into acocunt; as a result, the mesh motion
+%   problem is only one-way coupled with the fluid and solid equations. 
+%   - a condensed formulation is employed, i.e. only internal and interface
+%   fluid velocity, fluid pressure, and internal solid displacement are
+%   considered as degrees of freedom. See, e.g., the following paper
+%    "Gee et al., Truly monolithic algebraic multigrid for fluid?structure 
+%     interaction, IJNME 2011."
+%   - the coupling is treated in a monolithic way
+%   - the fluid equations are approximated in time by means of a
+%   fully implicit BDF scheme. Space discretization can be either P2,
+%   P2Bubble (B1) or P1 with SUPG stabilization.
+%   - the structure can be either linear or nonlinear; time discretization
+%   is performed via the Newmark scheme
+%   - Newton method is employed to handle the nonlinearities
+%   ======================================================================
 
 %   This file is part of redbKIT.
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
@@ -200,8 +227,11 @@ Coef_MassS = TimeAdvanceS.MassCoefficient( );
 
 
 %% Initalize Geometry Time Advance
+% time discretization of the ALE follows the fluid one
 ALE_velocity = zeros(MESH.Fluid.numNodes*dim, 1);
 d_Fn         = zeros(MESH.Fluid.numNodes*dim, 1);
+
+% only used in the fully implicit case
 TimeAdvanceG = BDF_TimeAdvance( BDF_orderF );
 TimeAdvanceG.Initialize( d_Fn );
 
@@ -529,7 +559,7 @@ while ( t < tf )
             
         case 'implicit'
             
-            % get lifting
+            % get lifting for F-velocity and S_displacement
             [~, ~, v_D]                 = CFD_ApplyBC([], [], FE_SPACE_v, FE_SPACE_p, MESH.Fluid, DATA.Fluid, t);            
             [~, ~, DisplacementDir_np1] = CSM_ApplyBC([], [], FE_SPACE_s, MESH.Solid, DATA.Solid, t);
             
@@ -559,8 +589,8 @@ while ( t < tf )
             
             ALE_rhsBDF = TimeAdvanceG.RhsContribute( );
             
-            k                         = 1;
-            norm_k                    = tol + 1;
+            k        = 1;
+            norm_k   = tol + 1;
             
             % Start Newton's method
             while( k <= maxIter && (norm_k > tol || isnan(norm_k) ) )
@@ -579,7 +609,7 @@ while ( t < tf )
                 % Apply Solid boundary conditions
                 [dG_STR, G_S] = CSM_ApplyBC(dG_STR, -G_S, FE_SPACE_s, MESH.Solid, DATA.Solid, t, 1);
                 
-                %% Update Fluid Matrices
+                % Update Fluid Matrices
                 FluidModel = CFD_Assembler( MESH.Fluid, DATA.Fluid, FE_SPACE_v, FE_SPACE_p );
                 
                 fprintf('\n   -- Fluid_Assembling Stokes terms... ');
@@ -588,7 +618,7 @@ while ( t < tf )
                 t_assembly = toc(t_assembly);
                 fprintf('done in %3.3f s\n', t_assembly);
                 
-                fprintf('\n   -- Fluid_Assembling mass matrix... ');
+                fprintf('\n   -- Fluid_Assembling Mass matrix... ');
                 t_assembly = tic;
                 Mv = FluidModel.compute_mass_velocity();
                 Mp = FluidModel.compute_mass_pressure();
@@ -620,6 +650,8 @@ while ( t < tf )
                 % Apply Fluid boundary conditions
                 [dG_NS, G_NS]   =  CFD_ApplyBC(C_NS, -F_NS, FE_SPACE_v, FE_SPACE_p, MESH.Fluid, DATA.Fluid, t, 1);
                 
+                fprintf('\n   -- Form monolithic system ... ');
+                t_assembly = tic;
                 % Interface Solid Stiffness expressed in the fluid numbering
                 S_GG     = IdGamma_SF * (dG_STR(MESH.Solid.Gamma,MESH.Solid.Gamma) * IdGamma_FS);
                 
@@ -636,6 +668,9 @@ while ( t < tf )
                     G_NS(MESH.Fluid.Gamma)+IdGamma_SF*G_S(MESH.Solid.Gamma)+1/alpha*(IdGamma_SF*(dG_STR(MESH.Solid.Gamma,MESH.Solid.Gamma)*F_L2)); ...
                     G_S(MESH.Solid.II)+1/alpha*dG_STR(MESH.Solid.II,MESH.Solid.Gamma)*F_L2];
                 
+                t_assembly = toc(t_assembly);
+                fprintf('done in %3.3f s\n', t_assembly);
+                    
                 % Solve Monolothic System
                 fprintf('\n -- Solve J x = -R ... ');
                 Precon.Build( dG_FSI );
@@ -648,24 +683,26 @@ while ( t < tf )
                 norm_k   = norm(dX)/norm(X_nk);
                 X_nk     = X_nk + dX;
                 
+                % Update current velocity and pressure
                 u_nk(MESH.Fluid.internal_dof)             = X_nk(1:length(MESH.Fluid.internal_dof));
                 u_nk(MESH.Fluid.Dirichlet_dof) = v_D;
                 
+                % Update current solid displacement
                 d_nk(MESH.Solid.II_global)              = X_nk(1+length(MESH.Fluid.internal_dof):end);
                 d_nk(MESH.Solid.Dirichlet_dof)          = DisplacementDir_np1;
                 d_nk(MESH.Solid.internal_dof(MESH.Solid.Gamma))     = 1/alpha * ( IdGamma_FS*X_nk(MESH.Fluid.Gamma) -  F_L);
                 
-                %% Deform Fluid mesh by Solid-Extension Mesh Motion technique
+                % Deform Fluid mesh by Solid-Extension Mesh Motion technique
                 d_F = FSI_SolidExtension(MESH, d_nk, Solid_Extension);
                 Fluid_def_nodes    = Fluid_ReferenceNodes + d_F;
                 Fluid_def_vertices = Fluid_def_nodes(1:dim, 1:MESH.Fluid.numVertices);
                 
                 d_F      = reshape(d_F',dim*MESH.Fluid.numNodes,1);
                 
-                %% Compute Fluid mesh velocity
+                % Compute Fluid mesh velocity by BDF formula
                 ALE_velocity  =  1/dt * ( alphaF*d_F - ALE_rhsBDF );
                 
-                %% Update Fluid MESH
+                % Update Fluid MESH jacobian etc
                 MESH.Fluid.vertices = Fluid_def_vertices;
                 MESH.Fluid.nodes    = Fluid_def_nodes;
                 [MESH.Fluid.jac, MESH.Fluid.invjac, MESH.Fluid.h] = geotrasf(dim, MESH.Fluid.vertices, MESH.Fluid.elements);
@@ -695,21 +732,23 @@ while ( t < tf )
     % update time advance
     TimeAdvanceS.Update( Displacement_np1 );
     
+    %% If GCE is used, update Fluid Mesh
     if strcmp(DATA.Fluid.time.nonlinearity, 'semi-implicit')
-        %% Deform Fluid mesh by Solid-Extension Mesh Motion technique
+        
+        % Deform Fluid mesh by Solid-Extension Mesh Motion technique
         d_F = FSI_SolidExtension(MESH, Displacement_np1, Solid_Extension);
         Fluid_def_nodes    = Fluid_ReferenceNodes + d_F;
         Fluid_def_vertices = Fluid_def_nodes(1:dim, 1:MESH.Fluid.numVertices);
         
         d_F      = reshape(d_F',dim*MESH.Fluid.numNodes,1);
         
-        %% Compute Fluid mesh velocity: w = 1/dt * ( d_f^(n+1) - d_f^n )
+        % Compute Fluid mesh velocity: w = 1/dt * ( d_f^(n+1) - d_f^n )
         % This part should be checked! inconsistent with BDF integrator
         ALE_velocity  =  1/dt * ( d_F - d_Fn );
         d_Fn          =  d_F;
         
         
-        %% Update Fluid MESH
+        % Update Fluid MESH
         MESH.Fluid.vertices = Fluid_def_vertices;
         MESH.Fluid.nodes    = Fluid_def_nodes;
         % update mesh jacobian, determinant and inverse
