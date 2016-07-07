@@ -46,7 +46,7 @@ data.du0{3} = @(x, y, z, t, param)(0.*x.*y);
 data.Young   = 2.5*10^6;
 data.Poisson = 0.35;
 data.Density = 0.1;
-data.Material_Model   = 'Linear';%'StVenantKirchhoff', Linear, NeoHookean2
+data.Material_Model   = 'NeoHookean2';%'StVenantKirchhoff', Linear, NeoHookean2
 data.model   = 'CSM';
 
 mu = data.Young / (2 + 2 * data.Poisson);
@@ -59,12 +59,12 @@ data.Bulk    = bulk;
 
 
 % NonLinear Solver
-data.NonLinearSolver.tol               = 1e-8;
+data.NonLinearSolver.tol               = 1e-6;
 data.NonLinearSolver.maxit             = 35;
 
 % Time options
 data.time.t0         = 0;
-data.time.dt         = 0.01; 
+data.time.dt         = 0.005; 
 data.time.tf         = 5;
 data.time.gamma      = 1/2;
 data.time.beta       = 1/4;

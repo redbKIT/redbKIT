@@ -1,6 +1,4 @@
-%DATAFILE for FSI1 - Fluid
-
-H     = 0.41;
+%DATAFILE Fluid
 U_bar = 51.3;
 
 % Source term
@@ -76,9 +74,14 @@ if poolsize > 0
     % Preconditioner
     data.Preconditioner.type              = 'AdditiveSchwarz'; % AdditiveSchwarz, None, ILU
     data.Preconditioner.local_solver      = 'matlab_lu'; % matlab_lu, MUMPS
-    data.Preconditioner.overlap_level     = 3;
+    data.Preconditioner.overlap_level     = 2;
     data.Preconditioner.mumps_reordering  = 7;
-    data.Preconditioner.num_subdomains    = 4; %poolsize, number of subdomains
+    data.Preconditioner.num_subdomains    = poolsize; %poolsize, number of subdomains
+    data.Preconditioner.coarse_level             = 'None'; % None, Aggregation, SmoothedAggregation
+    data.Preconditioner.coarse_num_aggregates    = 200;
+    data.Preconditioner.coarse_smoother_iter     = 1;
+    data.Preconditioner.coarse_smoother_dumping  = 1;
+
 
 else
     
