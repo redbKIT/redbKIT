@@ -624,6 +624,12 @@ while ( t < tf )
                 % Update Fluid Matrices
                 FluidModel = CFD_Assembler( MESH.Fluid, DATA.Fluid, FE_SPACE_v, FE_SPACE_p );
                 
+                fprintf('\n   -- Fluid_Assembling volumetric forces... ');
+                t_assembly = tic;
+                F_gravity = FluidModel.compute_external_forces(t);
+                t_assembly = toc(t_assembly);
+                fprintf('done in %3.3f s\n', t_assembly);
+                
                 fprintf('\n   -- Fluid_Assembling Stokes terms... ');
                 t_assembly = tic;
                 [A_Stokes] = FluidModel.compute_Stokes_matrix();
@@ -644,7 +650,7 @@ while ( t < tf )
                 t_assembly = toc(t_assembly);
                 fprintf('done in %3.3f s\n', t_assembly);
                 
-                F_NS = 1/dt * M * (alphaF*u_nk - u_BDF) + A_Stokes * u_nk + C1 * u_nk;
+                F_NS = 1/dt * M * (alphaF*u_nk - u_BDF) + A_Stokes * u_nk + C1 * u_nk - F_gravity;
                 C_NS = alphaF/dt * M + A_Stokes + C1 + C2;
                 
                 % Assemble SUPG contributes

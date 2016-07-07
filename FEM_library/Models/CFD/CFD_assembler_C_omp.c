@@ -1368,6 +1368,8 @@ void AssembleSUPG_ImplicitALE(mxArray* plhs[], const mxArray* prhs[])
     double dt = tmp_ptr3[0];
     double* tmp_ptr4 = mxGetPr(prhs[18]);
     double alpha = tmp_ptr4[0];
+    
+    double* gravity   = mxGetPr(prhs[21]);
         
     /* Assembly: loop over the elements */
     int ie, d1, d2;
@@ -1473,7 +1475,7 @@ void AssembleSUPG_ImplicitALE(mxArray* plhs[], const mxArray* prhs[])
             {
                 Res_C[q] += GradUh[q][d1][d1];
                 
-                Res_M[d1][q] =   density / dt * (alpha * U_hq[q][d1] - v_nq[q][d1]) + GradPh[q][d1];
+                Res_M[d1][q] =   density / dt * (alpha * U_hq[q][d1] - v_nq[q][d1]) + GradPh[q][d1] - gravity[d1];
                 for (d2 = 0; d2 < dim; d2 = d2 + 1 )
                 {
                      Res_M[d1][q] += density * ConvVel_hq[q][d2] * GradUh[q][d1][d2];
@@ -1760,8 +1762,8 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     if (strcmp(Assembly_name, "SUPG_ImplicitALE")==0)
     {
         /* Check for proper number of arguments */
-        if(nrhs!=21) {
-            mexErrMsgTxt("21 inputs are required.");
+        if(nrhs!=22) {
+            mexErrMsgTxt("22 inputs are required.");
         } else if(nlhs>5) {
             mexErrMsgTxt("Too many output arguments.");
         }

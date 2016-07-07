@@ -34,6 +34,7 @@ classdef CFD_Assembler < handle
         M_totSize;
         M_density;
         M_kinematic_viscosity;
+        M_gravity;
     end
    
     methods
@@ -48,6 +49,12 @@ classdef CFD_Assembler < handle
             obj.M_FE_SPACE_p  = FE_SPACE_p;
             obj.M_totSize     = FE_SPACE_v.numDof + FE_SPACE_p.numDof;
             obj = SetFluidParameters( obj );
+            
+            if isfield(obj.M_DATA, 'gravity')
+                obj.M_gravity = obj.M_DATA.gravity;
+            else
+                obj.M_gravity = [0 0 0];
+            end
             
         end
         
@@ -101,7 +108,7 @@ classdef CFD_Assembler < handle
                     
                 case 3
                     
-                    x = zeros(obj.M_MESH.numElem,obj.M_FE_SPACE.numQuadNodes); y = x; z = x;
+                    x = zeros(obj.M_MESH.numElem,obj.M_FE_SPACE_v.numQuadNodes); y = x; z = x;
                     
                     for j = 1 : 4
                         i = obj.M_MESH.elements(j,:);
@@ -322,7 +329,7 @@ classdef CFD_Assembler < handle
                 obj.M_FE_SPACE_v.numDof, obj.M_FE_SPACE_p.numDof,  obj.M_FE_SPACE_p.phi, ... %10 11 12
                 U_k, v_n, ... %13 14
                 obj.M_density, obj.M_kinematic_viscosity, dt, alpha_BDF,... %15 16 17 18
-                obj.M_FE_SPACE_p.dphi_ref, convective_velocity); % 19, 20
+                obj.M_FE_SPACE_p.dphi_ref, convective_velocity, obj.M_gravity); % 19, 20, 21
             
             % Build sparse matrix
             dG_SUPG   = GlobalAssemble(rowA, colA, coefA, obj.M_totSize, obj.M_totSize);
