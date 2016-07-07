@@ -241,8 +241,20 @@ PreconFactory = PreconditionerFactory( );
 Precon        = PreconFactory.CreatePrecon(DATA.Fluid.Preconditioner.type, DATA.Fluid);
 
 if isfield(DATA.Fluid.Preconditioner, 'type') && strcmp( DATA.Fluid.Preconditioner.type, 'AdditiveSchwarz')
-    R      = FSI_overlapping_DD(MESH, DATA.Fluid.Preconditioner.num_subdomains,  DATA.Fluid.Preconditioner.overlap_level);
+    
+    if isfield(DATA.Fluid.Preconditioner, 'coarse_level')
+        if ~strcmp( DATA.Fluid.Preconditioner.coarse_level, 'None')
+            R = FSI_overlapping_DD(MESH, DATA.Fluid.Preconditioner.num_subdomains,  ...
+                     DATA.Fluid.Preconditioner.overlap_level, DATA.Preconditioner.coarse_num_aggregates);
+        else
+            R = FSI_overlapping_DD(MESH, DATA.Fluid.Preconditioner.num_subdomains,  DATA.Fluid.Preconditioner.overlap_level);
+        end
+    else
+        R = FSI_overlapping_DD(MESH, DATA.Fluid.Preconditioner.num_subdomains,  DATA.Fluid.Preconditioner.overlap_level);
+    end
+    
     Precon.SetRestrictions( R );
+    clear R;
 end
 
 %% Assemble Solid-Extension matrix
