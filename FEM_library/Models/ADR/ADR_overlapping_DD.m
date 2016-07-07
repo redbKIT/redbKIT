@@ -1,4 +1,4 @@
-function [ R ] = ADR_overlapping_DD( MESH, n_subdom, overlap )
+function [ R ] = ADR_overlapping_DD( MESH, n_subdom, overlap, n_aggregates )
 %ADR_OVERLAPPING_DD builds restriction operators associated to mesh decompositions
 %for CSM problems
 %
@@ -15,6 +15,12 @@ function [ R ] = ADR_overlapping_DD( MESH, n_subdom, overlap )
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch> 
 
+if nargin < 4 || isempty(n_aggregates)
+    compute_coarse_aggregates = false;
+else
+    compute_coarse_aggregates = true;
+end
+
 vertices     = MESH.vertices;
 elements     = MESH.elements(1:MESH.dim+1,:);% P1 elements
 dim          = MESH.dim;
@@ -23,7 +29,7 @@ nln          = MESH.numElemDof;
 nodes        = MESH.nodes;
 elements_fem = MESH.elements(1:nln,:);% P1 elements
 
-[subdom] = geometric_domain_decomposition(vertices, elements, dim, n_subdom, overlap, 1, 'Figures', elements_fem);
+[subdom, ~, A] = geometric_domain_decomposition(vertices, elements, dim, n_subdom, overlap, 1, 'Figures', elements_fem);
 
 %% restrict subdomains to internal vertices
 for i = 1 : n_subdom
@@ -48,12 +54,21 @@ check_n_subd = length(R);
 fprintf('\n%d subdomains and restriction/prolongation operators built ---\n',check_n_subd);
         
 %% build coarse aggregation restriction/prolongation operator
-% R{n_subdom+1}  = sparse(nov,n_subdom);
-% 
-% for j = 1 : n_subdom
-%     R{n_subdom+1}(subdom_I{j},j) = 1;
-% end
-% 
-% R{n_subdom+1} = R{n_subdom+1}(I,:)';
+
+if compute_coarse_aggregates
+    
+    [subdom_Coarse] = geometric_aggregates(A, nodes, elements, dim, n_aggregates);
+    
+    R{n_subdom+1}  = sparse(n_aggregates, nov);
+    
+    for i = 1 : n_aggregates
+        R{n_subdom+1}(i, subdom_Coarse{i}) = 1;
+    end
+    
+    R{n_subdom+1} = R{n_subdom+1}(:,I);
+    
+end
+
+fprintf('\n%d Coarse aggregates computed ---\n', n_aggregates);
 
 return

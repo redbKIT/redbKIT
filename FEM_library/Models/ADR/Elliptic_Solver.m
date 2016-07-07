@@ -66,8 +66,20 @@ PreconFactory = PreconditionerFactory( );
 Precon        = PreconFactory.CreatePrecon(DATA.Preconditioner.type, DATA);
 
 if isfield(DATA.Preconditioner, 'type') && strcmp( DATA.Preconditioner.type, 'AdditiveSchwarz')
-    R      = ADR_overlapping_DD(MESH, DATA.Preconditioner.num_subdomains,  DATA.Preconditioner.overlap_level);
+    
+    if isfield(DATA.Preconditioner, 'coarse_level')
+        if ~strcmp( DATA.Preconditioner.coarse_level, 'None')
+            R = ADR_overlapping_DD(MESH, DATA.Preconditioner.num_subdomains, ...
+                DATA.Preconditioner.overlap_level, DATA.Preconditioner.coarse_num_aggregates);
+        else
+            R = ADR_overlapping_DD(MESH, DATA.Preconditioner.num_subdomains, DATA.Preconditioner.overlap_level);
+        end
+    else
+        R = ADR_overlapping_DD(MESH, DATA.Preconditioner.num_subdomains, DATA.Preconditioner.overlap_level);
+    end
+    
     Precon.SetRestrictions( R );
+    clear R;
 end
 
 %% Assemble matrix and right-hand side

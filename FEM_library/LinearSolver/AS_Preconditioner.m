@@ -13,6 +13,9 @@ classdef AS_Preconditioner < Preconditioner & handle
         M_invperm;
         M_mumps_ID;
         M_A_DD;
+        M_twoLevel;
+        M_A_coarse;
+        M_R_coarse;
     end
     
     methods
@@ -21,6 +24,38 @@ classdef AS_Preconditioner < Preconditioner & handle
         function obj = AS_Preconditioner( varargin )
             
             obj@Preconditioner( varargin{:} );
+            
+            if ~isfield(obj.M_options, 'coarse_level')
+                obj.M_options.coarse_level = 'None';
+            end
+            
+            % Parse Coarse Solver options
+            switch obj.M_options.coarse_level
+                case 'None'
+                    obj.M_twoLevel = false;
+                    
+                case {'Aggregation', 'SmoothedAggregation'}
+                    obj.M_twoLevel = true;
+                    
+                    if ~isfield(obj.M_options, 'coarse_num_aggregates')
+                        obj.M_options.coarse_num_aggregates =  obj.M_options.num_subdomains;
+                    end
+                    
+                    if strcmp(obj.M_options.coarse_level, 'SmoothedAggregation')
+                        
+                        if ~isfield(obj.M_options, 'coarse_smoother_iter')
+                            obj.M_options.coarse_smoother_iter = 1;
+                        end
+                        
+                        if ~isfield(obj.M_options, 'coarse_smoother_dumping')
+                            obj.M_options.coarse_smoother_dumping = 1;
+                        end
+                    end
+                    
+                otherwise
+                    error('AS_Preconditioner: invalid coarse_level type.');
+                    
+            end
             
         end
         
@@ -40,7 +75,7 @@ classdef AS_Preconditioner < Preconditioner & handle
                     
                     if ~obj.M_reuse || (obj.M_reuse && ~obj.M_isBuilt)
                         
-                        A_DD = Composite(length(obj.M_Restrictions));
+                        A_DD = Composite(obj.M_options.num_subdomains);
                         for ii = 1:numel(A_DD)
                             A_DD{ii}             = A(obj.M_Restrictions{ii},obj.M_Restrictions{ii});
                         end
@@ -52,17 +87,39 @@ classdef AS_Preconditioner < Preconditioner & handle
                         end
                         obj.M_L = M_L;
                         obj.M_U = M_U;
-                        
-                        obj.M_perm = M_perm;
+                        obj.M_perm    = M_perm;
                         obj.M_invperm = M_invperm;
+                        
+                        % coarse level
+                        if obj.M_twoLevel
+                            
+                            if strcmp(obj.M_options.coarse_level, 'SmoothedAggregation')
+                                D       = spdiags( spdiags(A, 0), 0, size(A,1), size(A,1));
+                                R_coarse = obj.M_Restrictions{end}';
+                                
+                                for i = 1 : obj.M_options.coarse_smoother_dumping
+                                    R_coarse = R_coarse - obj.M_options.coarse_smoother_dumping * ( D \ ( A*R_coarse ) );
+                                end
+                                
+                                R_coarse       = R_coarse';
+                            else
+                                R_coarse = obj.M_Restrictions{end};
+                            end
+                            
+                            obj.M_A_coarse = R_coarse * (A * R_coarse');
+                            obj.M_R_coarse = R_coarse;
+                            
+                        end
+                        
                         obj.M_isBuilt = true;
+                        
                     end
                     
                 case 'MUMPS'
                     
                     if ~obj.M_reuse || (obj.M_reuse && ~obj.M_isBuilt)
                         
-                        A_DD = Composite(length(obj.M_Restrictions));
+                        A_DD = Composite(obj.M_options.num_subdomains);
                         for ii = 1:numel(A_DD)
                             A_DD{ii}   = A(obj.M_Restrictions{ii},obj.M_Restrictions{ii});
                         end
@@ -79,8 +136,29 @@ classdef AS_Preconditioner < Preconditioner & handle
                         end
                         obj.M_A_DD     = A_DD;
                         obj.M_mumps_ID = mumps_ID;
-                        obj.M_isBuilt  = true;
                         clear mumps_ID;
+
+                        % coarse level
+                        if obj.M_twoLevel
+                            if strcmp(obj.M_options.coarse_level, 'SmoothedAggregation')
+                                D       = spdiags( spdiags(A, 0), 0, size(A,1), size(A,1));
+                                R_coarse = obj.M_Restrictions{end}';
+                                
+                                for i = 1 : obj.M_options.coarse_smoother_dumping
+                                    R_coarse = R_coarse - obj.M_options.coarse_smoother_dumping * ( D \ ( A*R_coarse ) );
+                                end
+                                
+                                R_coarse       = R_coarse';
+                            else
+                                R_coarse = obj.M_Restrictions{end};
+                            end
+                            
+                            obj.M_A_coarse = R_coarse * (A * R_coarse');
+                            obj.M_R_coarse = R_coarse;
+                            
+                        end
+                            
+                        obj.M_isBuilt  = true;
                     end
                     
             end
@@ -100,8 +178,17 @@ classdef AS_Preconditioner < Preconditioner & handle
                     perm = obj.M_perm;
                     invperm = obj.M_invperm;
                     Restrictions = obj.M_Restrictions;
-                     
-                    spmd(0,length(Restrictions))
+                    
+                    % coarse level
+                    if obj.M_twoLevel
+                        warning ('off','all');
+                        z  = obj.M_R_coarse'*(obj.M_A_coarse\(obj.M_R_coarse*r));
+                        warning ('on','all');
+                    else
+                        z     = 0 *r;
+                    end
+                    
+                    spmd(0,obj.M_options.num_subdomains)
                         zi = r(Restrictions{labindex});
                         
                         warning ('off','all');
@@ -113,8 +200,7 @@ classdef AS_Preconditioner < Preconditioner & handle
                         zi(Restrictions{labindex}) = zi_l(invperm);
                     end
                     
-                    z     = 0 *r;
-                    for i = 1 : length(obj.M_Restrictions)
+                    for i = 1 : obj.M_options.num_subdomains
                         z = z + zi{i};
                     end
                     
@@ -122,7 +208,17 @@ classdef AS_Preconditioner < Preconditioner & handle
                     A_DD     = obj.M_A_DD;
                     mumps_ID = obj.M_mumps_ID;
                     Restrictions = obj.M_Restrictions;
-                    spmd(0,length(Restrictions))
+                    
+                    % coarse level
+                    if obj.M_twoLevel
+                        warning ('off','all');
+                        z  = obj.M_R_coarse'*(obj.M_A_coarse\(obj.M_R_coarse*r));
+                        warning ('on','all');
+                    else
+                        z     = 0 *r;
+                    end
+                    
+                    spmd(0,obj.M_options.num_subdomains)
                         zi = 0*r;
                         
                         mumps_ID.JOB    = 3;
@@ -132,8 +228,7 @@ classdef AS_Preconditioner < Preconditioner & handle
                         zi(Restrictions{labindex}) = mumps_ID.SOL;
                     end
                     
-                    z     = 0 *r;
-                    for i = 1 : length(obj.M_Restrictions)
+                    for i = 1 : obj.M_options.num_subdomains
                         z = z + zi{i};
                     end
                     

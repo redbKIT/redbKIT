@@ -1,4 +1,4 @@
-function [subdom, subdom_noOverlap] = geometric_domain_decomposition(vertices, elements, dim, n_subdom, overlap, visual, folder, elements_fem)
+function [subdom, subdom_noOverlap, A] = geometric_domain_decomposition(vertices, elements, dim, n_subdom, overlap, visual, folder, elements_fem)
 %GEOMETRIC_DOMAIN_DECOMPOSITION builds mesh subdomains with and without overlap 
 %using Metis Library
 %
