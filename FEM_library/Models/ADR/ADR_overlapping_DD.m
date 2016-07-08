@@ -29,7 +29,7 @@ nln          = MESH.numElemDof;
 nodes        = MESH.nodes;
 elements_fem = MESH.elements(1:nln,:);% P1 elements
 
-[subdom, ~, A] = geometric_domain_decomposition(vertices, elements, dim, n_subdom, overlap, 1, 'Figures', elements_fem);
+[subdom, ~, A, A_elemC] = geometric_domain_decomposition(vertices, elements, dim, n_subdom, overlap, 1, 'Figures', elements_fem);
 
 %% restrict subdomains to internal vertices
 for i = 1 : n_subdom
@@ -57,7 +57,7 @@ fprintf('\n%d subdomains and restriction/prolongation operators built ---\n',che
 
 if compute_coarse_aggregates
     
-    [subdom_Coarse] = geometric_aggregates(A, nodes, elements, dim, n_aggregates);
+    [subdom_Coarse] = geometric_aggregates(A_elemC, vertices, elements, dim, n_aggregates, elements_fem(1:MESH.numElemDof,:));
     
     R{n_subdom+1}  = sparse(n_aggregates, nov);
     
@@ -67,8 +67,9 @@ if compute_coarse_aggregates
     
     R{n_subdom+1} = R{n_subdom+1}(:,I);
     
+    fprintf('\n%d Coarse aggregates computed ---\n', n_aggregates);
+    
 end
 
-fprintf('\n%d Coarse aggregates computed ---\n', n_aggregates);
 
 return

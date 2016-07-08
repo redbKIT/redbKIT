@@ -89,7 +89,7 @@ shift_back(nov_F+[1:length(S_not_interface_dofs)]) = S_not_interface_dofs;
 shift_back(F_dof_interface(Interface_FSmap)) = S_dof_interface;   
 
 %% Partition the Fluid+Solid+Interface mesh
-[subdom] = geometric_domain_decomposition(vertices, elements, dim, n_subdom, overlap, 1, 'Figures', elements_fem);
+[subdom, ~, ~, A_elemC] = geometric_domain_decomposition(vertices, elements, dim, n_subdom, overlap, 1, 'Figures', elements_fem);
 
 
 %% Translate the partition into the fluid and solid partitions, separately
@@ -101,13 +101,13 @@ for i = 1 : n_subdom
 
 end
 
-for i = 1 : n_subdom
-    subdomF2{i} =  zeros(size(nov_F,2),1);
-    subdomF2{i}(subdomF{i}) = subdomF{i};
-    
-    subdomS2{i} =  zeros(size(nov_S,2),1);
-    subdomS2{i}(subdomS{i}) = subdomS{i};
-end
+% for i = 1 : n_subdom
+%     subdomF2{i} =  zeros(size(nov_F,2),1);
+%     subdomF2{i}(subdomF{i}) = subdomF{i};
+%     
+%     subdomS2{i} =  zeros(size(nov_S,2),1);
+%     subdomS2{i}(subdomS{i}) = subdomS{i};
+% end
 
 %% restrict subdomains to internal vertices for each component of velocity and pressure
 F_component = (dim + 1);
@@ -164,22 +164,94 @@ check_n_subd = length(R);
 fprintf('\n%d subdomains and restriction/prolongation operators built ---\n',check_n_subd);
         
 
-% %% build coarse aggregation restriction/prolongation operator
-% 
+%% build coarse aggregation restriction/prolongation operator
+
 % if compute_coarse_aggregates
 %     
-%     [subdom_Coarse] = geometric_aggregates(A, nodes, elements, dim, n_aggregates);
+%     [subdom_Coarse] = geometric_aggregates(A_elemC, vertices, elements, dim, n_aggregates, elements_fem);
 %     
-%     R{n_subdom+1}  = sparse(n_aggregates, nov);
-%     
+%     % Translate the partition into the fluid and solid partitions, separately
 %     for i = 1 : n_aggregates
-%         R{n_subdom+1}(i, subdom_Coarse{i}) = 1;
+%         
+%         subdom_CF{i} = intersect(1:nov_F, subdom_Coarse{i});
+%         subdom_CS{i} = shift_back ( intersect(union(F_dof_interface, (1+nov_F):size(vertices_fem,2)), subdom_Coarse{i}) );
+%         
 %     end
 %     
-%     R{n_subdom+1} = R{n_subdom+1}(:,I);
+%     R{n_subdom+1}  = sparse((F_component+S_component)*n_aggregates, nov_tot);
+%     
+%     for i = 1 : n_aggregates
+%         
+%         for k = 1 : F_component
+%             R{n_subdom+1}(i+n_aggregates*(k-1), nov_v*(k-1)+subdom_Coarse{i}) = 1;
+%             %R{n_subdom+1}(k+i*(n_aggregates-1), nov_v*(k-1)+subdom_Coarse{i}) = 1;
+%         end
+%         for k = F_component+1 : F_component+S_component
+%             R{n_subdom+1}(i+n_aggregates*(k-1), nov_totF+nov_S*(k-F_component-1)+subdom_Coarse{i}) = 1;
+%             %R{n_subdom+1}(k+i*(n_aggregates-1), nov_totF+nov_S*(k-F_component-1)+subdom_Coarse{i}) = 1;
+%         end
+%         
+%     end
+%     
+%     R{n_subdom+1} = R{n_subdom+1}(:,I_all);
+%     
+%     fprintf('\n%d Coarse aggregates computed ---\n', n_aggregates);
 %     
 % end
-% 
-% fprintf('\n%d Coarse aggregates computed ---\n', n_aggregates);
+
+if compute_coarse_aggregates
+    
+    [subdom_CoarseF] = geometric_aggregates([], F_vertices, F_elements, dim, n_aggregates(1), F_elements_fem);
+    [subdom_CoarseS] = geometric_aggregates([], S_vertices, S_elements, dim, n_aggregates(2), S_elements_fem);
+    
+    % Translate the partition into the fluid and solid partitions, separately
+    for i = 1 : n_aggregates(1)
+        subdom_CF{i} = intersect(1:nov_F, subdom_CoarseF{i});
+    end
+    
+    for i = 1 : n_aggregates(2)
+        subdom_CS{i} = intersect(1:nov_S, subdom_CoarseS{i});
+    end
+    
+    R{n_subdom+1}  = sparse( F_component*n_aggregates(1)+S_component*n_aggregates(2), nov_tot);
+    
+    %     for i = 1 : n_aggregates
+    %
+    %         for k = 1 : F_component
+    %             R{n_subdom+1}(i+n_aggregates*(k-1), nov_v*(k-1)+subdom_CF{i}) = 1;
+    %             %R{n_subdom+1}(k+i*(n_aggregates-1), nov_v*(k-1)+subdom_Coarse{i}) = 1;
+    %         end
+    %         for k = F_component+1 : F_component+S_component
+    %             R{n_subdom+1}(i+n_aggregates*(k-1), nov_totF+nov_S*(k-F_component-1)+subdom_CS{i}) = 1;
+    %             %R{n_subdom+1}(k+i*(n_aggregates-1), nov_totF+nov_S*(k-F_component-1)+subdom_Coarse{i}) = 1;
+    %         end
+    %
+    %     end
+    
+    for i = 1 : n_aggregates(1)
+        
+        for k = 1 : F_component
+            R{n_subdom+1}(i+n_aggregates(1)*(k-1), nov_v*(k-1)+subdom_CF{i}) = 1;
+            %R{n_subdom+1}(k+i*(n_aggregates-1), nov_v*(k-1)+subdom_Coarse{i}) = 1;
+        end
+        
+    end
+    
+    for i = 1 : n_aggregates(2)
+        
+        for k = F_component+1 : F_component+S_component
+            R{n_subdom+1}(i+n_aggregates(2)*(k-1-F_component)+n_aggregates(1)*F_component, nov_totF+nov_S*(k-F_component-1)+subdom_CS{i}) = 1;
+            %R{n_subdom+1}(k+i*(n_aggregates-1), nov_totF+nov_S*(k-F_component-1)+subdom_Coarse{i}) = 1;
+        end
+        
+    end
+    
+    R{n_subdom+1} = R{n_subdom+1}(:,I_all);
+    
+    fprintf('\n%d Coarse aggregates computed ---\n', n_aggregates);
+    
+end
+
+
 
 return

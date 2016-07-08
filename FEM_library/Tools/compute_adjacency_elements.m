@@ -1,4 +1,4 @@
-function [ A, node_to_element, node_to_boundaries ] = compute_adjacency_elements(vertices, elements, dim, boundaries, fem)
+function [ A, node_to_element, node_to_boundaries, A_c ] = compute_adjacency_elements(vertices, elements, dim, boundaries, fem)
 %COMPUTE_ADJACENCY_ELEMENTS compute elements adjacency matrix for 2D/3D
 %TRI/TET meshes
 
@@ -24,6 +24,7 @@ for ie = 1 : noe
     end    
 end
 
+node_to_boundaries = cell(1,nov);
 if nargin >=4 && ~isempty(boundaries)
       
       nbp                = size(boundaries,2);
@@ -66,9 +67,9 @@ for i = 1 : nov
 
 end
 
-A = sparse(row,col,coef,noe,noe);
+A_c = sparse(row,col,coef,noe,noe);
 
-[row,col,coef] = find(A);
+[row,col,coef] = find(A_c);
 
 indx = find(coef>1);
 coef(indx) = 1;

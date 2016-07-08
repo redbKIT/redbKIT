@@ -107,7 +107,12 @@ MESH.dim  = dim;
 MESH.Fluid.internal_dof_c{MESH.dim+1} = 1:FE_SPACE_p.numDof;
 
 %% Generates mappings from solid to fluid interface dofs and viceversa
+fprintf('\n Build FS interface Maps... ');
+t_assembly = tic;
 [MESH] = FSI_InterfaceMap(DATA, MESH);
+t_assembly = toc(t_assembly);
+fprintf('done in %3.3f s', t_assembly);
+
 
 for k = 1 : dim
     MESH.ndof_interface{k} = length(MESH.Interface_FSmap{k});
@@ -245,7 +250,7 @@ if isfield(DATA.Fluid.Preconditioner, 'type') && strcmp( DATA.Fluid.Precondition
     if isfield(DATA.Fluid.Preconditioner, 'coarse_level')
         if ~strcmp( DATA.Fluid.Preconditioner.coarse_level, 'None')
             R = FSI_overlapping_DD(MESH, DATA.Fluid.Preconditioner.num_subdomains,  ...
-                     DATA.Fluid.Preconditioner.overlap_level, DATA.Preconditioner.coarse_num_aggregates);
+                     DATA.Fluid.Preconditioner.overlap_level, DATA.Fluid.Preconditioner.coarse_num_aggregates);
         else
             R = FSI_overlapping_DD(MESH, DATA.Fluid.Preconditioner.num_subdomains,  DATA.Fluid.Preconditioner.overlap_level);
         end
@@ -823,8 +828,8 @@ while ( t < tf )
     iter_time = toc(iter_time);
     fprintf('\nnorm(U^(n+1) - U^(n))/norm(U^(n)) = %2.3e -- Iteration time: %3.2f s \n',full(norm_n),iter_time);
     
-    X(:,k_t+1) = [u; Displacement_np1];
-    %X = [u; Displacement_np1];
+    %X(:,k_t+1) = [u; Displacement_np1];
+    X = [u; Displacement_np1];
     
 end
 

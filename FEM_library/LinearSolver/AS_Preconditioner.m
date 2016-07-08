@@ -108,7 +108,8 @@ classdef AS_Preconditioner < Preconditioner & handle
                             
                             obj.M_A_coarse = R_coarse * (A * R_coarse');
                             obj.M_R_coarse = R_coarse;
-                            
+                            A_C = obj.M_A_coarse;
+                            save A_C A_C;
                         end
                         
                         obj.M_isBuilt = true;

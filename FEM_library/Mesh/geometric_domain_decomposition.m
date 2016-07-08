@@ -1,4 +1,4 @@
-function [subdom, subdom_noOverlap, A] = geometric_domain_decomposition(vertices, elements, dim, n_subdom, overlap, visual, folder, elements_fem)
+function [subdom, subdom_noOverlap, A, A_elemC] = geometric_domain_decomposition(vertices, elements, dim, n_subdom, overlap, visual, folder, elements_fem)
 %GEOMETRIC_DOMAIN_DECOMPOSITION builds mesh subdomains with and without overlap 
 %using Metis Library
 %
@@ -50,7 +50,7 @@ noe = size(elements,2);
 
 nln = 3 + (dim-2);
 
-[A_elem] = compute_adjacency_elements(vertices,elements,dim);
+[A_elem, ~, ~, A_elemC] = compute_adjacency_elements(vertices,elements,dim);
 
 
 elem_iD          = zeros(1,noe);
