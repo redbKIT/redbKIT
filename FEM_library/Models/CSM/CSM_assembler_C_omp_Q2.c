@@ -14,7 +14,6 @@
 #include "MaterialModels/LinearElasticMaterial.h"
 #include "MaterialModels/SEMMTMaterial.h"
 #include "MaterialModels/NeoHookeanMaterial.h"
-#include "MaterialModels/NeoHookean2Material.h"
 #include "MaterialModels/StVenantKirchhoffMaterial.h"
 #include "MaterialModels/RaghavanVorpMaterial.h"
 
@@ -59,18 +58,6 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
             SEMMTMaterial_jacobian(plhs, prhs);
     }
     
-   
-    /*
-    if (strcmp(Material_Model, "NeoHookean_forces")==0)
-    {
-            NeoHookeanMaterial_forces(plhs, prhs);
-    }
-    
-    if (strcmp(Material_Model, "NeoHookean_jacobian")==0)
-    {
-            NeoHookeanMaterial_jacobian(plhs, prhs);
-    }
-    */
     
     if (strcmp(Material_Model, "StVenantKirchhoff_forces")==0)
     {
@@ -89,17 +76,17 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     
     if (strcmp(Material_Model, "NeoHookean2_forces")==0)
     {
-            NeoHookean2Material_forces(plhs, prhs);
+            NeoHookeanMaterial_forces(plhs, prhs);
     }
     
     if (strcmp(Material_Model, "NeoHookean2_jacobian")==0)
     {
-            NeoHookean2Material_jacobian(plhs, prhs);
+            NeoHookeanMaterial_jacobian(plhs, prhs);
     }
     
     if (strcmp(Material_Model, "NeoHookean2_stress")==0)
     {
-            NeoHookean2Material_stress(plhs, prhs);
+            NeoHookeanMaterial_stress(plhs, prhs);
     }
     
     if (strcmp(Material_Model, "RaghavanVorp_forces")==0)
@@ -115,13 +102,6 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     if (strcmp(Material_Model, "RaghavanVorp_stress")==0)
     {
             RaghavanVorpMaterial_stress(plhs, prhs);
-    }
-    
-    /* ===================================== */
-    
-    if (strcmp(Material_Model, "NeoHookean")==0)
-    {
-            NeoHookeanMaterial(plhs, prhs);
     }
     
     mxFree(Material_Model);

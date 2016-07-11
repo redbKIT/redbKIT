@@ -51,15 +51,9 @@ classdef CSM_Assembler < handle
         function obj = SetMaterialParameters( obj )
             
             switch obj.M_MaterialModel
-                case 'Linear'
+                case {'Linear', 'StVenantKirchhoff', 'NeoHookean'}
                     obj.M_MaterialParam = [obj.M_DATA.Young obj.M_DATA.Poisson];
                     
-                case 'StVenantKirchhoff'
-                    obj.M_MaterialParam = [obj.M_DATA.Young obj.M_DATA.Poisson];
-                    
-                case {'NeoHookean','NeoHookean2'}
-                    obj.M_MaterialParam = [obj.M_DATA.Young obj.M_DATA.Poisson];%[DATA.Shear DATA.Poisson];
-                
                 case {'RaghavanVorp'}
                     obj.M_MaterialParam = [obj.M_DATA.Alpha obj.M_DATA.Beta obj.M_DATA.Bulk];
                      

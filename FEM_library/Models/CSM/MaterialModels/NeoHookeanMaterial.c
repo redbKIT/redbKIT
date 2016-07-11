@@ -3,11 +3,11 @@
  *   Author: Federico Negri <federico.negri@epfl.ch>
  */
 
-#include "NeoHookean2Material.h"
+#include "NeoHookeanMaterial.h"
 
 
 /*************************************************************************/
-void NeoHookean2Material_forces(mxArray* plhs[], const mxArray* prhs[])
+void NeoHookeanMaterial_forces(mxArray* plhs[], const mxArray* prhs[])
 {
     
     double* dim_ptr = mxGetPr(prhs[0]);
@@ -174,7 +174,7 @@ void NeoHookean2Material_forces(mxArray* plhs[], const mxArray* prhs[])
 
 
 /*************************************************************************/
-void NeoHookean2Material_jacobian(mxArray* plhs[], const mxArray* prhs[])
+void NeoHookeanMaterial_jacobian(mxArray* plhs[], const mxArray* prhs[])
 {
     
     double* dim_ptr = mxGetPr(prhs[0]);
@@ -403,7 +403,7 @@ void NeoHookean2Material_jacobian(mxArray* plhs[], const mxArray* prhs[])
 }
 /*************************************************************************/
 
-void NeoHookean2Material_stress(mxArray* plhs[], const mxArray* prhs[])
+void NeoHookeanMaterial_stress(mxArray* plhs[], const mxArray* prhs[])
 {
     
     double* dim_ptr = mxGetPr(prhs[0]);
