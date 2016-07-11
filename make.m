@@ -36,25 +36,19 @@ source_files{1} = {'FEM_library/Models/ADR/','ADR_assembler_C_omp.c'};
 dependencies{1} = {};
 source_files{2} = {'FEM_library/Models/ADR/','Mass_assembler_C_omp.c'};
 dependencies{2} = {};
-source_files{3} = {'FEM_library/Models/CSM/','CSM_assembler_C_omp.c'};
+source_files{3} = {'FEM_library/Models/CSM/','CSM_assembler_ExtForces.c'};
 dependencies{3} = {};
-source_files{4} = {'FEM_library/Models/CSM/','CSM_assembler_ExtForces.c'};
-dependencies{4} = {};
-source_files{5} = {'FEM_library/Models/CFD/','CFD_assembler_C_omp.c'};
-dependencies{5} = {'../CSM/MaterialModels/Tools.c'};
-source_files{6} = {'FEM_library/Models/CFD/','CFD_assembler_ExtForces.c'};
-dependencies{6} = {};
-source_files{7} = {'FEM_library/Models/CSM/','CSM_ComputeStress_C_omp.c'};
-dependencies{7} = {};
-source_files{8} = {'FEM_library/Models/CSM/','CSM_assembler_C_omp_Q.c'};
-dependencies{8} = {};
-source_files{9} = {'FEM_library/Models/CSM/','CSM_assembler_C_omp_Q2.c'};
-dependencies{9} = {'MaterialModels/Tools.c', 'MaterialModels/NeoHookeanMaterial.c',...
+source_files{4} = {'FEM_library/Models/CFD/','CFD_assembler_C_omp.c'};
+dependencies{4} = {'../CSM/MaterialModels/Tools.c'};
+source_files{5} = {'FEM_library/Models/CFD/','CFD_assembler_ExtForces.c'};
+dependencies{5} = {};
+source_files{6} = {'FEM_library/Models/CSM/','CSM_assembler_C_omp.c'};
+dependencies{6} = {'MaterialModels/Tools.c', 'MaterialModels/NeoHookeanMaterial.c',...
                    'MaterialModels/LinearElasticMaterial.c', 'MaterialModels/SEMMTMaterial.c', ...
                    'MaterialModels/StVenantKirchhoffMaterial.c',...
                    'MaterialModels/RaghavanVorpMaterial.c'};
-source_files{10} = {'RB_library/RBF_interpolation/','RBF_evaluate_Fast.c'};
-dependencies{10} = {};
+source_files{7} = {'RB_library/RBF_interpolation/','RBF_evaluate_Fast.c'};
+dependencies{7} = {};
 
 Mexify = 0;               
 if nargin < 2 || isempty( sources )
