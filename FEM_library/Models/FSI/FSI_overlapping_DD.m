@@ -201,8 +201,8 @@ fprintf('\n%d subdomains and restriction/prolongation operators built ---\n',che
 
 if compute_coarse_aggregates
     
-    [subdom_CoarseF] = geometric_aggregates([], F_vertices, F_elements, dim, n_aggregates(1), F_elements_fem);
-    [subdom_CoarseS] = geometric_aggregates([], S_vertices, S_elements, dim, n_aggregates(2), S_elements_fem);
+    [subdom_CoarseF] = geometric_aggregates([], F_vertices, F_elements, dim, n_aggregates(1), F_elements_fem, 'FluidAggregates');
+    [subdom_CoarseS] = geometric_aggregates([], S_vertices, S_elements, dim, n_aggregates(2), S_elements_fem, 'SolidAggregates');
     
     % Translate the partition into the fluid and solid partitions, separately
     for i = 1 : n_aggregates(1)

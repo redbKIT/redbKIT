@@ -21,7 +21,8 @@ classdef PreconditionerFactory < handle
             factory.RegisterPrecon('None', @(x) Preconditioner(x));
             factory.RegisterPrecon('ILU', @(x) ILU_Preconditioner(x));
             factory.RegisterPrecon('AdditiveSchwarz', @(x) AS_Preconditioner(x));
-            
+            factory.RegisterPrecon('AdditiveSchwarz_Serial', @(x) AS_Preconditioner_Serial(x));
+
         end
         
         function [] = RegisterPrecon(factory, preconName, createPreconCallback)
