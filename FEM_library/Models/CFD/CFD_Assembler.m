@@ -92,7 +92,7 @@ classdef CFD_Assembler < handle
                 
                 case 2
                     
-                    x = zeros(obj.M_MESH.numElem,obj.M_FE_SPACE.numQuadNodes); y = x;
+                    x = zeros(obj.M_MESH.numElem,obj.M_FE_SPACE_v.numQuadNodes); y = x;
                     for j = 1 : 3
                         i = obj.M_MESH.elements(j,:);
                         vtemp = obj.M_MESH.vertices(1,i);
