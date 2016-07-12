@@ -44,6 +44,15 @@ classdef CSM_Assembler < handle
             obj.M_MaterialModel = DATA.Material_Model;
             obj = SetMaterialParameters(obj);
             
+            if obj.M_MESH.dim == 2 
+                if strcmp(obj.M_MaterialModel, 'NeoHookean')
+                    error('NeoHookean material law is available only for 3D simulations.')
+                end
+                if strcmp(obj.M_MaterialModel, 'RaghavanVorp') 
+                    error('RaghavanVorp material law is available only for 3D simulations.')
+                end
+            end
+            
         end
         
         %==========================================================================
