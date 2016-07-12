@@ -74,17 +74,17 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
             StVenantKirchhoffMaterial_stress(plhs, prhs);
     }
     
-    if (strcmp(Material_Model, "NeoHookean2_forces")==0)
+    if (strcmp(Material_Model, "NeoHookean_forces")==0)
     {
             NeoHookeanMaterial_forces(plhs, prhs);
     }
     
-    if (strcmp(Material_Model, "NeoHookean2_jacobian")==0)
+    if (strcmp(Material_Model, "NeoHookean_jacobian")==0)
     {
             NeoHookeanMaterial_jacobian(plhs, prhs);
     }
     
-    if (strcmp(Material_Model, "NeoHookean2_stress")==0)
+    if (strcmp(Material_Model, "NeoHookean_stress")==0)
     {
             NeoHookeanMaterial_stress(plhs, prhs);
     }

@@ -1,6 +1,7 @@
 function [MESH] = FSI_InterfaceMap(DATA, MESH)
 %FSI_INTERFACEMAP preprocessing function for FSI solver
 %
+%   [MESH] = FSI_INTERFACEMAP(DATA, MESH)
 %   Generates mappings from solid to fluid interface dofs and viceversa.
 
 %   This file is part of redbKIT.
