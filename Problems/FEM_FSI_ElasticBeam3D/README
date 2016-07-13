@@ -1,0 +1,18 @@
+3D version of the 2D Flow Past an Elastic Beam Attached to a Fixed, Rigid Block
+(see FEM_FSI_ElasticBeam2D)
+
+The 3D geometry is obtained by extruding the 2D geometry in the z-direction
+(see meshFS.geo file).
+
+This test was used to compare the redbKIT-FSI solver with the one developed
+by Davide Forti (EPFL) in the LifeV library.
+
+Instructions:
+
+1) In the mesh subfolder we already provide gmsh script to generate conforming
+   fluid and solid meshes. See the script generate_mesh.sh 
+
+2) Launch main.m to start the simulation. The output of interest (i.e. the vertical
+   tip displacement at the midplane as a function of time) can be obtained 
+   with Paraview by selecting the corresponding mesh node and using the 
+   "Plot Selection Over Time" filter.

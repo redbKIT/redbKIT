@@ -1,3 +1,7 @@
+%   This file is part of redbKIT.
+%   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
+%   Author: Federico Negri <federico.negri@epfl.ch>
+
 %DATAFILE Fluid
 U_bar = 51.3;
 
@@ -100,12 +104,6 @@ data.time.t0         = 0;
 data.time.dt         = 0.005; 
 data.time.tf         = 5;
 data.time.nonlinearity  = 'implicit';
-
-% %% Output options
-% data.options.Output.computeWSS      = 0;
-% data.options.Output.computeDragLift = 1;
-% data.options.Output.Drag_factor     = 2/(10^3*0.2^2*0.05);
-% data.options.Output.flag_Drag       = [3];
 
 %% Output options
 data.Output.DragLift.computeDragLift = 1;

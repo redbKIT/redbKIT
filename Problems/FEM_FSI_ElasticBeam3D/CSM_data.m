@@ -1,4 +1,8 @@
-%DATAFILE for FS1 - Solid
+%   This file is part of redbKIT.
+%   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
+%   Author: Federico Negri <federico.negri@epfl.ch>
+
+%DATAFILE Solid
 
 % Source term
 data.force{1} = @(x, y, z, t, param)(0.*x.*y);
@@ -46,16 +50,8 @@ data.du0{3} = @(x, y, z, t, param)(0.*x.*y);
 data.Young   = 2.5*10^6;
 data.Poisson = 0.35;
 data.Density = 0.1;
-data.Material_Model   = 'NeoHookean';%'StVenantKirchhoff', Linear, NeoHookean2
+data.Material_Model   = 'StVenantKirchhoff';%'StVenantKirchhoff', Linear, NeoHookean
 data.model   = 'CSM';
-
-mu = data.Young / (2 + 2 * data.Poisson);
-lambda =  data.Young * data.Poisson /( (1+data.Poisson) * (1-2*data.Poisson) );
-bulk = ( 2.0 / 3.0 ) * mu + lambda;
-
-data.Alpha   = mu / 2;
-data.Beta    = 0.0;
-data.Bulk    = bulk;
 
 
 % NonLinear Solver
