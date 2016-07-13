@@ -19,7 +19,7 @@ data.flag_neumann{1}    = [9];
 data.flag_dirichlet{2}  = [7 8];
 data.flag_neumann{2}    = [9];
 
-data.kinematic_viscosity = 1/100;
+data.dynamic_viscosity   = 1/100;
 data.density             = 1;
 
 %% SOLVER OPTIONS

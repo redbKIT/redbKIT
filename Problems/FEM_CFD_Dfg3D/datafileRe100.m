@@ -38,7 +38,7 @@ data.flag_dirichlet{3} = [2 10 6];
 data.flag_neumann{3}   = [3];
 
 % Model parameters
-data.kinematic_viscosity = 1e-3;
+data.dynamic_viscosity = 1e-3;
 data.density             = 1;
 
 % Nonlinear solver
@@ -49,17 +49,46 @@ data.NonlinearSolver.maxit       = 30;
 data.Stabilization = 'SUPG';
 
 % Linear solver
-data.LinearSolver.type           = 'MUMPS'; % MUMPS, backslash, gmres
-data.LinearSolver.mumps_reordering  = 7;
+%   If parallel pool available, use gmres with AdditiveSchwarz preconditioner
+%   Otherwise use direct solver
+poolobj = gcp('nocreate');
+if isempty(poolobj)
+    poolsize = 0;
+else
+    poolsize = poolobj.NumWorkers;
+end
 
-% Preconditioner
-data.Preconditioner.type         = 'None'; % AdditiveSchwarz, None, ILU
+if poolsize > 0
+    
+    % Linear Solver
+    data.LinearSolver.type              = 'gmres'; % MUMPS, backslash, gmres
+    data.LinearSolver.tol               = 1e-8;
+    data.LinearSolver.maxit             = 500;
+    data.LinearSolver.gmres_verbosity   = 5;
+    data.LinearSolver.mumps_reordering  = 4;
+    
+    % Preconditioner
+    data.Preconditioner.type              = 'AdditiveSchwarz'; % AdditiveSchwarz, None, ILU
+    data.Preconditioner.local_solver      = 'matlab_lu'; % matlab_lu, MUMPS
+    data.Preconditioner.overlap_level     = 2;
+    data.Preconditioner.mumps_reordering  = 7;
+    data.Preconditioner.num_subdomains    = poolsize; %poolsize, number of subdomains
+
+else
+    
+    % Linear Solver
+    data.LinearSolver.type              = 'backslash'; % MUMPS, backslash, gmres
+    data.LinearSolver.mumps_reordering  = 7;
+
+    % Preconditioner
+    data.Preconditioner.type         = 'None'; % AdditiveSchwarz, None, ILU
+end
 
 % time 
 data.time.BDF_order  = 2;
 data.time.t0         = 0;
 data.time.dt         = 0.005;
-data.time.tf         = 1;
+data.time.tf         = 2;
 data.time.nonlinearity  = 'implicit';
 
 %% Output options

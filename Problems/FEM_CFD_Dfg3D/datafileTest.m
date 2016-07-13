@@ -38,7 +38,7 @@ data.flag_dirichlet{3} = [2 10 6];
 data.flag_neumann{3}   = [3];
 
 % Model parameters
-data.kinematic_viscosity = 1e-3;
+data.dynamic_viscosity = 1e-3;
 data.density             = 1;
 
 % Nonlinear solver

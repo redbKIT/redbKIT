@@ -29,7 +29,7 @@ data.flag_dirichlet{2} = [1 3 4];
 data.flag_neumann{2}   = [2];
 
 % Model parameters
-data.kinematic_viscosity = 1e-3;
+data.dynamic_viscosity = 1e-3;
 data.density             = 1;
 
 

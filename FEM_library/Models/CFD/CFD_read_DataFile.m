@@ -39,7 +39,7 @@ switch dim
         end
 end
 
-DATA.kinematic_viscosity  = 1;
+DATA.dynamic_viscosity    = 1;
 DATA.density              = 1;
 
 %% Read data_file and put problem-data into the DATA struct

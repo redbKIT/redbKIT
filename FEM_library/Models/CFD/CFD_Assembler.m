@@ -18,7 +18,7 @@
 %    M_FE_SPACE_p          - struct containing Finite Element space data
 %    M_totSize             - size of the entire system (vel + pressure)
 %    M_density             - density value
-%    M_kinematic_viscosity - kinematic viscosity value
+%    M_dynamic_viscosity - kinematic viscosity value
 
 %   This file is part of redbKIT.
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
@@ -33,7 +33,7 @@ classdef CFD_Assembler < handle
         M_FE_SPACE_p;
         M_totSize;
         M_density;
-        M_kinematic_viscosity;
+        M_dynamic_viscosity;
         M_gravity;
     end
    
@@ -69,11 +69,11 @@ classdef CFD_Assembler < handle
                  obj.M_density = obj.M_DATA.density;
              end
              
-             if isfield(obj.M_DATA, 'kinematic_viscosity')
-                 obj.M_kinematic_viscosity = obj.M_DATA.kinematic_viscosity;
+             if isfield(obj.M_DATA, 'dynamic_viscosity')
+                 obj.M_dynamic_viscosity = obj.M_DATA.dynamic_viscosity;
              else
                  warning('\nCFD_ASSEMBLER class: kinematic viscosity not provided\n set to 1 by default \n')
-                 obj.M_kinematic_viscosity = obj.M_DATA.kinematic_viscosity;
+                 obj.M_dynamic_viscosity = obj.M_DATA.dynamic_viscosity;
              end
              
         end
@@ -148,7 +148,7 @@ classdef CFD_Assembler < handle
             
             % C_OMP assembly, returns matrices in sparse vector format
             [rowA, colA, coefA] = ...
-                CFD_assembler_C_omp('Stokes', obj.M_kinematic_viscosity, obj.M_MESH.dim, obj.M_MESH.elements, ...
+                CFD_assembler_C_omp('Stokes', obj.M_dynamic_viscosity, obj.M_MESH.dim, obj.M_MESH.elements, ...
                 obj.M_FE_SPACE_v.numElemDof, obj.M_FE_SPACE_p.numElemDof, obj.M_FE_SPACE_v.numDof, ...
                 obj.M_FE_SPACE_v.quad_weights, obj.M_MESH.invjac, obj.M_MESH.jac, ...
                 obj.M_FE_SPACE_v.phi, obj.M_FE_SPACE_v.dphi_ref, obj.M_FE_SPACE_p.phi);
@@ -275,7 +275,7 @@ classdef CFD_Assembler < handle
                 obj.M_FE_SPACE_v.numElemDof, obj.M_FE_SPACE_p.numElemDof, ... %8 9
                 obj.M_FE_SPACE_v.numDof, obj.M_FE_SPACE_p.numDof,  obj.M_FE_SPACE_p.phi, ... %10 11 12
                 conv_velocity, v_n, ... %13 14
-                obj.M_density, obj.M_kinematic_viscosity, dt, alpha_BDF,... %15 16 17 18
+                obj.M_density, obj.M_dynamic_viscosity, dt, alpha_BDF,... %15 16 17 18
                 obj.M_FE_SPACE_p.dphi_ref); % 19
              
             % Build sparse matrix
@@ -299,7 +299,7 @@ classdef CFD_Assembler < handle
                 obj.M_FE_SPACE_v.numElemDof, obj.M_FE_SPACE_p.numElemDof, ... %8 9
                 obj.M_FE_SPACE_v.numDof, obj.M_FE_SPACE_p.numDof,  obj.M_FE_SPACE_p.phi, ... %10 11 12
                 U_k, v_n, ... %13 14
-                obj.M_density, obj.M_kinematic_viscosity, dt, alpha_BDF,... %15 16 17 18
+                obj.M_density, obj.M_dynamic_viscosity, dt, alpha_BDF,... %15 16 17 18
                 obj.M_FE_SPACE_p.dphi_ref); % 19
             
             % Build sparse matrix
@@ -328,7 +328,7 @@ classdef CFD_Assembler < handle
                 obj.M_FE_SPACE_v.numElemDof, obj.M_FE_SPACE_p.numElemDof, ... %8 9
                 obj.M_FE_SPACE_v.numDof, obj.M_FE_SPACE_p.numDof,  obj.M_FE_SPACE_p.phi, ... %10 11 12
                 U_k, v_n, ... %13 14
-                obj.M_density, obj.M_kinematic_viscosity, dt, alpha_BDF,... %15 16 17 18
+                obj.M_density, obj.M_dynamic_viscosity, dt, alpha_BDF,... %15 16 17 18
                 obj.M_FE_SPACE_p.dphi_ref, convective_velocity, obj.M_gravity); % 19, 20, 21
             
             % Build sparse matrix

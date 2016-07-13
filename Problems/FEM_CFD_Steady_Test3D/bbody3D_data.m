@@ -25,7 +25,7 @@ data.flag_neumann{2}    = [2 7 8];
 data.flag_dirichlet{3}  = [1 5 6 7 8];
 data.flag_neumann{3}    = [2 3 4];
 
-data.kinematic_viscosity = 1/150;
+data.dynamic_viscosity = 1/150;
 data.density             = 1;
 
 % Nonlinear solver

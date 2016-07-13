@@ -39,3 +39,26 @@ data.uxexact        = @(x,y,z,t,param)( pi* cos( pi * x ) .* sin( pi * y ) .* si
 data.uyexact        = @(x,y,z,t,param)( pi* sin( pi * x ) .* cos( pi * y ) .* sin( pi * z ) );
 data.uzexact        = @(x,y,z,t,param)( pi* sin( pi * x ) .* sin( pi * y ) .* cos( pi * z ) );
 
+% % Linear Solver % MUMPS should be faster for this problem
+% data.LinearSolver.type              = 'gmres'; % MUMPS, backslash, gmres
+% data.LinearSolver.tol               = 1e-8; 
+% data.LinearSolver.maxit             = 500; 
+% data.LinearSolver.gmres_verbosity   = 5;
+% data.LinearSolver.mumps_reordering  = 5;
+% 
+% % Preconditioner
+% data.Preconditioner.type              = 'AdditiveSchwarz'; % AdditiveSchwarz, None, ILU
+% data.Preconditioner.local_solver      = 'MUMPS'; % matlab_lu, MUMPS
+% data.Preconditioner.coarse_level      = 'Aggregation'; % None, Aggregation, SmoothedAggregation
+% data.Preconditioner.coarse_num_aggregates    = 50;
+% data.Preconditioner.coarse_smoother_iter     = 0;
+% data.Preconditioner.coarse_smoother_dumping  = 0.5;
+% data.Preconditioner.overlap_level     = 1;
+% data.Preconditioner.mumps_reordering  = 7;
+% poolobj = gcp('nocreate');
+% if isempty(poolobj)
+%     poolsize = 0;
+% else
+%     poolsize = poolobj.NumWorkers;
+% end
+% data.Preconditioner.num_subdomains    = poolsize; %poolsize, number of subdomains
