@@ -1,0 +1,22 @@
+2D Flow Past an Elastic Beam Attached to a Fixed, Rigid Block
+
+For the full description of the benchmark see:
+
+   [1] Wall, W. (1999). Fluid?Structure Interaction with Stabilized 
+       Finite Elements. PhD thesis, University of Stuttgart.
+   [2] Wall, W. and Ramm., E. Fluid Structure Interaction Based Upon a 
+       Stabilized (ALE) Finite Element Method, 1998.
+   [3] Bazilevs, Yuri, Kenji Takizawa, and Tayfun E. Tezduyar. Computational 
+       fluid-structure interaction: methods and applications. John Wiley & Sons, 2013.
+       (see Sect. 7.1)
+
+       
+Instructions:
+
+1) In the mesh subfolder we already provide gmsh script to generate conforming
+   fluid and solid meshes. See the script generate_mesh.sh 
+
+2) Launch main.m to start the simulation. The output of interest (i.e. the vertical
+   tip displacement at the midplane as a function of time) can be obtained 
+   with Paraview by selecting the corresponding mesh node and using the 
+   "Plot Selection Over Time" filter.
