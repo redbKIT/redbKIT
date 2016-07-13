@@ -36,8 +36,18 @@ Provides a flexible implementation for the following families of problems:
 
 - 2D/3D steady and unsteady structural problem. Both linear elasticity and nonlinear hyperelastic St. Venant Kirchhoff, nearly incompressible Neo-Hookean  and Raghavan-Vorp material models are implemented. For the steady case, a basic Newton algorithm with backtracking is provided. In the unsteady case, time advancing is performed via the generalized alpha-scheme suitably combined with Newton subiterations in the nonlinear case.
 
+- 2D/3D Fluid-Structure Interaction (FSI) problems. The solver implements the following numerical approximations of the FSI problem:
+    - (a) monolithic geometric convective explicit with semi-implicit fluid and linear/nonlinear structure
+    - (b) monolithic fully-implicit
+  
+ In both cases: 
+ 
+    - a condensed formulation is employed, i.e. only internal and interface fluid velocity, fluid pressure, and internal solid displacement are considered as degrees of freedom. In case (a), internal fluid displacement DoFs are automatically uncoupled from the Fluid-Solid problem. In case (b), since shape derivatives in the Jacobian matrix are not taken into account,  the mesh motion problem is only one-way coupled with the Fluid-Solid problem. 
+    - the fluid equations are approximated in time by means of a BDF scheme. Space discretization for the velocity can be either P2, P2Bubble or P1 with SUPG stabilization.
+    - the structure can be either linear or nonlinear; time discretization is performed via the Newmark scheme.
+    - for the mesh motion problem, we use the Solid Extension Mesh Motion technique with Jacobian-based stiffening.
 
-The package can load linear triangular meshes either in the .msh format or in the [MATLAB Partial Differential Equation Toolbox(R)](http://www.mathworks.com/products/pde/index.html?s_tid=gn_loc_drop) format. Results can be either visualized in MATLAB or exported in the (binary) [VTK format](http://www.vtk.org/wp-content/uploads/2015/04/file-formats.pdf) for post-processing with [Paraview](http://www.paraview.org/).
+The package can load linear triangular and tetrahedral meshes either in the .msh format or in the [MATLAB Partial Differential Equation Toolbox(R)](http://www.mathworks.com/products/pde/index.html?s_tid=gn_loc_drop) format. Results can be either visualized in MATLAB or exported in the (binary) [VTK format](http://www.vtk.org/wp-content/uploads/2015/04/file-formats.pdf) for post-processing with [Paraview](http://www.paraview.org/).
                   
 
 The assembly routines for the FE vectors and matrices are written in C code using suitable mex interfaces.  For this reason, before using the library you first need to compile the FE assemblers, as explained in the INSTALL file.  Loops over the elements are parallelized via OpenMP, while the global assembly of  sparse matrices from local contributes can be speeded-up by installing the [FAST package](http://user.it.uu.se/~stefane/freeware).
