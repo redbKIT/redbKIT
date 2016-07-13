@@ -48,7 +48,7 @@ data.options.NonlinearSolver.maxIt       = 12;
 % Time options
 data.time.t0         = 0;
 data.time.dt         = 0.005;
-data.time.tf         = 10;
+data.time.tf         = 1;
 data.time.gamma      = 1/2;
 data.time.beta       = 1/4;
 data.time.alpha_m    = 0;

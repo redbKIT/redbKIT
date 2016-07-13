@@ -2,10 +2,10 @@ clc
 clear all
 
 dim      =  2;
-fem      =  'P1';
+fem      =  'P2';
 
 %% Load P1 mesh
-[vertices, boundaries, elements] = msh_to_Mmesh('Turek_mesh_Solid_Fine', dim);
+[vertices, boundaries, elements] = msh_to_Mmesh('../mesh/Turek_mesh_Solid', dim);
 
 %% CSM1
 fprintf('\n------------ TEST CSM 1 --------------\n')

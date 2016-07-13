@@ -50,10 +50,10 @@ dependencies{6} = {'MaterialModels/Tools.c', 'MaterialModels/NeoHookeanMaterial.
 source_files{7} = {'RB_library/RBF_interpolation/','RBF_evaluate_Fast.c'};
 dependencies{7} = {};
 
-Mexify = 0;               
+%Mexify = 0;               
 if nargin < 2 || isempty( sources )
     sources = 1:length(source_files);
-    Mexify  = 1;
+    %Mexify  = 1;
 end
     
 n_sources = length(sources); 
