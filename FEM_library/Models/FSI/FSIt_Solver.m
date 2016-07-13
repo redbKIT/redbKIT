@@ -7,6 +7,10 @@ function [X, MESH, DATA] = FSIt_Solver(dim, meshFluid, meshSolid, fem_F, fem_S, 
 %   ======================================================================
 %   ** OPT1: monolithic GCE with semi-implicit fluid and 
 %            linear/nonlinear structure **
+%  
+%   This options is enabled by setting 
+%               data.time.nonlinearity  = 'semi-implicit';
+%   in the datafile for the fluid subproblem.
 %
 %   - the geometry is treated using the Geometric Convective Explicit (GCE)
 %   approach; as a result, the mesh motion problem is uncoupled from the
@@ -30,8 +34,12 @@ function [X, MESH, DATA] = FSIt_Solver(dim, meshFluid, meshSolid, fem_F, fem_S, 
 %   ======================================================================
 %   ** OPT2: monolithic fully-implicit **
 %
+%   This options is enabled by setting 
+%               data.time.nonlinearity  = 'implicit';
+%   in the datafile for the fluid subproblem.
+%
 %   - the geometry is treated implicitly, however shape derivatives in the 
-%   Jacobian matrix are not taken into acocunt; as a result, the mesh motion
+%   Jacobian matrix are not taken into account; as a result, the mesh motion
 %   problem is only one-way coupled with the fluid and solid equations. 
 %   - a condensed formulation is employed, i.e. only internal and interface
 %   fluid velocity, fluid pressure, and internal solid displacement are
@@ -769,7 +777,6 @@ while ( t < tf )
         % This part should be checked! inconsistent with BDF integrator
         ALE_velocity  =  1/dt * ( d_F - d_Fn );
         d_Fn          =  d_F;
-        
         
         % Update Fluid MESH
         MESH.Fluid.vertices = Fluid_def_vertices;
