@@ -36,7 +36,7 @@ fprintf('\nREFERENCE VALUES:\nA-Point: x-Displacement = %1.3e m, y-Displacement 
 %% CSM3
 fprintf('\n------------ TEST CSM 3 --------------\n')
 
-[U, FE_SPACE, MESH, DATA] = CSMt_Solver(dim, elements, vertices, boundaries, fem, 'CSM3_data');
+[U, FE_SPACE, MESH, DATA] = CSMt_Solver(dim, elements, vertices, boundaries, fem, 'CSM3_data', [], [], true);
 
 % PostProcessing
 indexA = find(ismember(MESH.vertices(1:2,:)',[0.6 0.2],'rows'));

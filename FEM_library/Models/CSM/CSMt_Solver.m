@@ -1,4 +1,4 @@
-function [u, FE_SPACE, MESH, DATA] = CSMt_Solver(dim, elements, vertices, boundaries, fem, data_file, param, vtk_filename)
+function [u, FE_SPACE, MESH, DATA] = CSMt_Solver(dim, elements, vertices, boundaries, fem, data_file, param, vtk_filename, sol_history)
 %CSMT_SOLVER Dynamic Structural Finite Element Solver
 
 %   This file is part of redbKIT.
@@ -21,6 +21,9 @@ if nargin < 8
     vtk_filename = [];
 end
 
+if nargin < 9 || isempty(sol_history)
+    sol_history = false;
+end
 
 %% Read problem parameters and BCs from data_file
 DATA   = CSM_read_DataFile(data_file, dim, param);
@@ -138,7 +141,7 @@ while ( t < tf )
     
     [~, ~, u_D]   =  CSM_ApplyBC([], [], FE_SPACE, MESH, DATA, t);
     dU             = zeros(MESH.numNodes*MESH.dim,1);
-    U_k            = u;
+    U_k            = u(:,end);
     U_k(MESH.Dirichlet_dof) = u_D;
     
     Csi = TimeAdvance.RhsContribute( );
@@ -227,14 +230,18 @@ while ( t < tf )
         
     end
     
-    u = U_k;
+    if sol_history
+        u = [u U_k];
+    else
+        u = U_k;
+    end
     
     %% Export to VTK
     if ~isempty(vtk_filename)
-        CSM_export_solution(MESH.dim, u, MESH.vertices, MESH.elements, MESH.numNodes, vtk_filename, k_t);
+        CSM_export_solution(MESH.dim, U_k, MESH.vertices, MESH.elements, MESH.numNodes, vtk_filename, k_t);
     end
     
-    TimeAdvance.Update( u );
+    TimeAdvance.Update( U_k );
     
     F_ext_old = F_ext;
     F_in_old  = F_in;
