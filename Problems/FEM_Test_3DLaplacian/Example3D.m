@@ -10,27 +10,25 @@
 clc
 clear all
 
-addpath([pwd,'/gmsh'])
+[~,~,~] = mkdir('Figures');
 
 fem      =  'P1';
 dim      =  3;
 
-h = [2/9 2/19 2/39];% 2/49];
+h = [2/4 2/9 2/19 2/29];
 
 %% solve for different level of refinement
 for i = 1 : length(h)
     
     %% load P1 mesh
-    [vertices, boundaries, elements] = msh_to_Mmesh(strcat('Cubeh',num2str(i)), dim);
+    [vertices, boundaries, elements] = msh_to_Mmesh(strcat('gmsh/Cubeh',num2str(i)), dim);
     
     
     %% Solve
     [U, FE_SPACE, MESH, DATA, errorL2(i), errorH1(i)]  = Elliptic_Solver(dim, elements, vertices, boundaries, fem, 'Dirichlet_data');
-    %[U, FE_SPACE, MESH, DATA, errorL2(i), errorH1(i)] = Elliptic2D_Solver(elements, vertices, boundaries, fem, 'DirichletNeumann_data');
-    %[U, FE_SPACE, MESH, DATA, errorL2(i), errorH1(i)] = Elliptic2D_Solver(elements, vertices, boundaries, fem, 'DirichletRobin_data');
     
     %% export solution
-    ADR_export_solution(dim, U, MESH.vertices, MESH.elements, ['SOL_',num2str(i)]);
+    ADR_export_solution(dim, U, MESH.vertices, MESH.elements, ['Figures/SOL_',num2str(i)]);
     
 end
 

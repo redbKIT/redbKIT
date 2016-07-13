@@ -4,16 +4,14 @@ function [] = test(fem, datafile)
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch>
 
-addpath([pwd,'/gmsh'])
-
 dim = 3;
-h   = [2/9 2/19];
+h   = [2/4 2/9];
 
 %% solve for different level of refinement
 for i = 1 : 2
     
     %% load P1 mesh
-    [vertices, boundaries, elements] = msh_to_Mmesh(strcat('Cubeh',num2str(i)), dim);
+    [vertices, boundaries, elements] = msh_to_Mmesh(strcat('gmsh/Cubeh',num2str(i)), dim);
     
     %% Solve   
     [~, ~, ~, ~, errorL2(i), errorH1(i)]  = Elliptic_Solver(dim, elements, vertices, boundaries, fem, datafile);

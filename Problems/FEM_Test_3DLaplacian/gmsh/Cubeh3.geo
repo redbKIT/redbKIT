@@ -44,7 +44,7 @@ Line Loop(1000) = {10,20,30,40}; //fixed face
 Plane Surface(700) = {1000}; //on line loops
 
 //h = 0.5;
-nn = 40;
+nn = 20;
 // ############# GENERATE A STRUCTURED SURFACE MESH ############
 Transfinite Line{10,20,30,40}=nn;
 Transfinite Surface { 700 } = {0,1,2,3} ; //on points
