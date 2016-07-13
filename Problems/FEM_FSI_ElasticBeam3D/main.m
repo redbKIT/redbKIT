@@ -11,7 +11,7 @@ dim      =  3;
 [mshF.vertices, mshF.boundaries, mshF.elements, mshF.rings] = msh_to_Mmesh('mesh/mesh_Fluid', dim);
 
 %% Solve
-[U2, MESH, DATA] = FSIt_Solver(dim, mshF, mshS, {'P1','P1'}, 'P1', 'NS_data', 'CSM_data', [], 'Figures/Benchmark_ImplP1NH_');
+[U2, MESH, DATA] = FSIt_Solver(dim, mshF, mshS, {'P1','P1'}, 'P1', 'NS_data', 'CSM_data', [], 'Figures/Benchmark_ImplP1NH_Final_');
 
 %% PostProcessing
 [t, Drag, Lift] = importAerodynamicForces( DATA.Fluid.Output.DragLift.filename );

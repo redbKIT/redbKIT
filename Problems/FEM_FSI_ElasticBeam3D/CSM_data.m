@@ -46,7 +46,7 @@ data.du0{3} = @(x, y, z, t, param)(0.*x.*y);
 data.Young   = 2.5*10^6;
 data.Poisson = 0.35;
 data.Density = 0.1;
-data.Material_Model   = 'NeoHookean2';%'StVenantKirchhoff', Linear, NeoHookean2
+data.Material_Model   = 'NeoHookean';%'StVenantKirchhoff', Linear, NeoHookean2
 data.model   = 'CSM';
 
 mu = data.Young / (2 + 2 * data.Poisson);

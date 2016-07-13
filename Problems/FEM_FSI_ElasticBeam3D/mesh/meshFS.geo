@@ -1,9 +1,12 @@
-//
+// Coarse
 mesh_s1 = 0.9;
 mesh_s2 = 0.45;
 mesh_s3 = 0.06;
 
-
+// Medium
+mesh_s1 = 0.75;
+mesh_s2 = 0.3;
+mesh_s3 = 0.04;
 
 H  = 12.0;
 L  = 19.5;
