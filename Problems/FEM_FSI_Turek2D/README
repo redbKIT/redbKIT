@@ -1,0 +1,17 @@
+Numerical Benchmarking of fluid-structure interaction between an elastic 
+object and laminar incompressible flow.
+
+For the full description of the benchmark see:
+   [1] http://www.featflow.de/en/benchmarks/cfdbenchmarking/fsi_benchmark.html
+
+Instructions:
+
+1) In the mesh subfolder we already provide gmsh script to generate conforming
+   fluid and solid meshes. See the script generate_mesh.sh 
+
+2) The CSM contains the Computational Solid Mechanics set of tests proposed 
+   in [1]. Launch the main file CSM.m to reproduce the results. A comparison
+   wiht reference values provided in [1] is automatically performed.
+
+3) The FSI folder contains implementation of tests FSI1 and FSI2 proposed 
+   in [1].
