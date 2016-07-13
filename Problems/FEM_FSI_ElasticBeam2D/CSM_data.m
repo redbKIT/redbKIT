@@ -48,7 +48,7 @@ data.Bulk    = bulk;
 
 
 % NonLinear Solver
-data.NonLinearSolver.tol               = 1e-8;
+data.NonLinearSolver.tol               = 1e-6;
 data.NonLinearSolver.maxit             = 35;
 
 % Time options
