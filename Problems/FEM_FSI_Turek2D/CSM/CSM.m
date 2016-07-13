@@ -4,6 +4,8 @@ clear all
 dim      =  2;
 fem      =  'P2';
 
+[~,~,~] = mkdir('Figures');
+
 %% Load P1 mesh
 [vertices, boundaries, elements] = msh_to_Mmesh('../mesh/Turek_mesh_Solid', dim);
 

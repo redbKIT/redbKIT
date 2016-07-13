@@ -8,7 +8,7 @@ data.force{1} = @(x, y, t, param)(0.*x.*y);
 data.force{2} = @(x, y, t, param)(0.*x.*y);
 
 % Dirichlet
-data.bcDir_t  = @(t)( 0.5*(1-cos(pi/2*t)).*(t<2) + 1 * (t>=2));
+data.bcDir_t  = @(t)( 0.5*(1-cos(pi/1*t)).*(t<1) + 1 * (t>=1));
 
 data.bcDir{1} = @(x, y, t, param)(data.bcDir_t(t) * 1.5*U_bar*y.*(H-y)/(H/2)^2.*(x==0) + 0.*x.*y); 
 data.bcDir{2} = @(x, y, t, param)(0.*x.*y); 
@@ -36,7 +36,7 @@ data.flag_ring{2}         =  [1];
 data.flag_ALE_fixed{2}    =  [2 4 5 3];
 
 % Model parameters
-data.kinematic_viscosity  =   1;
+data.dynamic_viscosity  =   1;
 data.density              =   10^3;
 data.Stabilization        =   'SUPG';
 
@@ -53,8 +53,8 @@ data.mumps_reordering            = 7;
 data.time.BDF_order  = 2;
 data.time.t0         = 0;
 data.time.dt         = 0.01; 
-data.time.tf         = 13;
-data.time.nonlinearity  = 'semi-implicit';
+data.time.tf         = 10;
+data.time.nonlinearity  = 'implicit';
 
 % %% Output options
 % data.options.Output.computeWSS      = 0;

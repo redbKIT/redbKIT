@@ -3,13 +3,16 @@ clc
 
 dim      =  2;
 
+[~,~,~] = mkdir('Figures');
+[~,~,~] = mkdir('Results');
+
 %% FSI1
 fprintf('\n------------ TEST FSI 1 --------------\n')
 
-[mshS.vertices, mshS.boundaries, mshS.elements, mshS.rings] = msh_to_Mmesh('Turek_mesh_Solid_SuperCoarse', dim);
-[mshF.vertices, mshF.boundaries, mshF.elements, mshF.rings] = msh_to_Mmesh('Turek_mesh_Fluid_SuperCoarse', dim);
+[mshS.vertices, mshS.boundaries, mshS.elements, mshS.rings] = msh_to_Mmesh('../mesh/Turek_mesh_Solid', dim);
+[mshF.vertices, mshF.boundaries, mshF.elements, mshF.rings] = msh_to_Mmesh('../mesh/Turek_mesh_Fluid', dim);
 
-[U1, MESH, DATA] = FSIt_Solver(dim, mshF, mshS, {'P1','P1'}, 'P1', 'FSI_TurekC1_NS_data', 'FSI_TurekC1_CSM_data', [], 'Figures/Turek1_');
+[U1, MESH, DATA] = FSIt_Solver(dim, mshF, mshS, {'P2','P1'}, 'P2', 'FSI_TurekC1_NS_data', 'FSI_TurekC1_CSM_data', [], 'Figures/Turek1_');
 
 % PostProcessing
 [t, Drag, Lift] = importAerodynamicForces( DATA.Fluid.Output.DragLift.filename );
@@ -27,10 +30,10 @@ fprintf('\nREFERENCE VALUES:\nA-Point: x-Displacement = %1.3e m, y-Displacement 
 %% FSI2
 fprintf('\n------------ TEST FSI 2 --------------\n')
 
-[mshS.vertices, mshS.boundaries, mshS.elements, mshS.rings] = msh_to_Mmesh('Turek_mesh_Solid_Coarse', dim);
-[mshF.vertices, mshF.boundaries, mshF.elements, mshF.rings] = msh_to_Mmesh('Turek_mesh_Fluid_Coarse', dim);
+[mshS.vertices, mshS.boundaries, mshS.elements, mshS.rings] = msh_to_Mmesh('../mesh/Turek_mesh_Solid', dim);
+[mshF.vertices, mshF.boundaries, mshF.elements, mshF.rings] = msh_to_Mmesh('../mesh/Turek_mesh_Fluid', dim);
 
-[U2, MESH, DATA] = FSIt_Solver(dim, mshF, mshS, {'P2','P1'}, 'P2', 'FSI_TurekC2_NS_data', 'FSI_TurekC2_CSM_data', [], 'Figures/Turek2_');
+[U2, MESH, DATA] = FSIt_Solver(dim, mshF, mshS, {'P1','P1'}, 'P1', 'FSI_TurekC2_NS_data', 'FSI_TurekC2_CSM_data', [], 'Figures/Turek2_');
 
 % PostProcessing
 [t, Drag, Lift] = importAerodynamicForces( DATA.Fluid.Output.DragLift.filename );
