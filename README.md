@@ -81,6 +81,15 @@ The `Problems` contains a gallery of tests, examples and applications which are 
 
 `FEM_MeshMotion_test2D` mesh deformation of a 2D domain (square with a hole) using the harmonic- and solid-extension mesh motion techniques.  
 
+##### FEM-FSI: Fluid-Structure Interaction
+
+`FEM_FSI_Turek2D` numerical benchmarking of fluid-structure interaction between an elastic object and laminar incompressible flow. For a detailed description of this problem see the [FeatFlow website](http://www.featflow.de/en/benchmarks/cfdbenchmarking/fsi_benchmark.html ).
+
+`FEM_FSI_ElasticBeam2D` 2D flow past an elastic beam attached to a fixed, rigid block. Details can be found [here](https://www.google.ch/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=0ahUKEwjA78rw-PDNAhVBvBQKHeI5Cr0QFgghMAA&url=http%3A%2F%2Fwww.ibrarian.net%2Fnavon%2Fpaper%2FCOMPUTATIONAL_MECHANICS_New_Trends_and_Applicatio.pdf%3Fpaperid%3D21694946&usg=AFQjCNGaQU6FfrAKawt22WgAldOPp8DTqA&sig2=d7v16pYE874StTrqJS5pzw&bvm=bv.126993452,d.d24) and [here](http://eu.wiley.com/WileyCDA/WileyTitle/productCd-0470978775.html). 
+
+`FEM_FSI_ElasticBeam3D` 3D version of the 2D flow past an elastic beam attached to a fixed, rigid block. 
+
+
 ##### Reduced Basis Methods
 `RB_Mixer` RB approximation of the steady heat conduction-convection problem described in Sects. 3.8, 6.6 and 7.2 of **[QMN16]**
 
