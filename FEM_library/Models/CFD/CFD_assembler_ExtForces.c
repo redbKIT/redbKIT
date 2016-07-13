@@ -11,7 +11,7 @@
 #ifdef _OPENMP
 #include <omp.h>
 #else
-#warning "OpenMP not enabled. Compile with mex CSM_assembler_ExtForces.c CFLAGS="\$CFLAGS -fopenmp" LDFLAGS="\$LDFLAGS -fopenmp""
+#warning "OpenMP not enabled. Compile with mex CFD_assembler_ExtForces.c CFLAGS="\$CFLAGS -fopenmp" LDFLAGS="\$LDFLAGS -fopenmp""
 #endif
 
 
