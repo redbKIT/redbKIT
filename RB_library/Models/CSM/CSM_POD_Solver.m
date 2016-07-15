@@ -1,5 +1,5 @@
-function [u, FE_SPACE, MESH, DATA] = CSM_Solver(dim, elements, vertices, boundaries, fem, data_file, param, vtk_filename, InitialGuess, Training_Options)
-%CSM_SOLVER Static Structural Finite Element Solver
+function [u, FE_SPACE, MESH, DATA] = CSM_POD_Solver(dim, elements, vertices, boundaries, fem, data_file, param, vtk_filename, InitialGuess, Training_Options, V_POD)
+%CSM_POD_SOLVER Static Structural POD-Galerkin Solver
 
 %   This file is part of redbKIT.
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
@@ -61,20 +61,17 @@ fprintf(' * Number of Dofs      = %d \n',length(MESH.internal_dof));
 fprintf('-------------------------------------------\n');
 
 if export_h5
-    DispSnap_h5  = HDF5_DenseMultiCVector(Training_Options.h5_filename, Training_Options.h5_section, length(MESH.internal_dof));
+    Fint_h5  = HDF5_DenseMultiCVector(Training_Options.h5_filename, ...
+        Training_Options.InternalForces.h5_section, length(MESH.internal_dof));
+    Fext_h5  = HDF5_DenseMultiCVector(Training_Options.h5_filename, ...
+        Training_Options.ExternalForces.h5_section, length(MESH.internal_dof));
 end
 
 %% Generate Domain Decomposition (if required)
 PreconFactory = PreconditionerFactory( );
 Precon        = PreconFactory.CreatePrecon(DATA.Preconditioner.type, DATA);
 
-if isfield(DATA.Preconditioner, 'type') && strcmp( DATA.Preconditioner.type, 'AdditiveSchwarz')
-    R      = CSM_overlapping_DD(MESH, DATA.Preconditioner.num_subdomains,  DATA.Preconditioner.overlap_level);
-    Precon.SetRestrictions( R );
-end
-
 %% Newton Method
-
 tolNewton  = DATA.NonLinearSolver.tol;
 resRelNorm = tolNewton + 1;
 incrNorm   = tolNewton + 1;
@@ -104,9 +101,13 @@ SolidModel = CSM_Assembler( MESH, DATA, FE_SPACE );
 fprintf('\n -- Assembling external Forces... ');
 t_assembly = tic;
 F_ext      = SolidModel.compute_volumetric_forces();
-[~, F_ext] =  CSM_ApplyBC([], F_ext, FE_SPACE, MESH, DATA, [], 1);
+[~, F_ext] = CSM_ApplyBC([], F_ext, FE_SPACE, MESH, DATA, [], 1);
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s\n', t_assembly);
+
+if export_h5
+    Fext_h5.append( F_ext );
+end
 
 % Assemble Robin BC
 fprintf('\n -- Assembling Robin BC... ');
@@ -122,6 +123,10 @@ t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s\n', t_assembly);
 
 F_in = F_in + A_robin * U_k;
+
+if export_h5
+    Fint_h5.append( F_in(MESH.internal_dof) );
+end
 
 Residual = F_in(MESH.internal_dof) - F_ext;
 res0Norm = norm(full(Residual));
@@ -146,11 +151,12 @@ while (k <= maxIter && incrNorm > tolNewton && resRelNorm > tolNewton)
     fprintf('done in %3.3f s\n', t_assembly);
 
     % Solve
-    fprintf('\n   -- Solve J x = -R ... ');    
-    Precon.Build( A );
+    fprintf('\n   -- Solve J x = -R ... ');  
+    Precon.Build( V_POD' * (A * V_POD) );
     fprintf('\n        time to build the preconditioner: %3.3f s \n', Precon.GetBuildTime());
     LinSolver.SetPreconditioner( Precon );
-    dU(MESH.internal_dof) = LinSolver.Solve( A, -Residual );
+    dU_N                  = LinSolver.Solve( V_POD' * (A * V_POD), -V_POD' * Residual );
+    dU(MESH.internal_dof) = V_POD * dU_N;
     fprintf('\n        time to solve the linear system: %3.3f s \n', LinSolver.GetSolveTime());
 
     % update Zero Normal Displacement condition
@@ -199,7 +205,7 @@ while (k <= maxIter && incrNorm > tolNewton && resRelNorm > tolNewton)
     resNorm_old = norm(Residual);
     
     if export_h5
-        DispSnap_h5.append( dU(MESH.internal_dof) );
+        Fint_h5.append( F_in(MESH.internal_dof) );
     end
 
     fprintf('\n **** Iteration  k = %d:  norm(dU)/norm(Uk) = %1.2e, Residual Rel Norm = %1.2e \n\n',k,full(incrNorm), full(norm(resRelNorm)));

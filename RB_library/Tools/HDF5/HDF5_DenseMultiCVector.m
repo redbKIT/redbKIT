@@ -36,7 +36,12 @@ classdef HDF5_DenseMultiCVector < handle
                 h5create(filename, ['/',dataset,'/NumVectors'],  [1 1]    );
                 h5write(filename,  ['/',dataset,'/NumRows'],     int32(n) );
                 
-                obj.rowDim    = n;
+                if nargin < 3 || isempty( n )
+                    obj.rowDim    = 0;
+                else
+                    obj.rowDim    = n;
+                end
+                
                 obj.vecNumber = 0;
                 
             else
@@ -120,8 +125,6 @@ classdef HDF5_DenseMultiCVector < handle
             if nargin == 2
                 
                 if obj.ComplexData
-%                     V_Re  = h5read(obj.filename, ['/',obj.dataset,'/values_Re/'], [1 i], [Inf 1]);
-%                     V_Im  = h5read(obj.filename, ['/',obj.dataset,'/values_Im/'], [1 i], [Inf 1]);
                     V_Re  = h5read(obj.filename, ['/',obj.dataset,'/values_Re/'], [1 i], [obj.rowDim 1]);
                     V_Im  = h5read(obj.filename, ['/',obj.dataset,'/values_Im/'], [1 i], [obj.rowDim 1]);
                     V     = V_Re + complex(0,1) * V_Im;
