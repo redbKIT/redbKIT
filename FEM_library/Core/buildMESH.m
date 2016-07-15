@@ -35,7 +35,7 @@ else
 end
 
 
-%% Update Mesh data with BC information and geometrical maps
+%% Update Mesh data with geometrical maps
 [MESH.numElemDof,MESH.numBoundaryDof,MESH.numRingsDof]    = select(fem, dim);
 MESH.numNodes                = size(MESH.nodes,2);
 MESH.numElem                 = size(MESH.elements,2);
@@ -49,14 +49,8 @@ MESH.numElem                 = size(MESH.elements,2);
 % Evaluate P1 geometrical mapping basis functions in the quad points
 [MESH.chi]                  =  fem_basis(dim, 'P1', quad_nodes);
 
-if nargin >= 7 && ~isempty(DATA)
-    if nargin < 8
-        model = [];
-    end
-    % Update MESH with BC information
-    [MESH]         = BC_info(MESH, DATA, model);
-end
 
+%% Generate mesh normals
 if strcmp( model, 'CSM') || strcmp( model, 'CFD')
     fprintf('\n Generating mesh normals ... ')
     time_mesh = tic;
@@ -71,6 +65,16 @@ if strcmp( model, 'CSM') || strcmp( model, 'CFD')
     time_mesh = toc(time_mesh);
     fprintf('done in %f s\n', time_mesh)
 end
+
+%% Update Mesh data with BC information
+if nargin >= 7 && ~isempty(DATA)
+    if nargin < 8
+        model = [];
+    end
+    % Update MESH with BC information
+    [MESH]         = BC_info(MESH, DATA, model);
+end
+
     
 
 end

@@ -98,15 +98,24 @@ F_ext      = SolidModel.compute_volumetric_forces();
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s\n', t_assembly);
 
+% Assemble Robin BC
+fprintf('\n -- Assembling Robin BC... ');
+t_assembly = tic;
+A_robin = SolidModel.assemble_ElasticRobinBC();
+t_assembly = toc(t_assembly);
+fprintf('done in %3.3f s\n', t_assembly);
+
 fprintf('\n -- Assembling internal Forces... ');
 t_assembly = tic;
 F_in      = SolidModel.compute_internal_forces(U_k);
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s\n', t_assembly);
 
+F_in = F_in + A_robin * U_k;
+
 Residual = F_in(MESH.internal_dof) - F_ext;
-res0Norm = norm(Residual);
-resNorm_old = norm(Residual);
+res0Norm = norm(full(Residual));
+resNorm_old = norm(full(Residual));
 
 LinSolver = LinearSolver( DATA.LinearSolver );
 
@@ -122,7 +131,7 @@ while (k <= maxIter && incrNorm > tolNewton && resRelNorm > tolNewton)
     % Apply boundary conditions
     fprintf('\n -- Apply boundary conditions ... ');
     t_assembly = tic;
-    A   =  CSM_ApplyBC(dF_in, [], FE_SPACE, MESH, DATA, [], 1);
+    A   =  CSM_ApplyBC(dF_in + A_robin, [], FE_SPACE, MESH, DATA, [], 1);
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);
 
@@ -134,9 +143,11 @@ while (k <= maxIter && incrNorm > tolNewton && resRelNorm > tolNewton)
     dU(MESH.internal_dof) = LinSolver.Solve( A, -Residual );
     fprintf('\n        time to solve the linear system: %3.3f s \n', LinSolver.GetSolveTime());
 
+    % update Zero Normal Displacement condition
+    %dU = MESH.DirichletNormal_R * dU;
+    
     % update solution
     U_k_tmp     = U_k + dU;
-    incrNorm   = norm(dU)/norm(U_k);
     
     % Assemble residual
     fprintf('\n   -- Assembling internal forces... ');
@@ -145,6 +156,7 @@ while (k <= maxIter && incrNorm > tolNewton && resRelNorm > tolNewton)
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);
     
+    F_in = F_in + A_robin * U_k_tmp;
     Residual = F_in(MESH.internal_dof) - F_ext;
     resRelNorm = norm(Residual) / res0Norm;
 
@@ -152,7 +164,7 @@ while (k <= maxIter && incrNorm > tolNewton && resRelNorm > tolNewton)
     alpha          = 1;
     backtrack_iter = 0;
     
-    while ((norm(Residual) > 2 * resNorm_old || isnan( norm(Residual) )) && backtrack_iter < backtrackMaxIter )
+    while ((norm(full(Residual)) > 2 * resNorm_old || isnan( norm(full(Residual)) )) && backtrack_iter < backtrackMaxIter )
     
         alpha = alpha * backtrackFactor;
         backtrack_iter = backtrack_iter + 1;
@@ -165,8 +177,9 @@ while (k <= maxIter && incrNorm > tolNewton && resRelNorm > tolNewton)
         t_assembly = tic;
         F_in       = SolidModel.compute_internal_forces(U_k_tmp);
         t_assembly = toc(t_assembly);
+        F_in     = F_in + A_robin * U_k_tmp;
         Residual = F_in(MESH.internal_dof) - F_ext;
-        resRelNorm = norm(Residual) / res0Norm;
+        resRelNorm = norm(full(Residual)) / res0Norm;
         fprintf('done in %3.3f s, Residual Rel Norm = %1.2e\n', t_assembly, full(norm(resRelNorm)));
         
     end

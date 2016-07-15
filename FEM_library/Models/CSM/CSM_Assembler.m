@@ -289,7 +289,7 @@ classdef CSM_Assembler < handle
         end
         
         %==========================================================================
-        %% Compute internal forces Residual
+        %% Compute internal forces Jacobian
         function [dF_in] = compute_jacobian(obj, U_h)
 
             % C_OMP assembly, returns matrices in sparse vector format
@@ -300,6 +300,58 @@ classdef CSM_Assembler < handle
             
             % Build sparse matrix and vector
             dF_in   = GlobalAssemble(rowdG, coldG, coefdG, obj.M_MESH.numNodes*obj.M_MESH.dim, obj.M_MESH.numNodes*obj.M_MESH.dim);
+        end
+        
+        %==========================================================================
+        %% Assemble Robin Condition: Pn + K d = 0 on \Gamma_Robin, with K = ElasticCoefRobin
+        function [A] = assemble_ElasticRobinBC(obj)
+            
+            A = sparse(obj.M_MESH.numNodes*obj.M_MESH.dim, obj.M_MESH.numNodes*obj.M_MESH.dim);
+            
+            for k = 1 : obj.M_MESH.dim
+                if ~isempty(obj.M_MESH.Robin_side{k})
+                    
+                    [quad_points, wi] = quadrature(obj.M_MESH.dim-1, obj.M_FE_SPACE.quad_order);
+                    csi = quad_points(1,:);
+                    eta = quad_points(2,:);
+                    [phi]       =  fem_basis(obj.M_MESH.dim, obj.M_FE_SPACE.fem, [csi; eta; 0*eta], 1);
+                    
+                    nof         = length(obj.M_MESH.Robin_side{k});
+                    nbn         = obj.M_MESH.numBoundaryDof;
+                    
+                    Arows       = zeros(nbn*nbn*nof,1);
+                    Acols       = Arows;
+                    Acoef       = Arows;
+                    [rows,cols] = meshgrid(1:nbn,1:nbn);
+                    rows        = rows(:);
+                    cols        = cols(:);
+                    
+                    x    =  obj.M_MESH.vertices(1,obj.M_MESH.boundaries(1:3, obj.M_MESH.Robin_side{k}));
+                    y    =  obj.M_MESH.vertices(2,obj.M_MESH.boundaries(1:3, obj.M_MESH.Robin_side{k}));
+                    z    =  obj.M_MESH.vertices(3,obj.M_MESH.boundaries(1:3, obj.M_MESH.Robin_side{k}));
+                    
+                    areav = cross(  [x(2:3:end)-x(1:3:end);  y(2:3:end)-y(1:3:end);  z(2:3:end)-z(1:3:end)], ...
+                        [x(3:3:end)-x(1:3:end);  y(3:3:end)-y(1:3:end);  z(3:3:end)-z(1:3:end)]);
+                    
+                    MASS_loc = phi*phi';
+                    MASS_loc = MASS_loc(:);
+                    for l = 1 : nof
+                        
+                        area   = 0.5*norm(areav(:,l));
+                        detjac = 2*area;
+                        
+                        face = obj.M_MESH.Robin_side{k}(l);
+                        
+                        Arows(1+(l-1)*nbn*nbn:l*nbn*nbn)   =  obj.M_MESH.boundaries(rows,face);
+                        Acols(1+(l-1)*nbn*nbn:l*nbn*nbn)   =  obj.M_MESH.boundaries(cols,face);
+                        Acoef(1+(l-1)*nbn*nbn:l*nbn*nbn)   =  detjac*obj.M_DATA.ElasticCoefRobin*MASS_loc;
+                        
+                    end
+                    A = A + sparse(Arows+(k-1)*obj.M_MESH.numNodes,Acols+(k-1)*obj.M_MESH.numNodes,...
+                        Acoef,obj.M_MESH.dim*obj.M_MESH.numNodes,obj.M_MESH.dim*obj.M_MESH.numNodes);
+                    
+                end
+            end
         end
         
     end
