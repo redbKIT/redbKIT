@@ -20,7 +20,7 @@ mu_max = [ 7*10^4   0.4  2000];
 mu_bar = [ 6.5*10^4 0.35 1500]; 
     
 % Training Parameters
-mu_train_Dimension   = 10; % number of samples
+mu_train_Dimension   = 5; % number of samples
 mu_cube              = lhsdesign(mu_train_Dimension,P); % generate normalized design
 Training_Parameters  = bsxfun(@plus,mu_min,bsxfun(@times,mu_cube,(mu_max-mu_min)));
 
@@ -81,10 +81,12 @@ end
 Fint_Reader  = HDF5_DenseMultiCVector(OfflineTraining.System.h5_filename, OfflineTraining.System.InternalForces.h5_section);
 S_int        = Fint_Reader.readValues();
 [Phi_int,    ~,    Sigma_int]  = VPOD_basis_computation(S_int, [], tol_POD_Fint, 1);
+[IDEIM_int, P_int] = DEIM( Phi_int );
 
 Fext_Reader  = HDF5_DenseMultiCVector(OfflineTraining.System.h5_filename, OfflineTraining.System.ExternalForces.h5_section);
 S_ext        = Fext_Reader.readValues();
 [Phi_ext,    ~,    Sigma_ext]  = VPOD_basis_computation(S_ext, [], tol_POD_Fext, 1);
+[IDEIM_ext, P_ext] = DEIM( Phi_ext );
 
 figure
 subplot(1,2,1)
