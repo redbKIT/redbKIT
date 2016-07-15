@@ -1,4 +1,4 @@
-function [u, FE_SPACE, MESH, DATA] = CSMt_Solver(dim, elements, vertices, boundaries, fem, data_file, param, vtk_filename, sol_history, Training_Options)
+function [u, M, FE_SPACE, MESH, DATA] = CSMt_POD_Solver(dim, elements, vertices, boundaries, fem, data_file, param, vtk_filename, sol_history, Training_Options, V_POD)
 %CSMT_SOLVER Dynamic Structural Finite Element Solver
 
 %   This file is part of redbKIT.
@@ -92,17 +92,15 @@ fprintf(' * Number of timesteps =  %d\n', (tf-t0)/dt);
 fprintf('-------------------------------------------\n');
 
 if export_h5
-    DispSnap_h5  = HDF5_DenseMultiCVector(Training_Options.h5_filename, Training_Options.h5_section, length(MESH.internal_dof));
+    Fint_h5  = HDF5_DenseMultiCVector(Training_Options.h5_filename, ...
+        Training_Options.InternalForces.h5_section, length(MESH.internal_dof));
+    Fext_h5  = HDF5_DenseMultiCVector(Training_Options.h5_filename, ...
+        Training_Options.ExternalForces.h5_section, length(MESH.internal_dof));
 end
 
 %% Generate Domain Decomposition (if required)
 PreconFactory = PreconditionerFactory( );
 Precon        = PreconFactory.CreatePrecon(DATA.Preconditioner.type, DATA);
-
-if isfield(DATA.Preconditioner, 'type') && strcmp( DATA.Preconditioner.type, 'AdditiveSchwarz')
-    R      = CSM_overlapping_DD(MESH, DATA.Preconditioner.num_subdomains,  DATA.Preconditioner.overlap_level);
-    Precon.SetRestrictions( R );
-end
 
 SolidModel = CSM_Assembler( MESH, DATA, FE_SPACE );
 
@@ -119,18 +117,24 @@ LinSolver = LinearSolver( DATA.LinearSolver );
 % Assemble matrix and right-hand side
 fprintf('\n -- Assembling external Forces at t0... ');
 t_assembly = tic;
-F_ext_old      = SolidModel.compute_volumetric_forces(t0);
-%CSM_Assembler('external_forces', MESH, DATA, FE_SPACE, [], t0);%M*(-9.81*ones(size(M,1),1));%
+F_ext_old      = SolidModel.compute_external_forces(t0);
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s\n', t_assembly);
 
+if export_h5
+        Fext_h5.append( F_ext_old(MESH.internal_dof) );
+end
+    
 fprintf('\n -- Assembling internal Forces at t0... ');
 t_assembly = tic;
 F_in_old  =  SolidModel.compute_internal_forces( u0 );
-%CSM_Assembler('internal_forces', MESH, DATA, FE_SPACE, u0);
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s\n', t_assembly)
 
+if export_h5
+        Fint_h5.append( F_in_old(MESH.internal_dof) );
+end
+    
 %% Time Loop
 while ( t < tf )
     
@@ -159,17 +163,23 @@ while ( t < tf )
     % Assemble matrix and right-hand side
     fprintf('\n -- Assembling external Forces... ');
     t_assembly = tic;
-    F_ext      = SolidModel.compute_volumetric_forces( t );
-    %CSM_Assembler('external_forces', MESH, DATA, FE_SPACE, [], t);
+    F_ext      = SolidModel.compute_external_forces( t );
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);
     
+    if export_h5
+        Fext_h5.append( F_ext(MESH.internal_dof) );
+    end
+    
     fprintf('\n -- Assembling internal Forces ... ');
     t_assembly = tic;
-    %[F_in, dF_in]  =  CSM_Assembler('internal_forces', MESH, DATA, FE_SPACE, U_k);
     F_in      = SolidModel.compute_internal_forces( U_k );
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);
+    
+    if export_h5
+        Fint_h5.append( F_in(MESH.internal_dof) );
+    end
     
     Residual  = Coef_Mass * M * U_k +  ...
                   (1 - TimeAdvance.M_alpha_f) * F_in  + TimeAdvance.M_alpha_f * F_in_old ...
@@ -179,7 +189,6 @@ while ( t < tf )
             
     fprintf('\n -- Assembling Jacobian matrix... ');
     t_assembly = tic;
-    %[F_in, dF_in]  =  CSM_Assembler('internal_forces', MESH, DATA, FE_SPACE, U_k);
     dF_in     = SolidModel.compute_jacobian( U_k );
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);        
@@ -189,7 +198,7 @@ while ( t < tf )
     % Apply boundary conditions
     fprintf('\n -- Apply boundary conditions ... ');
     t_assembly = tic;
-    [A, b]   =  CSM_ApplyBC(Jacobian, -Residual, FE_SPACE, MESH, DATA, t, 1);
+    [A, b]   =  CSM_ApplyBC(Jacobian, -Residual, FE_SPACE, MESH, DATA, t, 1); % attenzione a carichi 
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);
     
@@ -203,12 +212,10 @@ while ( t < tf )
         Precon.Build( A );
         fprintf('\n        time to build the preconditioner %3.3f s \n', Precon.GetBuildTime());
         LinSolver.SetPreconditioner( Precon );
-        dU(MESH.internal_dof) = LinSolver.Solve( A, b );
+        dU_N                  = LinSolver.Solve( V_POD' * (A * V_POD), V_POD' * b );
+        dU(MESH.internal_dof) = V_POD * dU_N;
+        %dU(MESH.internal_dof)  = LinSolver.Solve( A, b );
         fprintf('\n        time to solve the linear system in %3.3f s \n', LinSolver.GetSolveTime());
-        
-        if export_h5
-            DispSnap_h5.append( dU(MESH.internal_dof) );
-        end
         
         % update solution
         U_k        = U_k + dU;
@@ -233,7 +240,7 @@ while ( t < tf )
         % Apply boundary conditions
         fprintf('\n   -- Apply boundary conditions ... ');
         t_assembly = tic;
-        [A, b]   =  CSM_ApplyBC(Jacobian, -Residual, FE_SPACE, MESH, DATA, t, 1);
+        [A, b]   =  CSM_ApplyBC(Jacobian, -Residual, FE_SPACE, MESH, DATA, t, 1);  % attenzione a carichi 
         t_assembly = toc(t_assembly);
         fprintf('done in %3.3f s\n', t_assembly);
         
