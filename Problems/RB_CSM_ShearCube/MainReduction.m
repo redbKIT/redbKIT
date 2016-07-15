@@ -20,7 +20,7 @@ mu_max = [ 7*10^4   0.4  2000];
 mu_bar = [ 6.5*10^4 0.35 1500]; 
     
 % Training Parameters
-mu_train_Dimension   = 5; % number of samples
+mu_train_Dimension   = 100; % number of samples
 mu_cube              = lhsdesign(mu_train_Dimension,P); % generate normalized design
 Training_Parameters  = bsxfun(@plus,mu_min,bsxfun(@times,mu_cube,(mu_max-mu_min)));
 
@@ -66,13 +66,17 @@ grid on
 xlim([1  size(S_u,2)])
 title('Solution snapshots spectrum')
 
+clear S_u;
+
+ROM.V = V;
+
 %% ========================================================================
 % Solve POD-Galerkin ROM and Collect System Snapshots
 
 for i = 1 : mu_train_Dimension
 
     CSM_POD_Solver(dim, elements, vertices, boundaries, fem, 'datafileR', ...
-               Training_Parameters(i,:), ['Figures/TrainingTierII_', num2str(i)], [], OfflineTraining.System, V);
+               Training_Parameters(i,:), ['Figures/TrainingTierII_', num2str(i)], [], OfflineTraining.System, ROM.V);
 
 end
 
@@ -109,4 +113,78 @@ grid on
 xlim([1  size(S_ext,2)])
 title('Fext snapshots spectrum')
 
+clear S_ext S_int;
+
+%ROM.Phi_int   = Phi_int;
+%ROM.Phi_ext   = Phi_ext;
+ROM.Phi_int_IDEIM = Phi_int(IDEIM_int, :);
+ROM.Phi_ext_IDEIM = Phi_ext(IDEIM_ext, :);
+ROM.IDEIM_ext = IDEIM_ext;
+ROM.IDEIM_in  = IDEIM_int;
+
+ROM.LeftProjection_int = ( ROM.V' * Phi_int ) / ( ROM.Phi_int_IDEIM );
+ROM.LeftProjection_ext = ( ROM.V' * Phi_ext ) / ( ROM.Phi_ext_IDEIM );
+
+DATA       = CSM_read_DataFile('datafileR', dim, mu_bar);
+
+% Set quad_order
+if dim == 2
+    quad_order       = 4;
+elseif dim == 3
+    quad_order       = 5;
+end
+
+[ MESH ] = buildMESH( dim, elements, vertices, boundaries, fem, quad_order, DATA, 'CSM' );
+
+ndf       =  length(MESH.internal_dof); 
+
+[ ~, node_to_element, node_to_boundary ] = compute_adjacency_elements(MESH.nodes, ...
+    MESH.elements, MESH.dim, MESH.boundaries, fem); 
+
+[IDEIM_int_elem, ~, IDEIM_int_bound ]     = CSM_DEIM_Index_to_Elements('rhs', IDEIM_int,   ndf, node_to_element, ...
+    node_to_boundary, MESH.internal_dof, MESH.numNodes, MESH.dim);
+
+[IDEIM_ext_elem, ~, IDEIM_ext_bound]    = CSM_DEIM_Index_to_Elements('rhs',   IDEIM_ext, ndf, node_to_element, ...
+    node_to_boundary, MESH.internal_dof, MESH.numNodes, MESH.dim);
+  
+IDEIM_all_elem       = unique([IDEIM_int_elem  IDEIM_ext_elem]);
+IDEIM_all_bound      = unique([IDEIM_int_bound  IDEIM_ext_bound]);
+IDEIM_all_nodes      = MESH.elements(:,IDEIM_all_elem);
+IDEIM_all_nodes      = unique(IDEIM_all_nodes(:));
+
+% Save reduced mesh to vtk for visualization
+ADR_export_solution(MESH.dim, ones(MESH.numVertices,1), MESH.vertices, MESH.elements, ['Figures/','Reference_Mesh']);
+ADR_export_solution(MESH.dim, ones(MESH.numVertices,1), MESH.vertices, MESH.elements(:,IDEIM_all_elem), ['Figures/','Reduced_Mesh']);
+
+[ ROM.Red_Mesh ] = buildMESH( dim, MESH.elements(:,IDEIM_all_elem), vertices, ...
+    MESH.boundaries(:, IDEIM_all_bound), fem, quad_order, DATA, 'CSM' );
+
+%% ========================================================================
+% Solve POD-DEIM ROM
+
+% testing Parameters
+% mu_test_Dimension   = 100; % number of samples
+% mu_cube              = lhsdesign(mu_test_Dimension,P); % generate normalized design
+% Testing_Parameters  = bsxfun(@plus,mu_min,bsxfun(@times,mu_cube,(mu_max-mu_min)));
+% 
+% 
+% for i = 1 : mu_test_Dimension
+% 
+%     tmp_time = tic;
+%     U_ROM = CSM_PODDEIM_Solver(dim, elements, vertices, boundaries, fem, 'datafileR', ...
+%                Testing_Parameters(i,:), ['Figures/TrainingTierIII_', num2str(i)], [], ROM);
+%     time_ROM(i) = toc(tmp_time);
+%        
+%     tmp_time = tic;
+%     U_FEM = CSM_Solver(dim, elements, vertices, boundaries, fem, 'datafileR', ...
+%                Testing_Parameters(i,:));
+%     time_FOM(i) = toc(tmp_time);
+%     
+%     Error_Training(i) = norm(U_FEM(MESH.internal_dof) - U_ROM(MESH.internal_dof)) / norm( U_FEM(MESH.internal_dof) );      
+% 
+% end
+% 
+% fprintf('\n\n*** Average Relative Error on the displacement = %2.3f%% \n', mean( Error_Training ) * 100 );
+% fprintf('\n*** Average FOM Time-to-Solution = %1.2e s\n', mean(time_FOM) );
+% fprintf('\n*** Average ROM Time-to-Solution = %1.2e s\n\n', mean(time_ROM) );
 %% ========================================================================
