@@ -8,6 +8,9 @@ clear all
 [~,~,~] = mkdir('Snapshots');
 [~,~,~] = mkdir('Figures');
 
+delete('Snapshots/SystemSnapshots.h5')
+delete('Snapshots/DisplacementSnapshots.h5')
+
 %% ========================================================================
 % DATA
 dim      =  3;
@@ -20,7 +23,7 @@ mu_max = [ 7*10^4   0.4  2000];
 mu_bar = [ 6.5*10^4 0.35 1500]; 
     
 % Training Parameters
-mu_train_Dimension   = 100; % number of samples
+mu_train_Dimension   = 10; % number of samples
 mu_cube              = lhsdesign(mu_train_Dimension,P); % generate normalized design
 Training_Parameters  = bsxfun(@plus,mu_min,bsxfun(@times,mu_cube,(mu_max-mu_min)));
 
@@ -162,29 +165,29 @@ ADR_export_solution(MESH.dim, ones(MESH.numVertices,1), MESH.vertices, MESH.elem
 %% ========================================================================
 % Solve POD-DEIM ROM
 
-% testing Parameters
-% mu_test_Dimension   = 100; % number of samples
-% mu_cube              = lhsdesign(mu_test_Dimension,P); % generate normalized design
-% Testing_Parameters  = bsxfun(@plus,mu_min,bsxfun(@times,mu_cube,(mu_max-mu_min)));
-% 
-% 
-% for i = 1 : mu_test_Dimension
-% 
-%     tmp_time = tic;
-%     U_ROM = CSM_PODDEIM_Solver(dim, elements, vertices, boundaries, fem, 'datafileR', ...
-%                Testing_Parameters(i,:), ['Figures/TrainingTierIII_', num2str(i)], [], ROM);
-%     time_ROM(i) = toc(tmp_time);
-%        
-%     tmp_time = tic;
-%     U_FEM = CSM_Solver(dim, elements, vertices, boundaries, fem, 'datafileR', ...
-%                Testing_Parameters(i,:));
-%     time_FOM(i) = toc(tmp_time);
-%     
-%     Error_Training(i) = norm(U_FEM(MESH.internal_dof) - U_ROM(MESH.internal_dof)) / norm( U_FEM(MESH.internal_dof) );      
-% 
-% end
-% 
-% fprintf('\n\n*** Average Relative Error on the displacement = %2.3f%% \n', mean( Error_Training ) * 100 );
-% fprintf('\n*** Average FOM Time-to-Solution = %1.2e s\n', mean(time_FOM) );
-% fprintf('\n*** Average ROM Time-to-Solution = %1.2e s\n\n', mean(time_ROM) );
+%testing Parameters
+mu_test_Dimension   = 5; % number of samples
+mu_cube              = lhsdesign(mu_test_Dimension,P); % generate normalized design
+Testing_Parameters  = bsxfun(@plus,mu_min,bsxfun(@times,mu_cube,(mu_max-mu_min)));
+
+
+for i = 1 : mu_test_Dimension
+
+    tmp_time = tic;
+    U_ROM = CSM_PODDEIM_Solver(dim, elements, vertices, boundaries, fem, 'datafileR', ...
+               Testing_Parameters(i,:), ['Figures/TestingTierIII_', num2str(i)], [], ROM);
+    time_ROM(i) = toc(tmp_time);
+       
+    tmp_time = tic;
+    U_FEM = CSM_Solver(dim, elements, vertices, boundaries, fem, 'datafileR', ...
+               Testing_Parameters(i,:));
+    time_FOM(i) = toc(tmp_time);
+    
+    Error_Training(i) = norm(U_FEM(MESH.internal_dof) - U_ROM(MESH.internal_dof)) / norm( U_FEM(MESH.internal_dof) );      
+
+end
+
+fprintf('\n\n*** Average Relative Error on the displacement = %2.3f%% \n', mean( Error_Training ) * 100 );
+fprintf('\n*** Average FOM Time-to-Solution = %1.2e s\n', mean(time_FOM) );
+fprintf('\n*** Average ROM Time-to-Solution = %1.2e s\n\n', mean(time_ROM) );
 %% ========================================================================

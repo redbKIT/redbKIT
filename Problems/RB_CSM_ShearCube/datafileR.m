@@ -32,7 +32,7 @@ data.flag_neumann{3}   = [4];
 data.flag_pressure{3}  = [];
 
 % material parameters 
-data.Material_Model = 'StVenantKirchhoff';%'StVenantKirchhoff', 'Linear'
+data.Material_Model = 'StVenantKirchhoff';%'StVenantKirchhoff', 'Linear', 'NeoHookean'
 data.Young   = param(1);
 data.Poisson = param(2);
 data.Density = 1;
