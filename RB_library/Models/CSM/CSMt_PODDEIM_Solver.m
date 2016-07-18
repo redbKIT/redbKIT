@@ -1,4 +1,4 @@
-function [u, M, FE_SPACE, MESH, DATA] = CSMt_PODDEIM_Solver(dim, elements, vertices, boundaries, fem, data_file, param, vtk_filename, sol_history, ROM)
+function [u, FE_SPACE, MESH, DATA] = CSMt_PODDEIM_Solver(dim, elements, vertices, boundaries, fem, data_file, param, vtk_filename, sol_history, ROM)
 %CSMT_SOLVER Dynamic Structural Finite Element Solver
 
 %   This file is part of redbKIT.

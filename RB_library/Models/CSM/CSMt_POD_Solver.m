@@ -230,6 +230,10 @@ while ( t < tf )
         t_assembly = toc(t_assembly);
         fprintf('done in %3.3f s\n', t_assembly);
         
+        if export_h5
+            Fint_h5.append( F_in(MESH.internal_dof) );
+        end
+        
         Residual  = Coef_Mass * M * U_k +  ...
                   (1 - TimeAdvance.M_alpha_f) * F_in  + TimeAdvance.M_alpha_f * F_in_old ...
                 - (1 - TimeAdvance.M_alpha_f) * F_ext + TimeAdvance.M_alpha_f * F_ext_old ...

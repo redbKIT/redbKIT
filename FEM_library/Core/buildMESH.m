@@ -1,4 +1,5 @@
-function [ MESH ] = buildMESH( dim, elements, vertices, boundaries, fem, quad_order, DATA, model, rings )
+function [ MESH ] = buildMESH( dim, elements, vertices, boundaries, fem, quad_order, DATA, ...
+    model, rings, reduced_elements, reduced_boundaries )
 %BUILDMESH generates MESH struct
 
 %   This file is part of redbKIT.
@@ -12,6 +13,7 @@ MESH.vertices    = vertices;
 MESH.boundaries  = boundaries;
 MESH.elements    = elements;
 MESH.numVertices = size(vertices,2);
+MESH.quad_order  = quad_order;
 
 if nargin > 8
     MESH.rings    = rings;
@@ -34,6 +36,13 @@ else
     MESH.nodes = vertices;
 end
 
+if nargin > 9
+    MESH.elements = MESH.elements(:, reduced_elements);
+end
+    
+if nargin > 10    
+    MESH.boundaries = MESH.boundaries(:, reduced_boundaries);
+end
 
 %% Update Mesh data with geometrical maps
 [MESH.numElemDof,MESH.numBoundaryDof,MESH.numRingsDof]    = select(fem, dim);

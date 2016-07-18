@@ -14,7 +14,7 @@ delete('Snapshots/DisplacementSnapshots.h5')
 %% ========================================================================
 % DATA
 dim      =  2;
-fem      =  'P1';
+fem      =  'P2';
 
 mu_bar = [];
 
@@ -29,7 +29,7 @@ OfflineTraining.System.ExternalForces.h5_section        = 'F_ext';
 OfflineTraining.System.ExternalForces.SamplingFrequency = 1;
 
 tol_POD_U    = 1e-3;
-tol_POD_Fext = 1e-3;
+tol_POD_Fext = 1e-5;
 tol_POD_Fint = 1e-3;
 %% ========================================================================
 % Solve High-Fidelity Models and Collect solution Snapshots
@@ -155,7 +155,7 @@ subplot(1,2,2)
 loglog(Sigma_ext./Sigma_ext(1),'-or');
 hold on
 cut_line_x = [1 : size(Phi_ext,2)];
-cut_line_y = Phi_ext(size(V,2))./Sigma_ext(1) * ones(1,size(Phi_ext,2));
+cut_line_y = Phi_ext(size(Phi_ext,2))./Sigma_ext(1) * ones(1,size(Phi_ext,2));
 loglog(cut_line_x, cut_line_y,'--k');
 grid on
 xlim([1  size(S_ext,2)])
@@ -177,42 +177,50 @@ ROM.M = ROM.V' * (Mass(MESH.internal_dof, MESH.internal_dof) * ROM.V);
 
 DATA       = CSM_read_DataFile('CSM3_data', dim, mu_bar);
 
-% Set quad_order
-if dim == 2
-    quad_order       = 4;
-elseif dim == 3
-    quad_order       = 5;
-end
+RedMeshObject =  ReducedMesh( MESH, fem, 'CSM' );
+RedMeshObject.AppendInternalDoFs( IDEIM_int );
+RedMeshObject.AppendInternalDoFs( IDEIM_ext );
+RedMeshObject.Build( DATA );
+RedMeshObject.ExportToVtk( 'Figures/', 'Test');
 
-[ MESH ] = buildMESH( dim, elements, vertices, boundaries, fem, quad_order, DATA, 'CSM' );
-
-ndf       =  length(MESH.internal_dof); 
-
-[ ~, node_to_element, node_to_boundary ] = compute_adjacency_elements(MESH.nodes, ...
-    MESH.elements, MESH.dim, MESH.boundaries, fem); 
-
-[IDEIM_int_elem, ~, IDEIM_int_bound ]     = CSM_DEIM_Index_to_Elements('rhs', IDEIM_int,   ndf, node_to_element, ...
-    node_to_boundary, MESH.internal_dof, MESH.numNodes, MESH.dim);
-
-[IDEIM_ext_elem, ~, IDEIM_ext_bound]    = CSM_DEIM_Index_to_Elements('rhs',   IDEIM_ext, ndf, node_to_element, ...
-    node_to_boundary, MESH.internal_dof, MESH.numNodes, MESH.dim);
-  
-IDEIM_all_elem       = unique([IDEIM_int_elem  IDEIM_ext_elem]);
-IDEIM_all_bound      = unique([IDEIM_int_bound  IDEIM_ext_bound]);
-IDEIM_all_nodes      = MESH.elements(:,IDEIM_all_elem);
-IDEIM_all_nodes      = unique(IDEIM_all_nodes(:));
-
-% Save reduced mesh to vtk for visualization
-ADR_export_solution(MESH.dim, ones(MESH.numVertices,1), MESH.vertices, MESH.elements, ['Figures/','Reference_Mesh']);
-ADR_export_solution(MESH.dim, ones(MESH.numVertices,1), MESH.vertices, MESH.elements(:,IDEIM_all_elem), ['Figures/','Reduced_Mesh']);
-
-[ ROM.Red_Mesh ] = buildMESH( dim, MESH.elements(:,IDEIM_all_elem), vertices, ...
-    MESH.boundaries(:, IDEIM_all_bound), fem, quad_order, DATA, 'CSM' );
+ROM.Red_Mesh = RedMeshObject.M_Red_Mesh;
+% 
+% % Set quad_order
+% if dim == 2
+%     quad_order       = 4;
+% elseif dim == 3
+%     quad_order       = 5;
+% end
+%  
+% [ MESH ] = buildMESH( dim, elements, vertices, boundaries, fem, quad_order, DATA, 'CSM' );
+% 
+% ndf       =  length(MESH.internal_dof); 
+% 
+% [ ~, node_to_element, node_to_boundary ] = compute_adjacency_elements(MESH.nodes, ...
+%     MESH.elements, MESH.dim, MESH.boundaries, fem); 
+% 
+% [IDEIM_int_elem, ~, IDEIM_int_bound ]     = CSM_DEIM_Index_to_Elements('rhs', IDEIM_int,   ndf, node_to_element, ...
+%     node_to_boundary, MESH.internal_dof, MESH.numNodes, MESH.dim);
+% 
+% [IDEIM_ext_elem, ~, IDEIM_ext_bound]    = CSM_DEIM_Index_to_Elements('rhs',   IDEIM_ext, ndf, node_to_element, ...
+%     node_to_boundary, MESH.internal_dof, MESH.numNodes, MESH.dim);
+%   
+% IDEIM_all_elem       = unique([IDEIM_int_elem  IDEIM_ext_elem]);
+% IDEIM_all_bound      = unique([IDEIM_int_bound  IDEIM_ext_bound]);
+% IDEIM_all_nodes      = MESH.elements(:,IDEIM_all_elem);
+% IDEIM_all_nodes      = unique(IDEIM_all_nodes(:));
+% 
+% % Save reduced mesh to vtk for visualization
+% ADR_export_solution(MESH.dim, ones(MESH.numVertices,1), MESH.vertices, MESH.elements, ['Figures/','Reference_Mesh']);
+% ADR_export_solution(MESH.dim, ones(MESH.numVertices,1), MESH.vertices, MESH.elements(:,IDEIM_all_elem), ['Figures/','Reduced_Mesh']);
+% 
+% [ ROM.Red_Mesh ] = buildMESH( dim, MESH.elements, vertices, ...
+%     MESH.boundaries, fem, quad_order, DATA, 'CSM' , [], IDEIM_all_elem, IDEIM_all_bound);
 
 %% ========================================================================
 % Solve POD-DEIM ROM
 
-[U_PODDEIM] = CSMt_PODDEIM_Solver(dim, elements, vertices, boundaries, fem, 'CSM3_data', ...
+[U_PODDEIM, ~, ~, DATA_R] = CSMt_PODDEIM_Solver(dim, elements, vertices, boundaries, fem, 'CSM3_data', ...
     [], [], true, ROM);
 
 % PostProcessing
@@ -220,7 +228,7 @@ indexA = find(ismember(MESH.vertices(1:2,:)',[0.6 0.2],'rows'));
 
 load ReferenceValues/csm3_l4_t0p005.point;
 
-t = DATA.time.t0:DATA.time.dt:DATA.time.tf;
+t = DATA_R.time.t0:DATA_R.time.dt:DATA_R.time.tf;
 
 handle = figure;
 subplot(2,1,1)
