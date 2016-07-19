@@ -49,11 +49,28 @@ classdef ReducedMesh < handle
         
         %% AppendInternalDoFs
         function obj = AppendInternalDoFs(obj, Dofs)
-
-            tmp2         = zeros(obj.M_numDoFs,1);
-            tmp2(obj.M_MESH.internal_dof(Dofs)) = 1;
             
-            obj.M_DoFsList = [obj.M_DoFsList find(tmp2)];
+            %tmp         = zeros(obj.M_numDoFs,1);
+            %tmp(obj.M_MESH.internal_dof(Dofs)) = 1;
+            
+            if size(obj.M_MESH.internal_dof(Dofs), 1) > 1
+                obj.M_DoFsList = [obj.M_DoFsList obj.M_MESH.internal_dof(Dofs)'];
+            else
+                obj.M_DoFsList = [obj.M_DoFsList obj.M_MESH.internal_dof(Dofs)];
+            end
+            
+        end
+        
+        %% AppendInternalDoFs_Vectorized
+        function obj = AppendInternalDoFs_Vectorized(obj, Dofs)
+            
+            tmp        = sparse(obj.M_numInternalDoFs*obj.M_numInternalDoFs,1);
+            tmp(Dofs)  = 1;
+            
+            tmp        = reshape(tmp, obj.M_numInternalDoFs, obj.M_numInternalDoFs);
+
+            [row, col] = find(tmp);
+            obj.M_DoFsList = [obj.M_DoFsList unique([row; col])'];
             
         end
         

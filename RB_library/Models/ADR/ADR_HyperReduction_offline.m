@@ -1,11 +1,10 @@
 function [HyRED, U_matrix, U_rhs] = ADR_HyperReduction_offline(FOM, S_rhs, S_matrix, tolPOD)
-%HYPERREDUCTION_OFFLINE given RHS and matrix snapshots, performs POD and
+%ADR_HYPERREDUCTION_OFFLINE given RHS and matrix snapshots, performs POD and
 %(M)DEIM to generate an affine approximation of the system
 
 %   This file is part of redbKIT.
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch> 
-
 
 fig_folder = 'Figures/DEIM/';
 [~,~,~] =  mkdir(fig_folder);
@@ -52,38 +51,16 @@ HyRED.U_matrix  = U_matrix(HyRED.IDEIM_m,:);
 HyRED.U_rhs     = U_rhs(HyRED.IDEIM_rhs,:);
         
 %% compute and store "reduced mesh" (corresponding to DEIM indices)
-ndf       =  length(FOM.MESH.internal_dof); 
+RedMeshObject =  ReducedMesh( FOM.MESH, FOM.MESH.fem, 'ADR' );
+RedMeshObject.AppendInternalDoFs_Vectorized( HyRED.IDEIM_m );
+RedMeshObject.AppendInternalDoFs( HyRED.IDEIM_rhs );
+RedMeshObject.Build( FOM.DATA );
+RedMeshObject.ExportToVtk( fig_folder, 'ADRHyper');
+Red_Mesh = RedMeshObject.M_Red_Mesh;
 
-[ ~, node_to_element, node_to_boundary ] = compute_adjacency_elements(FOM.MESH.nodes, ...
-    FOM.MESH.elements, FOM.MESH.dim, FOM.MESH.boundaries, FOM.FE_SPACE.fem); 
-
-[IDEIM_mA_elem, ~, IDEIM_mA_bound ]     = ADR_DEIM_Index_to_Elements('matrix', HyRED.IDEIM_m,   ndf, node_to_element, ...
-    node_to_boundary, FOM.MESH.internal_dof, FOM.MESH.numNodes);
-
-[IDEIM_rhs_elem, ~, IDEIM_rhs_bound]    = ADR_DEIM_Index_to_Elements('rhs',    HyRED.IDEIM_rhs, ndf, node_to_element, ...
-    node_to_boundary, FOM.MESH.internal_dof, FOM.MESH.numNodes);
-  
-IDEIM_all_elem       = unique([IDEIM_mA_elem  IDEIM_rhs_elem]);
-IDEIM_all_bound      = unique([IDEIM_mA_bound  IDEIM_rhs_bound]);
-IDEIM_all_nodes      = FOM.MESH.elements(:,IDEIM_all_elem);
-IDEIM_all_nodes      = unique(IDEIM_all_nodes(:));
-
-%% Save reduced mesh to vtk for visualization
-ADR_export_solution(FOM.MESH.dim, ones(FOM.MESH.numVertices,1), FOM.MESH.vertices, FOM.MESH.elements(1:3,:), [fig_folder,'Reference_Mesh']);
-ADR_export_solution(FOM.MESH.dim, ones(FOM.MESH.numVertices,1), FOM.MESH.vertices, FOM.MESH.elements(1:3,IDEIM_all_elem), [fig_folder,'Reduced_Mesh']);
 
 %% Generate HyRed Structure
-
-HyRED.Nelem           = length(IDEIM_all_elem);
-HyRED.IDEIM_all_elem  = IDEIM_all_elem;
-HyRED.IDEIM_all_bound = IDEIM_all_bound;
-HyRED.IDEIM_all_nodes = IDEIM_all_nodes;
-
-HyRED.MESH            = FOM.MESH;
-HyRED.MESH.elements   = HyRED.MESH.elements(:,IDEIM_all_elem);
-HyRED.MESH.numElem    = size(HyRED.MESH.elements,2);
-HyRED.MESH.Neumann_side = intersect(HyRED.MESH.Neumann_side, IDEIM_all_bound);
-HyRED.MESH.Robin_side   = intersect(HyRED.MESH.Robin_side,   IDEIM_all_bound);
-
+HyRED.MESH = Red_Mesh;
 HyRED.FE_SPACE         = FOM.FE_SPACE;
+
 end
