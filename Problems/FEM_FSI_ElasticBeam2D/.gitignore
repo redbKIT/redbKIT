@@ -1,0 +1,6 @@
+Results/
+mesh/meshFS.msh
+mesh/mesh_Fluid.msh
+mesh/mesh_Solid.msh
+mesh/mesh_Fluid_Medium.msh
+mesh/mesh_Solid_Medium.msh
