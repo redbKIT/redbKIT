@@ -11,6 +11,7 @@
 #define INVJAC(i,j,k) invjac[i+(j+k*dim)*noe]
 #define GRADREFPHI(i,j,k) gradrefphi[i+(j+k*NumQuadPoints)*nln]
 
+#include "../../Core/Tools.h"
 #include "MaterialModels/LinearElasticMaterial.h"
 #include "MaterialModels/SEMMTMaterial.h"
 #include "MaterialModels/NeoHookeanMaterial.h"

@@ -8,7 +8,7 @@
 #include <math.h>
 #include "blas.h"
 #include <string.h>
-#include "../CSM/MaterialModels/Tools.h"
+#include "../../Core/Tools.h"
 
 #define INVJAC(i,j,k) invjac[i+(j+k*dim)*noe]
 #define GRADREFPHIV(i,j,k) gradrefphiV[i+(j+k*NumQuadPoints)*nlnV]
