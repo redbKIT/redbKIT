@@ -6,6 +6,9 @@ function [ MESH ] = buildMESH( dim, elements, vertices, boundaries, fem, quad_or
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch> 
 
+if nargin < 8
+    model = [];
+end
 %% Fill MESH data structure
 MESH.dim         = dim;
 MESH.fem         = fem;
@@ -77,14 +80,9 @@ end
 
 %% Update Mesh data with BC information
 if nargin >= 7 && ~isempty(DATA)
-    if nargin < 8
-        model = [];
-    end
     % Update MESH with BC information
     [MESH]         = BC_info(MESH, DATA, model);
 end
-
-    
 
 end
 
