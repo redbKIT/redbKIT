@@ -7,6 +7,7 @@
 #include <math.h>
 #include "blas.h"
 #include <string.h>
+#include "../../../Core/Tools.h"
 
 #define INVJAC(i,j,k) invjac[i+(j+k*dim)*noe]
 #define GRADREFPHI(i,j,k) gradrefphi[i+(j+k*NumQuadPoints)*nln]
