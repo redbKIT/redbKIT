@@ -1,4 +1,5 @@
-function [u, FE_SPACE, MESH, DATA] = CSMt_PODDEIM_Solver(dim, elements, vertices, boundaries, fem, data_file, param, vtk_filename, sol_history, ROM)
+function [u, FE_SPACE, MESH, DATA] = CSMt_PODDEIM_Solver(dim, elements, vertices, boundaries, fem, data_file, ...
+    param, vtk_filename, sol_history, ROM)
 %CSMT_SOLVER Dynamic Structural Finite Element Solver
 
 %   This file is part of redbKIT.
@@ -72,20 +73,24 @@ for k = 1 : FE_SPACE.numComponents
 end
 d2u0 = 0*du0;
 u = u0;
-CSM_export_solution(MESH.dim, u0, MESH.vertices, MESH.elements, MESH.numNodes, vtk_filename, 0);
+if ~isempty(vtk_filename)
+    CSM_export_solution(MESH.dim, u0, MESH.vertices, MESH.elements, MESH.numNodes, vtk_filename, 0);
+end
 
 TimeAdvance.Initialize( ROM.V'*u0(MESH.internal_dof), ROM.V'*du0(MESH.internal_dof), ROM.V'*d2u0(MESH.internal_dof) );
 Coef_Mass = TimeAdvance.MassCoefficient( );
 
 fprintf('\n **** PROBLEM''S SIZE INFO ****\n');
-fprintf(' * Number of Vertices  = %d \n',MESH.numVertices);
-fprintf(' * Number of Elements  = %d \n',MESH.numElem);
-fprintf(' * Number of Nodes     = %d \n',MESH.numNodes);
-fprintf(' * Number of Dofs      = %d \n',length(MESH.internal_dof));
-fprintf(' * Number of timesteps =  %d\n', (tf-t0)/dt);
+fprintf(' * Number of Vertices         = %d \n', MESH.numVertices);
+fprintf(' * Number of Nodes            = %d \n', MESH.numNodes);
+fprintf(' * Number of Elements         = %d \n', MESH.numElem);
+fprintf(' * Number of Reduced Elements = %d \n', ROM.Red_Mesh.numElem);
+fprintf(' * %% Reduced Elements         = %2.2f \n', ROM.Red_Mesh.numElem / MESH.numElem * 100);
+fprintf(' * Number of Dofs             = %d \n', size(ROM.V,2));
+fprintf(' * Number of timesteps        = %d \n', (tf-t0)/dt);
 fprintf('-------------------------------------------\n');
 
-%% Generate Domain Decomposition (if required)
+%% Preconditioner (if required)
 PreconFactory = PreconditionerFactory( );
 Precon        = PreconFactory.CreatePrecon(DATA.Preconditioner.type, DATA);
 
@@ -94,7 +99,7 @@ SolidModel = CSM_Assembler( ROM.Red_Mesh, DATA, FE_SPACE );
 %% Assemble mass matrix
 fprintf('\n Assembling mass matrix... ');
 t_assembly = tic;
-M    =  ROM.M; % already with density, To be Fixed
+M    =  DATA.Density * ROM.M;
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s', t_assembly);
 

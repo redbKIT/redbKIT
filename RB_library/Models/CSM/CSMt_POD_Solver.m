@@ -1,13 +1,17 @@
-function [u, M, FE_SPACE, MESH, DATA] = CSMt_POD_Solver(dim, elements, vertices, boundaries, fem, data_file, param, vtk_filename, sol_history, Training_Options, V_POD)
+function [u, MassMatrix, FE_SPACE, MESH, DATA] = CSMt_POD_Solver(dim, elements, vertices, boundaries, fem, data_file, ...
+    param, vtk_filename, sol_history, Training_Options, V_POD)
 %CSMT_SOLVER Dynamic Structural Finite Element Solver
+%
+%   Training_Options should be a struct with fields:
+%      - Training_Options.h5_filename
+%      - Training_Options.InternalForces.h5_section
+%      - Training_Options.ExternalForces.h5_section
+%
+%   V_POD is a POD basis ( i.e. matrix of size #InternalDoFs x #PODmodes )
 
 %   This file is part of redbKIT.
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch>
-
-if nargin < 6
-    error('Missing input arguments. Please type help CSM_Solver')
-end
 
 if isempty(data_file)
     error('Missing data_file')
@@ -78,7 +82,9 @@ for k = 1 : FE_SPACE.numComponents
 end
 d2u0 = 0*du0;
 u = u0;
-CSM_export_solution(MESH.dim, u0, MESH.vertices, MESH.elements, MESH.numNodes, vtk_filename, 0);
+if ~isempty(vtk_filename)
+    CSM_export_solution(MESH.dim, u0, MESH.vertices, MESH.elements, MESH.numNodes, vtk_filename, 0);
+end
 
 TimeAdvance.Initialize( u0, du0, d2u0 );
 Coef_Mass = TimeAdvance.MassCoefficient( );
@@ -87,7 +93,7 @@ fprintf('\n **** PROBLEM''S SIZE INFO ****\n');
 fprintf(' * Number of Vertices  = %d \n',MESH.numVertices);
 fprintf(' * Number of Elements  = %d \n',MESH.numElem);
 fprintf(' * Number of Nodes     = %d \n',MESH.numNodes);
-fprintf(' * Number of Dofs      = %d \n',length(MESH.internal_dof));
+fprintf(' * Number of Dofs      = %d \n',size(V_POD, 2));
 fprintf(' * Number of timesteps =  %d\n', (tf-t0)/dt);
 fprintf('-------------------------------------------\n');
 
@@ -98,7 +104,7 @@ if export_h5
         Training_Options.ExternalForces.h5_section, length(MESH.internal_dof));
 end
 
-%% Generate Domain Decomposition (if required)
+%% Preconditioner (if required)
 PreconFactory = PreconditionerFactory( );
 Precon        = PreconFactory.CreatePrecon(DATA.Preconditioner.type, DATA);
 
@@ -107,8 +113,8 @@ SolidModel = CSM_Assembler( MESH, DATA, FE_SPACE );
 %% Assemble mass matrix
 fprintf('\n Assembling mass matrix... ');
 t_assembly = tic;
-M    =  SolidModel.compute_mass();
-M    =  M * DATA.Density;
+MassMatrix =  SolidModel.compute_mass();
+M          =  MassMatrix * DATA.Density;
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s', t_assembly);
 
@@ -214,7 +220,6 @@ while ( t < tf )
         LinSolver.SetPreconditioner( Precon );
         dU_N                  = LinSolver.Solve( V_POD' * (A * V_POD), V_POD' * b );
         dU(MESH.internal_dof) = V_POD * dU_N;
-        %dU(MESH.internal_dof)  = LinSolver.Solve( A, b );
         fprintf('\n        time to solve the linear system in %3.3f s \n', LinSolver.GetSolveTime());
         
         % update solution
@@ -224,7 +229,6 @@ while ( t < tf )
         % Assemble matrix and right-hand side
         fprintf('\n   -- Assembling internal forces... ');
         t_assembly = tic;
-        %[F_in, dF_in]  =  CSM_Assembler('internal_forces', MESH, DATA, FE_SPACE, full(U_k));
         F_in      = SolidModel.compute_internal_forces( full ( U_k ) );
         dF_in     = SolidModel.compute_jacobian( full ( U_k ) );
         t_assembly = toc(t_assembly);

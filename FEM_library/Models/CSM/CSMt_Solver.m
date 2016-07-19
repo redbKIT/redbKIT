@@ -78,7 +78,9 @@ for k = 1 : FE_SPACE.numComponents
 end
 d2u0 = 0*du0;
 u = u0;
-CSM_export_solution(MESH.dim, u0, MESH.vertices, MESH.elements, MESH.numNodes, vtk_filename, 0);
+if ~isempty(vtk_filename)
+    CSM_export_solution(MESH.dim, u0, MESH.vertices, MESH.elements, MESH.numNodes, vtk_filename, 0);
+end
 
 TimeAdvance.Initialize( u0, du0, d2u0 );
 Coef_Mass = TimeAdvance.MassCoefficient( );
@@ -120,14 +122,12 @@ LinSolver = LinearSolver( DATA.LinearSolver );
 fprintf('\n -- Assembling external Forces at t0... ');
 t_assembly = tic;
 F_ext_old      = SolidModel.compute_volumetric_forces(t0);
-%CSM_Assembler('external_forces', MESH, DATA, FE_SPACE, [], t0);%M*(-9.81*ones(size(M,1),1));%
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s\n', t_assembly);
 
 fprintf('\n -- Assembling internal Forces at t0... ');
 t_assembly = tic;
 F_in_old  =  SolidModel.compute_internal_forces( u0 );
-%CSM_Assembler('internal_forces', MESH, DATA, FE_SPACE, u0);
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s\n', t_assembly)
 
@@ -160,13 +160,11 @@ while ( t < tf )
     fprintf('\n -- Assembling external Forces... ');
     t_assembly = tic;
     F_ext      = SolidModel.compute_volumetric_forces( t );
-    %CSM_Assembler('external_forces', MESH, DATA, FE_SPACE, [], t);
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);
     
     fprintf('\n -- Assembling internal Forces ... ');
     t_assembly = tic;
-    %[F_in, dF_in]  =  CSM_Assembler('internal_forces', MESH, DATA, FE_SPACE, U_k);
     F_in      = SolidModel.compute_internal_forces( U_k );
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);
@@ -179,7 +177,6 @@ while ( t < tf )
             
     fprintf('\n -- Assembling Jacobian matrix... ');
     t_assembly = tic;
-    %[F_in, dF_in]  =  CSM_Assembler('internal_forces', MESH, DATA, FE_SPACE, U_k);
     dF_in     = SolidModel.compute_jacobian( U_k );
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);        
@@ -217,7 +214,6 @@ while ( t < tf )
         % Assemble matrix and right-hand side
         fprintf('\n   -- Assembling internal forces... ');
         t_assembly = tic;
-        %[F_in, dF_in]  =  CSM_Assembler('internal_forces', MESH, DATA, FE_SPACE, full(U_k));
         F_in      = SolidModel.compute_internal_forces( full ( U_k ) );
         dF_in     = SolidModel.compute_jacobian( full ( U_k ) );
         t_assembly = toc(t_assembly);
