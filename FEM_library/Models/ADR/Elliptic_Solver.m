@@ -42,6 +42,17 @@ end
 DATA   = read_DataFile(data_file, dim, param);
 DATA.param = param;
 
+use_SUPG = false;
+if isfield(DATA, 'Stabilization')
+    if strcmp( DATA.Stabilization, 'SUPG' )
+        if strcmp(fem, 'P1')
+            use_SUPG = true;
+        else
+            warning('SUPG Stabilization available only for P1 FEM');
+        end
+    end
+end
+
 %% Set quad_order
 if dim == 2
     quad_order       = 4;
@@ -89,6 +100,16 @@ t_assembly = tic;
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s', t_assembly);
 
+if use_SUPG
+    fprintf('\n Assembling SUPG Terms ... ');
+    t_assembly = tic;
+    [A_SUPG, F_SUPG] = ADR_Assembler(MESH, DATA, FE_SPACE, [], [], [], [], [], 'SUPG');
+    t_assembly = toc(t_assembly);
+    fprintf('done in %3.3f s\n', t_assembly);
+    
+    A = A + A_SUPG;
+    F = F + F_SUPG;
+end
 
 %% Apply boundary conditions
 fprintf('\n Apply boundary conditions ');

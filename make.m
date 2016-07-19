@@ -49,6 +49,8 @@ dependencies{6} = {'MaterialModels/Tools.c', 'MaterialModels/NeoHookeanMaterial.
                    'MaterialModels/RaghavanVorpMaterial.c'};
 source_files{7} = {'RB_library/Tools/RBF_interpolation/','RBF_evaluate_Fast.c'};
 dependencies{7} = {};
+source_files{8} = {'FEM_library/Models/ADR/','ADR_SUPGassembler_C_omp.c'};
+dependencies{8} = {'../CSM/MaterialModels/Tools.c'};
 
 %Mexify = 0;               
 if nargin < 2 || isempty( sources )

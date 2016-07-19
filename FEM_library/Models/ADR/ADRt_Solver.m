@@ -54,6 +54,17 @@ elseif dim == 3
     quad_order       = 5;
 end
 
+use_SUPG = false;
+if isfield(DATA, 'Stabilization')
+    if strcmp( DATA.Stabilization, 'SUPG' )
+        if strcmp(fem, 'P1')
+            use_SUPG = true;
+        else
+            warning('SUPG Stabilization available only for P1 FEM')
+        end
+    end
+end
+
 %% Create and fill the MESH data structure
 [ MESH ] = buildMESH( dim, elements, vertices, boundaries, fem, quad_order, DATA );
 
@@ -117,9 +128,24 @@ while (t < tf)
     [A, F]     =  ADR_Assembler(MESH, DATA, FE_SPACE, [], [], [], [], t);
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s', t_assembly);
-    
-    C = alpha/dt * M + A;
-    b = 1/dt * M * u_BDF + F;
+       
+    if use_SUPG
+        
+        fprintf('\n Assembling SUPG Terms ... ');
+        t_assembly = tic;
+        [A_SUPG, F_SUPG, M_SUPG] = ADR_Assembler(MESH, DATA, FE_SPACE, [], [], [], [], t, 'SUPGt', dt);
+        t_assembly = toc(t_assembly);
+        fprintf('done in %3.3f s\n', t_assembly);
+        
+        C = alpha/dt * (M + M_SUPG) + (A + A_SUPG);
+        b = 1/dt * (M + M_SUPG) * u_BDF + F + F_SUPG;
+        
+    else
+        
+        C = alpha/dt * M + A;
+        b = 1/dt * M * u_BDF + F;
+        
+    end
     
     %% Apply boundary conditions
     fprintf('\n Apply boundary conditions ');
