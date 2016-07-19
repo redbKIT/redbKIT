@@ -47,7 +47,7 @@ dependencies{6} = {'MaterialModels/Tools.c', 'MaterialModels/NeoHookeanMaterial.
                    'MaterialModels/LinearElasticMaterial.c', 'MaterialModels/SEMMTMaterial.c', ...
                    'MaterialModels/StVenantKirchhoffMaterial.c',...
                    'MaterialModels/RaghavanVorpMaterial.c'};
-source_files{7} = {'RB_library/RBF_interpolation/','RBF_evaluate_Fast.c'};
+source_files{7} = {'RB_library/Tools/RBF_interpolation/','RBF_evaluate_Fast.c'};
 dependencies{7} = {};
 
 %Mexify = 0;               
