@@ -202,10 +202,10 @@ while ( t < tf )
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);
     
-    res0Norm = norm(b);
+    res0Norm = norm(V_POD' * b);
         
     fprintf('\n============ Start Newton Iterations ============\n\n');
-    while (k <= maxIter && incrNorm > tol && resRelNorm > tol)
+    while (k <= maxIter && (incrNorm > tol || resRelNorm > tol))
         
         % Solve
         fprintf('\n   -- Solve J x = -R ... ');
@@ -248,7 +248,7 @@ while ( t < tf )
         t_assembly = toc(t_assembly);
         fprintf('done in %3.3f s\n', t_assembly);
         
-        resRelNorm = norm(b) / res0Norm;
+        resRelNorm = norm(V_POD' * b) / res0Norm;
         
         fprintf('\n **** Iteration  k = %d:  norm(dU)/norm(Uk) = %1.2e, Residual Rel Norm = %1.2e \n\n',k,full(incrNorm), full(norm(resRelNorm)));
         k = k + 1;

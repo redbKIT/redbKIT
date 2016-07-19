@@ -2,7 +2,7 @@
 
 % Source term
 data.force{1} = @(x, y, t, param)(0.*x.*y);
-data.force{2} = @(x, y, t, param)(-10^3*2 + 0.*x.*y);
+data.force{2} = @(x, y, t, param)(-10^3*param(1) + 0.*x.*y);
 
 % Dirichlet
 data.bcDir{1} = @(x, y, t, param)(0.*x.*y); 

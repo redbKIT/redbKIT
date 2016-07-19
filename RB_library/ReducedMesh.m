@@ -125,9 +125,6 @@ classdef ReducedMesh < handle
             
              obj = obj.FindReducedElements( );
              
-             obj.M_ReducedElements
-             obj.M_ReducedBoundaries
-             
             [ obj.M_Red_Mesh ] = buildMESH( obj.M_MESH.dim, obj.M_MESH.elements, ...
                 obj.M_MESH.vertices, obj.M_MESH.boundaries, obj.M_fem, obj.M_MESH.quad_order, ...
                 DATA, obj.M_PDEtype, [], obj.M_ReducedElements, obj.M_ReducedBoundaries );

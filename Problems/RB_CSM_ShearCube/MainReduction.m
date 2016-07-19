@@ -14,7 +14,7 @@ delete('Snapshots/DisplacementSnapshots.h5')
 %% ========================================================================
 % DATA
 dim      =  3;
-fem      =  'P1';
+fem      =  'P2';
 
 % Parameters range
 P = 3;% Yuoung modulus, Poisson Coefficient, External load
@@ -110,7 +110,7 @@ subplot(1,2,2)
 loglog(Sigma_ext./Sigma_ext(1),'-or');
 hold on
 cut_line_x = [1 : size(Phi_ext,2)];
-cut_line_y = Phi_ext(size(V,2))./Sigma_ext(1) * ones(1,size(Phi_ext,2));
+cut_line_y = Phi_ext(size(Phi_ext,2))./Sigma_ext(1) * ones(1,size(Phi_ext,2));
 loglog(cut_line_x, cut_line_y,'--k');
 grid on
 xlim([1  size(S_ext,2)])
@@ -127,6 +127,15 @@ ROM.LeftProjection_int = ( ROM.V' * Phi_int ) / ( ROM.Phi_int_IDEIM );
 ROM.LeftProjection_ext = ( ROM.V' * Phi_ext ) / ( ROM.Phi_ext_IDEIM );
 
 DATA       = CSM_read_DataFile('datafileR', dim, mu_bar);
+
+% Set quad_order
+if dim == 2
+    quad_order       = 4;
+elseif dim == 3
+    quad_order       = 5;
+end
+
+[ MESH ] = buildMESH( dim, elements, vertices, boundaries, fem, quad_order, DATA, 'CSM' );
 
 RedMeshObject =  ReducedMesh( MESH, fem, 'CSM' );
 RedMeshObject.AppendInternalDoFs( IDEIM_int );

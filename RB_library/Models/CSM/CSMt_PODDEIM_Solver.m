@@ -187,7 +187,7 @@ while ( t < tf )
     res0Norm = norm(Residual);
         
     fprintf('\n============ Start Newton Iterations ============\n\n');
-    while (k <= maxIter && incrNorm > tol && resRelNorm > tol)
+    while (k <= maxIter && (incrNorm > tol || resRelNorm > tol) )
         
         % Solve
         fprintf('\n   -- Solve J x = -R ... ');

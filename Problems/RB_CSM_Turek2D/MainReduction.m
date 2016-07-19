@@ -4,6 +4,7 @@
 
 clc
 clear all
+close all
 
 [~,~,~] = mkdir('Snapshots');
 [~,~,~] = mkdir('Figures');
@@ -14,7 +15,7 @@ delete('Snapshots/DisplacementSnapshots.h5')
 %% ========================================================================
 % DATA
 dim      =  2;
-fem      =  'P2';
+fem      =  'P1';
 
 mu_bar = [];
 
@@ -29,7 +30,7 @@ OfflineTraining.System.ExternalForces.h5_section        = 'F_ext';
 OfflineTraining.System.ExternalForces.SamplingFrequency = 1;
 
 tol_POD_U    = 1e-3;
-tol_POD_Fext = 1e-5;
+tol_POD_Fext = 1e-3;
 tol_POD_Fint = 1e-3;
 %% ========================================================================
 % Solve High-Fidelity Models and Collect solution Snapshots
@@ -163,8 +164,6 @@ title('Fext snapshots spectrum')
 
 clear S_ext S_int;
 
-%ROM.Phi_int   = Phi_int;
-%ROM.Phi_ext   = Phi_ext;
 ROM.Phi_int_IDEIM = Phi_int(IDEIM_int, :);
 ROM.Phi_ext_IDEIM = Phi_ext(IDEIM_ext, :);
 ROM.IDEIM_ext = IDEIM_ext;
@@ -184,38 +183,7 @@ RedMeshObject.Build( DATA );
 RedMeshObject.ExportToVtk( 'Figures/', 'Test');
 
 ROM.Red_Mesh = RedMeshObject.M_Red_Mesh;
-% 
-% % Set quad_order
-% if dim == 2
-%     quad_order       = 4;
-% elseif dim == 3
-%     quad_order       = 5;
-% end
-%  
-% [ MESH ] = buildMESH( dim, elements, vertices, boundaries, fem, quad_order, DATA, 'CSM' );
-% 
-% ndf       =  length(MESH.internal_dof); 
-% 
-% [ ~, node_to_element, node_to_boundary ] = compute_adjacency_elements(MESH.nodes, ...
-%     MESH.elements, MESH.dim, MESH.boundaries, fem); 
-% 
-% [IDEIM_int_elem, ~, IDEIM_int_bound ]     = CSM_DEIM_Index_to_Elements('rhs', IDEIM_int,   ndf, node_to_element, ...
-%     node_to_boundary, MESH.internal_dof, MESH.numNodes, MESH.dim);
-% 
-% [IDEIM_ext_elem, ~, IDEIM_ext_bound]    = CSM_DEIM_Index_to_Elements('rhs',   IDEIM_ext, ndf, node_to_element, ...
-%     node_to_boundary, MESH.internal_dof, MESH.numNodes, MESH.dim);
-%   
-% IDEIM_all_elem       = unique([IDEIM_int_elem  IDEIM_ext_elem]);
-% IDEIM_all_bound      = unique([IDEIM_int_bound  IDEIM_ext_bound]);
-% IDEIM_all_nodes      = MESH.elements(:,IDEIM_all_elem);
-% IDEIM_all_nodes      = unique(IDEIM_all_nodes(:));
-% 
-% % Save reduced mesh to vtk for visualization
-% ADR_export_solution(MESH.dim, ones(MESH.numVertices,1), MESH.vertices, MESH.elements, ['Figures/','Reference_Mesh']);
-% ADR_export_solution(MESH.dim, ones(MESH.numVertices,1), MESH.vertices, MESH.elements(:,IDEIM_all_elem), ['Figures/','Reduced_Mesh']);
-% 
-% [ ROM.Red_Mesh ] = buildMESH( dim, MESH.elements, vertices, ...
-%     MESH.boundaries, fem, quad_order, DATA, 'CSM' , [], IDEIM_all_elem, IDEIM_all_bound);
+
 
 %% ========================================================================
 % Solve POD-DEIM ROM
