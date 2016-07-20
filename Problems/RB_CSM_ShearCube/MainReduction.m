@@ -14,7 +14,7 @@ delete('Snapshots/DisplacementSnapshots.h5')
 %% ========================================================================
 % DATA
 dim      =  3;
-fem      =  'P2';
+fem      =  'P1';
 
 % Parameters range
 P = 3;% Yuoung modulus, Poisson Coefficient, External load
