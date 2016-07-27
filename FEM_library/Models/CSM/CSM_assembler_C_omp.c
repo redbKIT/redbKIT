@@ -85,6 +85,11 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
             NeoHookeanMaterial_jacobian(plhs, prhs);
     }
     
+    if (strcmp(Material_Model, "NeoHookean_jacobian2")==0)
+    {
+            NeoHookeanMaterial_jacobian2(plhs, prhs);
+    }
+    
     if (strcmp(Material_Model, "NeoHookean_stress")==0)
     {
             NeoHookeanMaterial_stress(plhs, prhs);
