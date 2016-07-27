@@ -82,12 +82,12 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     
     if (strcmp(Material_Model, "NeoHookean_jacobian")==0)
     {
-            NeoHookeanMaterial_jacobian(plhs, prhs);
+            NeoHookeanMaterial_jacobianFast(plhs, prhs);
     }
     
-    if (strcmp(Material_Model, "NeoHookean_jacobian2")==0)
+    if (strcmp(Material_Model, "NeoHookean_jacobianSlow")==0)
     {
-            NeoHookeanMaterial_jacobian2(plhs, prhs);
+            NeoHookeanMaterial_jacobian(plhs, prhs);
     }
     
     if (strcmp(Material_Model, "NeoHookean_stress")==0)
@@ -101,6 +101,11 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     }
     
     if (strcmp(Material_Model, "RaghavanVorp_jacobian")==0)
+    {
+            RaghavanVorpMaterial_jacobianFast(plhs, prhs);
+    }
+    
+    if (strcmp(Material_Model, "RaghavanVorp_jacobianSlow")==0)
     {
             RaghavanVorpMaterial_jacobian(plhs, prhs);
     }

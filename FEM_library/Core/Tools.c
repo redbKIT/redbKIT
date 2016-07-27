@@ -129,6 +129,25 @@ void MatrixInvT(int dim, double A[dim][dim], double invAT[dim][dim] )
     
 }
 /*************************************************************************/
+void MatrixInvT3(int dim, double A[dim][dim], double invAT[dim][dim] )
+{
+   
+    double det = MatrixDeterminant3(3, A);
+    
+    double invdet = 1/det;
+    
+    invAT[0][0] =  (A[1][1]*A[2][2]-A[2][1]*A[1][2])*invdet;
+    invAT[1][0] = -(A[0][1]*A[2][2]-A[0][2]*A[2][1])*invdet;
+    invAT[2][0] =  (A[0][1]*A[1][2]-A[0][2]*A[1][1])*invdet;
+    invAT[0][1] = -(A[1][0]*A[2][2]-A[1][2]*A[2][0])*invdet;
+    invAT[1][1] =  (A[0][0]*A[2][2]-A[0][2]*A[2][0])*invdet;
+    invAT[2][1] = -(A[0][0]*A[1][2]-A[1][0]*A[0][2])*invdet;
+    invAT[0][2] =  (A[1][0]*A[2][1]-A[2][0]*A[1][1])*invdet;
+    invAT[1][2] = -(A[0][0]*A[2][1]-A[2][0]*A[0][1])*invdet;
+    invAT[2][2] =  (A[0][0]*A[1][1]-A[1][0]*A[0][1])*invdet;
+
+}
+/*************************************************************************/
 void MatrixProduct(int dim, double X[dim][dim], double Y[dim][dim], double result[dim][dim] )
 {
     int d1, d2, d3;

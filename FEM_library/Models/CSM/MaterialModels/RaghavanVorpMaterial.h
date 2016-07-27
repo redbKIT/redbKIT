@@ -20,6 +20,8 @@ void RaghavanVorpMaterial_forces(mxArray* plhs[], const mxArray* prhs[]);
 
 void RaghavanVorpMaterial_jacobian(mxArray* plhs[], const mxArray* prhs[]);
 
+void RaghavanVorpMaterial_jacobianFast(mxArray* plhs[], const mxArray* prhs[]);
+
 void RaghavanVorpMaterial_stress(mxArray* plhs[], const mxArray* prhs[]);
 
 #endif

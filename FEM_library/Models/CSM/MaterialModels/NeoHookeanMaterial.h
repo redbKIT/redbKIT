@@ -20,6 +20,8 @@ void NeoHookeanMaterial_forces(mxArray* plhs[], const mxArray* prhs[]);
 
 void NeoHookeanMaterial_jacobian(mxArray* plhs[], const mxArray* prhs[]);
 
+void NeoHookeanMaterial_jacobianFast(mxArray* plhs[], const mxArray* prhs[]);
+
 void NeoHookeanMaterial_stress(mxArray* plhs[], const mxArray* prhs[]);
 
 #endif
