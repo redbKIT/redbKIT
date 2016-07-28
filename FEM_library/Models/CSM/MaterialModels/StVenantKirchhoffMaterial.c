@@ -368,8 +368,10 @@ void StVenantKirchhoffMaterial_stress(mxArray* plhs[], const mxArray* prhs[])
     int nln2    = nln*nln;
     
     plhs[0] = mxCreateDoubleMatrix(noe,dim*dim, mxREAL);
+    plhs[1] = mxCreateDoubleMatrix(noe,dim*dim, mxREAL);
     
-    double* Sigma    = mxGetPr(plhs[0]);
+    double* P        = mxGetPr(plhs[0]);
+    double* Sigma    = mxGetPr(plhs[1]);
     
     int k,l;
     int q;
@@ -419,6 +421,7 @@ void StVenantKirchhoffMaterial_stress(mxArray* plhs[], const mxArray* prhs[])
     
     for (ie = 0; ie < noe; ie = ie + 1 )
     {
+        double F2[dim][dim];
         double traceE[NumQuadPoints];
         q = 0;
         
@@ -447,10 +450,12 @@ void StVenantKirchhoffMaterial_stress(mxArray* plhs[], const mxArray* prhs[])
                     GradUh[d1][d2][q] = GradUh[d1][d2][q] + U_h[e_k] * gradphi[d2][k][q];
                 }
                 F[d1][d2][q]  = Id[d1][d2] + GradUh[d1][d2][q];
+                F2[d1][d2]    = Id[d1][d2] + GradUh[d1][d2][q];
             }
         }
         compute_GreenStrainTensor(dim, NumQuadPoints, F, Id, E, q );
         traceE[q] = TraceQ(dim, NumQuadPoints, E, q);
+        double detF = MatrixDeterminant(dim, F2);
         
         double P1[dim][dim];
         for (d1 = 0; d1 < dim; d1 = d1 + 1 )
@@ -466,7 +471,19 @@ void StVenantKirchhoffMaterial_stress(mxArray* plhs[], const mxArray* prhs[])
         {
             for (d2 = 0; d2 < dim; d2 = d2 + 1 )
             {
-                Sigma[ie+(d1+d2*dim)*noe] =  P_Uh[d1][d2] ;
+                P[ie+(d1+d2*dim)*noe] =  P_Uh[d1][d2] ;
+            }
+        }
+        
+        double Sigma_tmp[dim][dim];
+        /* Sigma = 1 / det(F) * P * F^T */
+        MatrixProductAlphaT2(dim,  1.0 / detF, P_Uh, F2, Sigma_tmp );
+        
+        for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+        {
+            for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+            {
+                Sigma[ie+(d1+d2*dim)*noe] =  Sigma_tmp[d1][d2] ;
             }
         }
     }

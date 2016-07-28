@@ -218,7 +218,7 @@ end
 if DATA.Output.ComputeVonMisesStress
     fprintf('\n   -- Compute Element Stresses... ');
     t_assembly = tic;
-    [Sigma]  =  SolidModel.compute_stress(U_k);%CSM_Assembler_function('stress', MESH, DATA, FE_SPACE, full(U_k));
+    [~, Sigma]  =  SolidModel.compute_stress(U_k);%CSM_Assembler_function('stress', MESH, DATA, FE_SPACE, full(U_k));
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);
     

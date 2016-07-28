@@ -438,15 +438,17 @@ classdef CSM_Assembler < handle
         
         %==========================================================================
         %% Compute stress
-        function [S] = compute_stress(obj, U_h)
-            
+        function [P, Sigma] = compute_stress(obj, U_h)
             % C_OMP compute element stresses, returns dense matrix of size
             % N_elements x MESH.dim^2
+            %
+            % P is the First Piola-Kirchhof stress tensor, while Sigma is
+            % the Cauchy stress tensor ( Sigma = 1 / det(F) * P * F^T )
             
             [quad_nodes, quad_weights]   = quadrature(obj.M_MESH.dim, 1);
             [phi, dphi_ref]              = fem_basis(obj.M_FE_SPACE.dim, obj.M_FE_SPACE.fem, quad_nodes);
             
-            [S] = CSM_assembler_C_omp(obj.M_MESH.dim, [obj.M_MaterialModel,'_stress'], obj.M_MaterialParam, ...
+            [P, Sigma] = CSM_assembler_C_omp(obj.M_MESH.dim, [obj.M_MaterialModel,'_stress'], obj.M_MaterialParam, ...
                 U_h, obj.M_MESH.elements, obj.M_FE_SPACE.numElemDof,...
                 quad_weights, obj.M_MESH.invjac, obj.M_MESH.jac, phi, dphi_ref);
             

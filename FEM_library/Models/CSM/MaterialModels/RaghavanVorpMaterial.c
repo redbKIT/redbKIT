@@ -637,9 +637,11 @@ void RaghavanVorpMaterial_stress(mxArray* plhs[], const mxArray* prhs[])
     int nln2    = nln*nln;
     
     plhs[0] = mxCreateDoubleMatrix(noe,dim*dim, mxREAL);
+    plhs[1] = mxCreateDoubleMatrix(noe,dim*dim, mxREAL);
     
-    double* Sigma    = mxGetPr(plhs[0]);
-    
+    double* P        = mxGetPr(plhs[0]);
+    double* Sigma    = mxGetPr(plhs[1]);
+
     int k,l;
     int q;
     int NumQuadPoints     = mxGetN(prhs[6]);
@@ -752,7 +754,19 @@ void RaghavanVorpMaterial_stress(mxArray* plhs[], const mxArray* prhs[])
         {
             for (d2 = 0; d2 < dim; d2 = d2 + 1 )
             {
-                Sigma[ie+(d1+d2*dim)*noe] =  P_Uh[d1][d2] ;
+                P[ie+(d1+d2*dim)*noe] =  P_Uh[d1][d2] ;
+            }
+        }
+        
+        double Sigma_tmp[dim][dim];
+        /* Sigma = 1 / det(F) * P * F^T */
+        MatrixProductAlphaT2(dim,  1.0 / detF[q], P_Uh, F[q], Sigma_tmp );
+        
+        for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+        {
+            for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+            {
+                Sigma[ie+(d1+d2*dim)*noe] =  Sigma_tmp[d1][d2] ;
             }
         }
     }
