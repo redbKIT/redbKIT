@@ -49,6 +49,11 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
             LinearElasticMaterial_jacobian(plhs, prhs);
     }
     
+    if (strcmp(Material_Model, "Linear_stress")==0)
+    {
+            LinearElasticMaterial_stress(plhs, prhs);
+    }
+    
     if (strcmp(Material_Model, "SEMMT_forces")==0)
     {
             SEMMTMaterial_forces(plhs, prhs);
