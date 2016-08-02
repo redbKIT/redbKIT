@@ -251,6 +251,22 @@ while ( t < tf )
         CSM_export_solution(MESH.dim, U_k, MESH.vertices, MESH.elements, MESH.numNodes, vtk_filename, k_t);
     end
     
+    %% Compute Von Mises Stress
+    if DATA.Output.ComputeVonMisesStress
+        fprintf('\n   -- Compute Element Stresses... ');
+        t_assembly = tic;
+        [~, Sigma]  =  SolidModel.compute_stress(U_k);
+        t_assembly = toc(t_assembly);
+        fprintf('done in %3.3f s\n', t_assembly);
+        
+        if MESH.dim == 2
+            Sigma_VM = sqrt(  Sigma(:,1).^2 + Sigma(:,4).^2 - Sigma(:,1) .* Sigma(:,4) + 3 * Sigma(:,2).^2 );
+        elseif MESH.dim == 3
+            Sigma_VM = sqrt( 0.5 * ( (Sigma(:,1) - Sigma(:,5)).^2 + (Sigma(:,5) - Sigma(:,9)).^2 + (Sigma(:,9) - Sigma(:,1)).^2 + 6 * ( Sigma(:,2).^2 + Sigma(:,6).^2 + Sigma(:,7).^2 ) ) );
+        end
+        CSM_export_VonMisesStress(MESH.dim, Sigma_VM, MESH.vertices, MESH.elements, [vtk_filename, 'VMstress_'], k_t);
+    end
+    
     TimeAdvance.Update( U_k );
     
     F_ext_old = F_ext;

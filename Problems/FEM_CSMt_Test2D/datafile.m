@@ -59,13 +59,5 @@ data.LinearSolver.mumps_reordering  = 5;
 data.NonLinearSolver.tol               = 1e-6; 
 data.NonLinearSolver.maxit             = 10; 
 
-%% ROM Options
-data.OfflineTraining.Solution.h5_filename       = 'Snapshots/DisplacementSnapshots.h5';
-data.OfflineTraining.Solution.h5_section        = 'Displacement';
-data.OfflineTraining.Solution.SamplingFrequency = 1;
-
-data.OfflineTraining.System.h5_filename                      = 'Snapshots/SystemSnapshots.h5';
-data.OfflineTraining.System.InternalForces.h5_section        = 'F_int';
-data.OfflineTraining.System.InternalForces.SamplingFrequency = 1;
-data.OfflineTraining.System.ExternalForces.h5_section        = 'F_ext';
-data.OfflineTraining.System.ExternalForces.SamplingFrequency = 1;
+% Output Options
+data.Output.ComputeVonMisesStress = true;
