@@ -28,7 +28,7 @@ for i = 1 : length(h)
     [U, FE_SPACE, MESH, DATA, errorL2(i), errorH1(i)]  = Elliptic_Solver(dim, elements, vertices, boundaries, fem, 'Dirichlet_data');
     
     %% export solution
-    ADR_export_solution(dim, U, MESH.vertices, MESH.elements, ['Figures/SOL_',num2str(i)]);
+    ADR_export_solution(dim, U(1:MESH.numVertices), MESH.vertices, MESH.elements, ['Figures/SOL_',num2str(i)]);
     
 end
 

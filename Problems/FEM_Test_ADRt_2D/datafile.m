@@ -13,7 +13,6 @@ data.bcNeu = @(x,y,t,param)(0.*x.*y);
 
 % Robin
 data.bcRob_alpha    = @(x,y,t,param)(0.*x);
-data.bcRob_gamma    = @(x,y,t,param)(0.*x);
 data.bcRob_fun      = @(x,y,t,param)(0.*x);
 
 % BC flag
