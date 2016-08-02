@@ -1,16 +1,21 @@
-function [u, FE_SPACE, MESH, DATA, errorL2, errorH1] = Elliptic_Solver(dim, elements, vertices, boundaries, fem, data_file, param)
+function [u, FE_SPACE, MESH, DATA, errorL2, errorH1] = Elliptic_Solver(dim, elements, vertices, boundaries, fem, data_file, param, vtk_filename)
 %ELLIPTIC_SOLVER diffusion-transport-reaction finite element solver
 %
 %   [U, FE_SPACE, MESH, DATA, ERRORL2, ERRORH1] = ...
-%    ELLIPTIC2D_SOLVER(ELEMENTS, VERTICES, BOUNDARIES, FEM, DATA_FILE, PARAM)
+%    ELLIPTIC2D_SOLVER(DIM, ELEMENTS, VERTICES, BOUNDARIES, FEM, DATA_FILE, 
+%                      PARAM, VTK_FILENAME)
 %
 %   Inputs:
+%     DIM: space dimension, either 2 or 3
 %     ELEMENTS, VERTICES, BOUNDARIES: mesh information
 %     FEM: string 'P1' or 'P2'
 %     DATA_FILE: name of the file defining the problem data and
 %          boundary conditions.
 %     PARAM: vector of parameters possibly used in the data_file; 
 %         if not provided, the PARAM vector is set to the empty vector.
+%     VTK_FILENAME: string containing the filename for exporting the
+%         solution in the VTK File Format. If not provided or empty, the
+%         solution is not exported to vtk.
 %
 %   Outputs:
 %     U: problem solution
@@ -36,6 +41,10 @@ end
 
 if nargin < 7
     param = [];
+end
+
+if nargin < 8
+    vtk_filename = [];
 end
 
 %% Read problem parameters and BCs from data_file
@@ -128,6 +137,10 @@ fprintf('\n       ** time to solve the linear system in %3.3f s \n\n', LinSolver
 
 u(MESH.Dirichlet_dof)     = u_D;
 
+%% Export to VTK
+if ~isempty(vtk_filename)
+    ADR_export_solution(MESH.dim, u(1:MESH.numVertices), MESH.vertices, MESH.elements, vtk_filename);
+end
 
 %% Compute L2 and H1 errors
 errorL2 = [];

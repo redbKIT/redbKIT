@@ -1,26 +1,9 @@
 function [u, FE_SPACE, MESH, DATA] = ADRt_Solver(dim, elements, vertices, boundaries, fem, data_file, param, vtk_filename)
 %ADRT_SOLVER time-dependent diffusion-transport-reaction finite element solver
 %
-%   [U, FE_SPACE, MESH, DATA, ERRORL2, ERRORH1] = ...
-%    ADRT_SOLVER(ELEMENTS, VERTICES, BOUNDARIES, FEM, DATA_FILE, PARAM)
-%
-%   Inputs:
-%     ELEMENTS, VERTICES, BOUNDARIES: mesh information
-%     FEM: string 'P1' or 'P2'
-%     DATA_FILE: name of the file defining the problem data and
-%          boundary conditions.
-%     PARAM: vector of parameters possibly used in the data_file; 
-%         if not provided, the PARAM vector is set to the empty vector.
-%
-%   Outputs:
-%     U: problem solution
-%     ERRORL2: L2-error between the numerical solution and the exact one 
-%        (provided by the user in the data_file)
-%     ERRORH1: H1-error between the numerical solution and the exact one 
-%        (provided by the user in the data_file)
-%     FE_SPACE: struct containing Finite Element Space information
-%     MESH: struct containing mesh information
-%     DATA: struct containing problem data
+%   [U, FE_SPACE, MESH, DATA] = ...
+%    ADRT_SOLVER(DIM, ELEMENTS, VERTICES, BOUNDARIES, FEM, DATA_FILE, 
+%                PARAM, VTK_FILENAME)
 
 %   This file is part of redbKIT.
 %   Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne (EPFL)
@@ -165,7 +148,7 @@ while (t < tf)
     u(MESH.Dirichlet_dof)     = u_D;
     
     if ~isempty(vtk_filename)
-        ADR_export_solution(MESH.dim, u, MESH.vertices, MESH.elements, vtk_filename, k_t);
+        ADR_export_solution(MESH.dim, u(1:MESH.numVertices), MESH.vertices, MESH.elements, vtk_filename, k_t);
     end
     
     norm_n  = norm( BDFhandler.M_states{end} - u) / norm(BDFhandler.M_states{end});
