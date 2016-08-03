@@ -1,4 +1,4 @@
-function [u, FE_SPACE, MESH, DATA] = CSMt_Solver2(dim, elements, vertices, boundaries, fem, data_file, param, vtk_filename, sol_history, Training_Options)
+function [u, FE_SPACE, MESH, DATA] = CSMt_Solver(dim, elements, vertices, boundaries, fem, data_file, param, vtk_filename, sol_history, Training_Options)
 %CSMT_SOLVER Dynamic Structural Finite Element Solver
 
 %   This file is part of redbKIT.
