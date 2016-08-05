@@ -76,13 +76,12 @@ for k = 1 : FE_SPACE.numComponents
             du0 = [du0; DATA.du0{k}( MESH.nodes(1,:), MESH.nodes(2,:), MESH.nodes(3,:), t0, param )'];
     end
 end
-d2u0 = 0*du0;
+
 u = u0;
 if ~isempty(vtk_filename)
     CSM_export_solution(MESH.dim, u0, MESH.vertices, MESH.elements, MESH.numNodes, vtk_filename, 0);
 end
 
-TimeAdvance.Initialize( u0, du0, d2u0 );
 Coef_Mass = TimeAdvance.MassCoefficient( );
 
 fprintf('\n **** PROBLEM''S SIZE INFO ****\n');
@@ -115,6 +114,23 @@ M    =  SolidModel.compute_mass();
 M    =  M * DATA.Density;
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s', t_assembly);
+
+%% Initial Acceleration
+fprintf('\n -- Assembling external Forces at t0... ');
+t_assembly = tic;
+F_ext_0  = SolidModel.compute_volumetric_forces(t0);
+t_assembly = toc(t_assembly);
+fprintf('done in %3.3f s\n', t_assembly);
+
+fprintf('\n -- Assembling internal Forces at t0... ');
+t_assembly = tic;
+F_in_0   =  SolidModel.compute_internal_forces( u0 );
+t_assembly = toc(t_assembly);
+fprintf('done in %3.3f s\n', t_assembly)
+
+d2u0 = M \ (F_ext_0 - F_in_0);
+
+TimeAdvance.Initialize( u0, du0, d2u0 );
 
 LinSolver = LinearSolver( DATA.LinearSolver );
 

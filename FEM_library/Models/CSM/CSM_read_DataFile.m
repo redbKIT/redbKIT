@@ -16,8 +16,9 @@ end
 for d = 1 : dim
     DATA.flag_dirichlet{d} = [];
     DATA.flag_neumann{d}   = [];
-    DATA.flag_pressure{d}     = [];
+    DATA.flag_pressure{d}  = [];
     DATA.flag_robin{d}     = [];
+    DATA.flag_clamp_points{d} = [];
 end
 
 DATA.flag_dirichletNormal = [];

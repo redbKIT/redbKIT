@@ -133,6 +133,7 @@ switch model
             type_Neumann   = DATA.flag_neumann{d};
             type_Pressure  = DATA.flag_pressure{d};
             type_Robin     = DATA.flag_robin{d};
+            type_clamp_points = DATA.flag_clamp_points{d};
             
             if isempty(type_Dirichlet) && isempty(type_Neumann) && isempty(type_Pressure) && isempty(type_Robin)
                 error(['No boundary conditions are imposed on component ', num2str(d)]);
@@ -144,14 +145,25 @@ switch model
                 % Computes the Dirichlet dof of the domain
                 nDir                    = length(type_Dirichlet);
                 Dirichlet_side          = [];
-                flag_Dirichlet_vertices = [];
                 for kk = 1 : nDir
-                    Dirichlet_side          = [Dirichlet_side,find(MESH.boundaries(bc_flag_row,:) == type_Dirichlet(kk))];
-                    flag_Dirichlet_vertices = [flag_Dirichlet_vertices,type_Dirichlet(kk)];
+                    this_Dirichlet_side     = find(MESH.boundaries(bc_flag_row,:) == type_Dirichlet(kk));
+                    this_Dirichlet_dof      = MESH.boundaries(1:MESH.numBoundaryDof, unique( this_Dirichlet_side ) );
+                    MESH.DiriDof_CompFlag{d,kk}  = unique(this_Dirichlet_dof(:));
+                    Dirichlet_side          = [Dirichlet_side, this_Dirichlet_side];
                 end
                 Dirichlet_side             = unique(Dirichlet_side);
                 Dirichlet_dof              = MESH.boundaries(1:MESH.numBoundaryDof,Dirichlet_side);
-                MESH.Dirichlet_dof_c{d}    = unique(Dirichlet_dof(:));
+                Dirichlet_dof              = unique( Dirichlet_dof(:) );
+            else
+                Dirichlet_dof = [];
+            end
+                
+            dir_ringDofs = type_clamp_points;
+            MESH.clamp_points{d} = dir_ringDofs;
+                            
+            if ~isempty(type_Dirichlet) || ~isempty(dir_ringDofs)  
+                
+                MESH.Dirichlet_dof_c{d}    = unique([Dirichlet_dof; dir_ringDofs]);
                 MESH.internal_dof_c{d}     = setdiff([1:MESH.numNodes]',MESH.Dirichlet_dof_c{d});
                 
             else
@@ -161,7 +173,7 @@ switch model
             
             
             MESH.Dirichlet_dof = [MESH.Dirichlet_dof;  (d-1)*MESH.numNodes+MESH.Dirichlet_dof_c{d}];
-            MESH.internal_dof  = [MESH.internal_dof; (d-1)*MESH.numNodes+MESH.internal_dof_c{d}];
+            MESH.internal_dof  = [MESH.internal_dof; (d-1)*MESH.numNodes+MESH.internal_dof_c{d}];            
                         
             %% Find Neumann boundaries (if any)
             if ~isempty(type_Neumann)
