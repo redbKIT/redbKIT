@@ -1,6 +1,6 @@
 function [u, MassMatrix, FE_SPACE, MESH, DATA] = CSMt_POD_Solver(dim, elements, vertices, boundaries, fem, data_file, ...
     param, vtk_filename, sol_history, Training_Options, V_POD)
-%CSMT_SOLVER Dynamic Structural Finite Element Solver
+%CSMT_POD_SOLVER Dynamic Structural POD-Galerkin Solver
 %
 %   Training_Options should be a struct with fields:
 %      - Training_Options.h5_filename
@@ -159,7 +159,7 @@ while ( t < tf )
     maxIter    = DATA.NonLinearSolver.maxit;
     k          = 1;
     
-    [~, ~, u_D]   =  CSM_ApplyBC([], [], FE_SPACE, MESH, DATA, t);
+    [~, ~, u_D]   =  CSM_ApplyEssentialBC([], [], MESH, DATA, t);
     dU             = zeros(MESH.numNodes*MESH.dim,1);
     U_k            = u(:,end);
     U_k(MESH.Dirichlet_dof) = u_D;
@@ -204,7 +204,7 @@ while ( t < tf )
     % Apply boundary conditions
     fprintf('\n -- Apply boundary conditions ... ');
     t_assembly = tic;
-    [A, b]   =  CSM_ApplyBC(Jacobian, -Residual, FE_SPACE, MESH, DATA, t, 1); % attenzione a carichi 
+    [A, b]   =  CSM_ApplyEssentialBC(Jacobian, -Residual, MESH, DATA, t, 1);
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);
     
@@ -248,7 +248,7 @@ while ( t < tf )
         % Apply boundary conditions
         fprintf('\n   -- Apply boundary conditions ... ');
         t_assembly = tic;
-        [A, b]   =  CSM_ApplyBC(Jacobian, -Residual, FE_SPACE, MESH, DATA, t, 1);  % attenzione a carichi 
+        [A, b]   =  CSM_ApplyEssentialBC(Jacobian, -Residual, MESH, DATA, t, 1);
         t_assembly = toc(t_assembly);
         fprintf('done in %3.3f s\n', t_assembly);
         

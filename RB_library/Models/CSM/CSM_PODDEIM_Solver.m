@@ -49,11 +49,14 @@ red_MESH = ROM.Red_Mesh;
 %% Create and fill the FE_SPACE data structure
 [ FE_SPACE ] = buildFESpace( MESH, fem, dim, quad_order );
 
+fprintf('-------------------------------------------\n');
 fprintf('\n **** PROBLEM''S SIZE INFO ****\n');
-fprintf(' * Number of Vertices  = %d \n',MESH.numVertices);
-fprintf(' * Number of Elements  = %d \n',MESH.numElem);
-fprintf(' * Number of Nodes     = %d \n',MESH.numNodes);
-fprintf(' * Number of Dofs      = %d \n',length(MESH.internal_dof));
+fprintf(' * Number of Vertices         = %d \n', MESH.numVertices);
+fprintf(' * Number of Nodes            = %d \n', MESH.numNodes);
+fprintf(' * Number of Elements         = %d \n', MESH.numElem);
+fprintf(' * Number of Reduced Elements = %d \n', ROM.Red_Mesh.numElem);
+fprintf(' * %% Reduced Elements         = %2.2f \n', ROM.Red_Mesh.numElem / MESH.numElem * 100);
+fprintf(' * Number of Dofs             = %d \n', size(ROM.V,2));
 fprintf('-------------------------------------------\n');
 
 %% Generate Domain Decomposition (if required)
@@ -144,9 +147,6 @@ while (k <= maxIter && (incrNorm > tolNewton || resRelNorm > tolNewton ))
     dU_N                  = LinSolver.Solve( A, - Residual );
     dU(MESH.internal_dof) = ROM.V * dU_N;
     fprintf('\n        time to solve the linear system: %3.3f s \n', LinSolver.GetSolveTime());
-
-    % update Zero Normal Displacement condition
-    %dU = MESH.DirichletNormal_R * dU;
     
     % update solution
     U_k_tmp     = U_k + dU;
@@ -181,7 +181,7 @@ while (k <= maxIter && (incrNorm > tolNewton || resRelNorm > tolNewton ))
         % Assemble residual
         fprintf('\n    -- Backtracing alpha = %1.2e: Assembling internal forces... ', alpha);
         t_assembly = tic;
-        F_in       = SolidModel.compute_internal_forces(U_k_tmp);
+        F_in_FE    = SolidModel.compute_internal_forces(U_k_tmp);
         t_assembly = toc(t_assembly);        
         F_in_FE = F_in_FE + A_robin * U_k_tmp;
         F_in_FE = F_in_FE(MESH.internal_dof);

@@ -1,6 +1,6 @@
 function [u, FE_SPACE, MESH, DATA] = CSMt_PODDEIM_Solver(dim, elements, vertices, boundaries, fem, data_file, ...
     param, vtk_filename, sol_history, ROM)
-%CSMT_SOLVER Dynamic Structural Finite Element Solver
+%CSMT_PODDEIM_SOLVER Dynamic Structural POD-DEIM Solver
 
 %   This file is part of redbKIT.
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
@@ -142,7 +142,7 @@ while ( t < tf )
     maxIter    = DATA.NonLinearSolver.maxit;
     k          = 1;
     
-    [~, ~, u_D]   =  CSM_ApplyBC([], [], FE_SPACE, MESH, DATA, t);
+    [~, ~, u_D]   =  CSM_ApplyEssentialBC([], [], MESH, DATA, t);
     dU             = zeros(MESH.numNodes*MESH.dim,1);
     U_k            = u(:,end);
     U_k(MESH.Dirichlet_dof) = u_D;
@@ -175,19 +175,12 @@ while ( t < tf )
     fprintf('\n -- Assembling Jacobian matrix... ');
     t_assembly = tic;
     dF_in_FE   = SolidModel.compute_jacobian( U_k );
-    dF_in_FE   =  CSM_ApplyBC(dF_in_FE, [], FE_SPACE, MESH, DATA, t, 1); % attenzione a carichi 
-    dF_in      =  ROM.LeftProjection_int * ( dF_in_FE(ROM.IDEIM_in, : ) * ROM.V );
+    dF_in_FE   = CSM_ApplyEssentialBC(dF_in_FE, [], MESH, DATA, t, 1);
+    dF_in      = ROM.LeftProjection_int * ( dF_in_FE(ROM.IDEIM_in, : ) * ROM.V );
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);        
             
     Jacobian  = Coef_Mass * M + (1 - TimeAdvance.M_alpha_f) * dF_in;
-    
-%     % Apply boundary conditions
-%     fprintf('\n -- Apply boundary conditions ... ');
-%     t_assembly = tic;
-%     [A_FE, b]   =  CSM_ApplyBC(Jacobian, -Residual, FE_SPACE, MESH, DATA, t, 1); % attenzione a carichi 
-%     t_assembly = toc(t_assembly);
-%     fprintf('done in %3.3f s\n', t_assembly);
 
     res0Norm = norm(Residual);
         
@@ -215,8 +208,8 @@ while ( t < tf )
         F_in_FE      = F_in_FE(MESH.internal_dof);
         F_in         = ROM.LeftProjection_int * F_in_FE( ROM.IDEIM_in );
         dF_in_FE     = SolidModel.compute_jacobian( full ( U_k ) );
-        dF_in_FE   =  CSM_ApplyBC(dF_in_FE, [], FE_SPACE, MESH, DATA, t, 1); % attenzione a carichi
-        dF_in      =  ROM.LeftProjection_int * ( dF_in_FE(ROM.IDEIM_in, : ) * ROM.V );
+        dF_in_FE     = CSM_ApplyEssentialBC(dF_in_FE, [], MESH, DATA, t, 1);
+        dF_in        = ROM.LeftProjection_int * ( dF_in_FE(ROM.IDEIM_in, : ) * ROM.V );
         t_assembly = toc(t_assembly);
         fprintf('done in %3.3f s\n', t_assembly);
         
@@ -226,13 +219,6 @@ while ( t < tf )
                 - M * Csi;
             
         Jacobian  = Coef_Mass * M + (1 - TimeAdvance.M_alpha_f) * dF_in;
-        
-        % Apply boundary conditions
-%         fprintf('\n   -- Apply boundary conditions ... ');
-%         t_assembly = tic;
-%         [A, b]   =  CSM_ApplyBC(Jacobian, -Residual, FE_SPACE, MESH, DATA, t, 1);  % attenzione a carichi 
-%         t_assembly = toc(t_assembly);
-%         fprintf('done in %3.3f s\n', t_assembly);
         
         resRelNorm = norm(Residual) / res0Norm;
         

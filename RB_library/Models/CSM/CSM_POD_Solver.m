@@ -1,5 +1,12 @@
 function [u, FE_SPACE, MESH, DATA] = CSM_POD_Solver(dim, elements, vertices, boundaries, fem, data_file, param, vtk_filename, InitialGuess, Training_Options, V_POD)
 %CSM_POD_SOLVER Static Structural POD-Galerkin Solver
+%
+%   Training_Options should be a struct with fields:
+%      - Training_Options.h5_filename
+%      - Training_Options.InternalForces.h5_section
+%      - Training_Options.ExternalForces.h5_section
+%
+%   V_POD is a POD basis ( i.e. matrix of size #InternalDoFs x #PODmodes )
 
 %   This file is part of redbKIT.
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
@@ -57,7 +64,7 @@ fprintf('\n **** PROBLEM''S SIZE INFO ****\n');
 fprintf(' * Number of Vertices  = %d \n',MESH.numVertices);
 fprintf(' * Number of Elements  = %d \n',MESH.numElem);
 fprintf(' * Number of Nodes     = %d \n',MESH.numNodes);
-fprintf(' * Number of Dofs      = %d \n',length(MESH.internal_dof));
+fprintf(' * Number of Dofs      = %d \n',size(V_POD, 2));
 fprintf('-------------------------------------------\n');
 
 if export_h5
@@ -152,10 +159,11 @@ while (k <= maxIter && incrNorm > tolNewton && resRelNorm > tolNewton)
 
     % Solve
     fprintf('\n   -- Solve J x = -R ... ');  
-    Precon.Build( V_POD' * (A * V_POD) );
+    A_N = V_POD' * (A * V_POD);
+    Precon.Build( A_N );
     fprintf('\n        time to build the preconditioner: %3.3f s \n', Precon.GetBuildTime());
     LinSolver.SetPreconditioner( Precon );
-    dU_N                  = LinSolver.Solve( V_POD' * (A * V_POD), -V_POD' * Residual );
+    dU_N                  = LinSolver.Solve( A_N, -V_POD' * Residual );
     dU(MESH.internal_dof) = V_POD * dU_N;
     fprintf('\n        time to solve the linear system: %3.3f s \n', LinSolver.GetSolveTime());
 
