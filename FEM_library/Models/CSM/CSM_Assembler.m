@@ -173,7 +173,7 @@ classdef CSM_Assembler < handle
                                 ylt = ylt + vtemp'*coord_ref(j,:);
                             end
                             
-                            pressure = obj.M_DATA.bcPrex(xlt,ylt,t,param);
+                            pressure = obj.M_DATA.bcPrex(xlt,ylt,t,obj.M_DATA.param);
                             one       = ones(nof,nqn);
                             pressure = pressure.*one;
                             
@@ -199,18 +199,18 @@ classdef CSM_Assembler < handle
                     
                 case 3
                     % Neumann condition
-                    for k = 1 : MESH.dim
-                        if ~isempty(MESH.Neumann_side{k})
+                    for k = 1 : obj.M_MESH.dim
+                        if ~isempty(obj.M_MESH.Neumann_side{k})
                             
-                            [quad_points, wi] = quadrature(MESH.dim-1, obj.M_FE_SPACE.quad_order);
+                            [quad_points, wi] = quadrature(obj.M_MESH.dim-1, obj.M_FE_SPACE.quad_order);
                             csi = quad_points(1,:);
                             eta = quad_points(2,:);
-                            [phi]          =  fem_basis(MESH.dim, obj.M_FE_SPACE.fem, [csi; eta; 0*eta], 1);
+                            [phi]          =  fem_basis(obj.M_MESH.dim, obj.M_FE_SPACE.fem, [csi; eta; 0*eta], 1);
                             eta1           =  1-csi-eta;
                             nqn            =  length(wi);
                             
-                            nof         = length(MESH.Neumann_side{k});
-                            nbn         = MESH.numBoundaryDof;
+                            nof         = length(obj.M_MESH.Neumann_side{k});
+                            nbn         = obj.M_MESH.numBoundaryDof;
                             
                             Rrows       = zeros(nbn*nof,1);
                             Rcoef       = Rrows;
@@ -218,22 +218,22 @@ classdef CSM_Assembler < handle
                             xlt = zeros(nof,nqn); ylt = xlt; zlt = xlt;
                             coord_ref = [eta1; csi; eta];
                             for j = 1 : 2
-                                dof = MESH.boundaries(j,MESH.Neumann_side{k});
-                                vtemp = MESH.vertices(1,dof);
+                                dof = obj.M_MESH.boundaries(j,obj.M_MESH.Neumann_side{k});
+                                vtemp = obj.M_MESH.vertices(1,dof);
                                 xlt = xlt + vtemp'*coord_ref(j,:);
-                                vtemp = MESH.vertices(2,dof);
+                                vtemp = obj.M_MESH.vertices(2,dof);
                                 ylt = ylt + vtemp'*coord_ref(j,:);
-                                vtemp = MESH.vertices(3,dof);
+                                vtemp = obj.M_MESH.vertices(3,dof);
                                 zlt = zlt + vtemp'*coord_ref(j,:);
                             end
                             
-                            u_Neumann = obj.M_DATA.bcNeu{k}(xlt,ylt,zlt,t,param);
+                            u_Neumann = obj.M_DATA.bcNeu{k}(xlt,ylt,zlt,t,obj.M_DATA.param);
                             one       = ones(nof,nqn);
                             u_Neumann = u_Neumann.*one;
                             
-                            x    =  MESH.vertices(1,MESH.boundaries(1:3, MESH.Neumann_side{k}));
-                            y    =  MESH.vertices(2,MESH.boundaries(1:3, MESH.Neumann_side{k}));
-                            z    =  MESH.vertices(3,MESH.boundaries(1:3, MESH.Neumann_side{k}));
+                            x    =  obj.M_MESH.vertices(1,obj.M_MESH.boundaries(1:3, obj.M_MESH.Neumann_side{k}));
+                            y    =  obj.M_MESH.vertices(2,obj.M_MESH.boundaries(1:3, obj.M_MESH.Neumann_side{k}));
+                            z    =  obj.M_MESH.vertices(3,obj.M_MESH.boundaries(1:3, obj.M_MESH.Neumann_side{k}));
                             
                             areav = cross(  [x(2:3:end)-x(1:3:end);  y(2:3:end)-y(1:3:end);  z(2:3:end)-z(1:3:end)], ...
                                 [x(3:3:end)-x(1:3:end);  y(3:3:end)-y(1:3:end);  z(3:3:end)-z(1:3:end)]);
@@ -243,35 +243,35 @@ classdef CSM_Assembler < handle
                                 area   = 0.5*norm(areav(:,l));
                                 detjac = 2*area;
                                 
-                                face = MESH.Neumann_side{k}(l);
+                                face = obj.M_MESH.Neumann_side{k}(l);
                                 
                                 u_Neumann_loc  = u_Neumann(l,:).*wi;
                                 u_Neumann_loc  = u_Neumann_loc(1,:)';
                                 
-                                Rrows(1+(l-1)*nbn:l*nbn)    = MESH.boundaries(1:nbn,face);
+                                Rrows(1+(l-1)*nbn:l*nbn)    = obj.M_MESH.boundaries(1:nbn,face);
                                 Rcoef(1+(l-1)*nbn:l*nbn)    = detjac*phi*u_Neumann_loc;
                             end
-                            F = F + sparse(Rrows+(k-1)*MESH.numNodes,1,Rcoef,MESH.dim*MESH.numNodes,1);
+                            F = F + sparse(Rrows+(k-1)*obj.M_MESH.numNodes,1,Rcoef,obj.M_MESH.dim*obj.M_MESH.numNodes,1);
                             
                         end
                     end
                     
                     % Pressure condition
-                    for k = 1 : MESH.dim
-                        if ~isempty(MESH.Pressure_side{k})
+                    for k = 1 : obj.M_MESH.dim
+                        if ~isempty(obj.M_MESH.Pressure_side{k})
                             
-                            [quad_points, wi] = quadrature(MESH.dim-1, obj.M_FE_SPACE.quad_order);
+                            [quad_points, wi] = quadrature(obj.M_MESH.dim-1, obj.M_FE_SPACE.quad_order);
                             csi = quad_points(1,:);
                             eta = quad_points(2,:);
-                            [phi]          =  fem_basis(MESH.dim, obj.M_FE_SPACE.fem, [csi; eta; 0*eta], 1);
+                            [phi]          =  fem_basis(obj.M_MESH.dim, obj.M_FE_SPACE.fem, [csi; eta; 0*eta], 1);
                             eta1           =  1-csi-eta;
                             nqn            =  length(wi);
                             
-                            nbn         = MESH.numBoundaryDof;
+                            nbn         = obj.M_MESH.numBoundaryDof;
                             
                             for flag = 1 : length(obj.M_DATA.flag_pressure{k})
                                 
-                                nof         = length(MESH.Pressure_side_CompFlag{k,flag});
+                                nof         = length(obj.M_MESH.Pressure_side_CompFlag{k,flag});
                                 
                                 Rrows       = zeros(nbn*nof,1);
                                 Rcoef       = Rrows;
@@ -279,17 +279,17 @@ classdef CSM_Assembler < handle
                                 xlt = zeros(nof,nqn); ylt = xlt; zlt = xlt;
                                 coord_ref = [eta1; csi; eta];
                                 for j = 1 : 2
-                                    dof = MESH.boundaries(j,MESH.Pressure_side_CompFlag{k,flag});
-                                    vtemp = MESH.vertices(1,dof);
+                                    dof = obj.M_MESH.boundaries(j,obj.M_MESH.Pressure_side_CompFlag{k,flag});
+                                    vtemp = obj.M_MESH.vertices(1,dof);
                                     xlt = xlt + vtemp'*coord_ref(j,:);
-                                    vtemp = MESH.vertices(2,dof);
+                                    vtemp = obj.M_MESH.vertices(2,dof);
                                     ylt = ylt + vtemp'*coord_ref(j,:);
-                                    vtemp = MESH.vertices(3,dof);
+                                    vtemp = obj.M_MESH.vertices(3,dof);
                                     zlt = zlt + vtemp'*coord_ref(j,:);
                                 end
                                 
                                 if length(obj.M_DATA.bcPrex) == 1
-                                    pressure = obj.M_DATA.bcPrex(xlt,ylt,zlt,t,param);
+                                    pressure = obj.M_DATA.bcPrex(xlt,ylt,zlt,t,obj.M_DATA.param);
                                 else
                                     pressure = obj.M_DATA.bcPrex{obj.M_DATA.flag_pressure{k}(flag)}(xlt,ylt,zlt,t,param);
                                 end
