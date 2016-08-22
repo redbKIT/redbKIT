@@ -71,13 +71,12 @@ for k = 1 : FE_SPACE.numComponents
             du0 = [du0; DATA.du0{k}( MESH.nodes(1,:), MESH.nodes(2,:), MESH.nodes(3,:), t0, param )'];
     end
 end
-d2u0 = 0*du0;
+
 u = u0;
 if ~isempty(vtk_filename)
     CSM_export_solution(MESH.dim, u0, MESH.vertices, MESH.elements, MESH.numNodes, vtk_filename, 0);
 end
 
-TimeAdvance.Initialize( ROM.V'*u0(MESH.internal_dof), ROM.V'*du0(MESH.internal_dof), ROM.V'*d2u0(MESH.internal_dof) );
 Coef_Mass = TimeAdvance.MassCoefficient( );
 
 fprintf('\n **** PROBLEM''S SIZE INFO ****\n');
@@ -105,24 +104,29 @@ fprintf('done in %3.3f s', t_assembly);
 
 LinSolver = LinearSolver( DATA.LinearSolver );
 
-% Assemble matrix and right-hand side
+%% Initial Acceleration
 fprintf('\n -- Assembling external Forces at t0... ');
 t_assembly = tic;
-F_ext_old_FE  = SolidModel.compute_external_forces(t0);
-F_ext_old_FE = F_ext_old_FE( MESH.internal_dof );
-F_ext_old = ROM.LeftProjection_ext * F_ext_old_FE( ROM.IDEIM_ext );
+F_ext_0_FE = SolidModel.compute_volumetric_forces(t0);
+F_ext_0_FE = F_ext_0_FE( MESH.internal_dof );
+F_ext_0    = ROM.LeftProjection_ext * F_ext_0_FE( ROM.IDEIM_ext );
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s\n', t_assembly);
 
 fprintf('\n -- Assembling internal Forces at t0... ');
 t_assembly = tic;
-F_in_old_FE  =  SolidModel.compute_internal_forces( u0 );
-F_in_old_FE  = F_in_old_FE( MESH.internal_dof );
-F_in_old     = ROM.LeftProjection_int * F_in_old_FE( ROM.IDEIM_in );
+F_in_0_FE  = SolidModel.compute_internal_forces( u0 );
+F_in_0_FE  = F_in_0_FE( MESH.internal_dof );
+F_in_0     = ROM.LeftProjection_int * F_in_0_FE( ROM.IDEIM_in );
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s\n', t_assembly)
 
+d2u0_N = M \ (F_ext_0 - F_in_0);
+
+TimeAdvance.Initialize( ROM.V'*u0(MESH.internal_dof), ROM.V'*du0(MESH.internal_dof), d2u0_N);%ROM.V'*d2u0(MESH.internal_dof) );
+
 U_kN = ROM.V' * u(MESH.internal_dof,1);
+U_n  = u0;
 
 %% Time Loop
 while ( t < tf )
@@ -152,7 +156,7 @@ while ( t < tf )
     % Assemble matrix and right-hand side
     fprintf('\n -- Assembling external Forces... ');
     t_assembly = tic;
-    F_ext_FE      = SolidModel.compute_external_forces( t );
+    F_ext_FE      = SolidModel.compute_external_forces( (1 - TimeAdvance.M_alpha_f) * t + TimeAdvance.M_alpha_f * (t-dt) );
     F_ext_FE      = F_ext_FE( MESH.internal_dof );
     F_ext         = ROM.LeftProjection_ext * F_ext_FE( ROM.IDEIM_ext );
     t_assembly = toc(t_assembly);
@@ -160,21 +164,17 @@ while ( t < tf )
     
     fprintf('\n -- Assembling internal Forces ... ');
     t_assembly = tic;
-    F_in_FE      = SolidModel.compute_internal_forces( U_k );
+    F_in_FE      = SolidModel.compute_internal_forces( (1 - TimeAdvance.M_alpha_f) * U_k + TimeAdvance.M_alpha_f * U_n );
     F_in_FE      = F_in_FE(MESH.internal_dof);
     F_in         = ROM.LeftProjection_int * F_in_FE( ROM.IDEIM_in );
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);
     
-    Residual  = Coef_Mass * M * U_kN +  ...
-                  (1 - TimeAdvance.M_alpha_f) * F_in  + TimeAdvance.M_alpha_f * F_in_old ...
-                - (1 - TimeAdvance.M_alpha_f) * F_ext + TimeAdvance.M_alpha_f * F_ext_old ...
-                - M * Csi;
-            
-            
+    Residual  = Coef_Mass * M * U_kN + F_in - F_ext - M * Csi;
+        
     fprintf('\n -- Assembling Jacobian matrix... ');
     t_assembly = tic;
-    dF_in_FE   = SolidModel.compute_jacobian( U_k );
+    dF_in_FE   = SolidModel.compute_jacobian( (1 - TimeAdvance.M_alpha_f) * U_k + TimeAdvance.M_alpha_f * U_n );
     dF_in_FE   = CSM_ApplyEssentialBC(dF_in_FE, [], MESH, DATA, t, 1);
     dF_in      = ROM.LeftProjection_int * ( dF_in_FE(ROM.IDEIM_in, : ) * ROM.V );
     t_assembly = toc(t_assembly);
@@ -204,20 +204,17 @@ while ( t < tf )
         % Assemble matrix and right-hand side
         fprintf('\n   -- Assembling internal forces... ');
         t_assembly = tic;
-        F_in_FE      = SolidModel.compute_internal_forces( full ( U_k ) );
+        F_in_FE      = SolidModel.compute_internal_forces( (1 - TimeAdvance.M_alpha_f) * U_k + TimeAdvance.M_alpha_f * U_n );
         F_in_FE      = F_in_FE(MESH.internal_dof);
         F_in         = ROM.LeftProjection_int * F_in_FE( ROM.IDEIM_in );
-        dF_in_FE     = SolidModel.compute_jacobian( full ( U_k ) );
+        dF_in_FE     = SolidModel.compute_jacobian( (1 - TimeAdvance.M_alpha_f) * U_k + TimeAdvance.M_alpha_f * U_n );
         dF_in_FE     = CSM_ApplyEssentialBC(dF_in_FE, [], MESH, DATA, t, 1);
         dF_in        = ROM.LeftProjection_int * ( dF_in_FE(ROM.IDEIM_in, : ) * ROM.V );
         t_assembly = toc(t_assembly);
         fprintf('done in %3.3f s\n', t_assembly);
         
-        Residual  = Coef_Mass * M * U_kN +  ...
-                  (1 - TimeAdvance.M_alpha_f) * F_in  + TimeAdvance.M_alpha_f * F_in_old ...
-                - (1 - TimeAdvance.M_alpha_f) * F_ext + TimeAdvance.M_alpha_f * F_ext_old ...
-                - M * Csi;
-            
+        Residual  = Coef_Mass * M * U_kN + F_in - F_ext - M * Csi;
+    
         Jacobian  = Coef_Mass * M + (1 - TimeAdvance.M_alpha_f) * dF_in;
         
         resRelNorm = norm(Residual) / res0Norm;
@@ -233,15 +230,14 @@ while ( t < tf )
         u = U_k;
     end
     
+    U_n = U_k;
+
     %% Export to VTK
     if ~isempty(vtk_filename)
         CSM_export_solution(MESH.dim, U_k, MESH.vertices, MESH.elements, MESH.numNodes, vtk_filename, k_t);
     end
     
     TimeAdvance.Update( U_kN );
-    
-    F_ext_old = F_ext;
-    F_in_old  = F_in;
     
     iter_time = toc(iter_time);
     fprintf('\n-------------- Iteration time: %3.2f s -----------------',iter_time);
