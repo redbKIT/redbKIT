@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>redbKIT</title>
+	<title>Getting Started</title>
 	<link rel="stylesheet" type="text/css" href="http://redbkit.github.io/redbKIT/assets/css/styles_feeling_responsive.css">
 	<script src="http://redbkit.github.io/redbKIT/assets/js/modernizr.min.js"></script>
 
@@ -31,9 +31,9 @@
 
 
 	<!-- Facebook Open Graph -->
-	<meta property="og:title" content="redbKIT">
+	<meta property="og:title" content="Getting Started">
 	<meta property="og:description" content="»redbKIT:« a MATLAB library for reduced-order modeling of parametrized PDEs">
-	<meta property="og:url" content="http://redbkit.github.io/redbKIT/index.html">
+	<meta property="og:url" content="http://redbkit.github.io/redbKIT/getting-started/">
 	<meta property="og:locale" content="en_EN">
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="redbKIT">
@@ -78,8 +78,31 @@
 	
 
 	
+        <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    TeX: {
+      equationNumbers: {
+        autoNumber: "AMS"
+      }
+    },
+    tex2jax: {
+      inlineMath: [ ['$','$'] ],
+      displayMath: [ ['$$','$$'] ],
+      processEscapes: true,
+    }
+  });
+</script>
+<script type="text/javascript"
+        src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { extensions: ["color.js"] }});
+</script>
+
+        
 </head>
-<body id="top-of-page" class="myfrontpage">
+<body id="top-of-page" class="page-fullwidth">
 	
 	<div id="navigation" class="sticky">
   <nav class="top-bar" role="navigation" data-topbar>
@@ -157,7 +180,7 @@
 
             
             
-              <li class="active"><a href="http://redbkit.github.io/redbKIT/">About</a></li>
+              <li><a href="http://redbkit.github.io/redbKIT/">About</a></li>
               <li class="divider"></li>
 
             
@@ -187,7 +210,7 @@
 
             
             
-              <li><a href="http://redbkit.github.io/redbKIT/getting-started/">Getting Started</a></li>
+              <li class="active"><a href="http://redbkit.github.io/redbKIT/getting-started/">Getting Started</a></li>
               <li class="divider"></li>
 
             
@@ -401,90 +424,129 @@
 
 
 
-
 	
 
 
 <div class="row t30">
-	<div class="small-14 columns">
+	<div class="medium-9 small-centered columns">
 		<article>
 			<header>
 				
-				<h1></h1>
+				<h1>Getting Started</h1>
 			</header>
 
 			
 
-			<div class="row t50">
-	
-	<div class="medium-4 columns">
-		
-		<ul class="small-block-grid-1">
-  		<li><a href="http://www.springer.com/us/book/9783319154305#aboutBook"><img src="http://redbkit.github.io/redbKIT/images/Back_Cover.png" alt="" /></a></li>
-		</ul>
-
-		<h2 class="font-size-h2 t10"> What is redbKIT? </h2>
-
-		redbKIT is a <a href="http://www.mathworks.com/products/matlab/">MATLAB</a> library for finite element simulation and reduced-order modeling of Partial Differential Equations. 
-
-		In particular, it includes straightforward implementations of many of the algorithms presented in the companion book.
- 		<br /> <br /> 
-	<!--
-		<div class="medium-9 medium-centered small-5 small-centered columns">
-		<ul class="medium-block-grid-1">
-  			<li><a href="http://www.springer.com/us/book/9783319154305#aboutBook"><img src="http://redbkit.github.io/redbKIT/images/Back_Cover.png" alt=""></a></li>
-		</ul>
-		</div>
-	-->
-
-	<p><a class="button tiny radius" href="https://github.com/redbKIT/redbKIT">More ›</a></p>
-
-	</div>
-
-	<div class="medium-4 columns">
-		
-<ul class="small-block-grid-1">
-  		<li><a href="http://redbkit.github.io/redbKIT/getting-started/"><img src="http://redbkit.github.io/redbKIT/images//simulations/ElasticBeamHome.png" alt="" /></a></li>
-		</ul>
-
-		<h2 class="font-size-h2 t10"> Features </h2>
-
-		redbKIT consists of three main packages
-		<br /> <br /> 
-		<code class="highlighter-rouge">FEM_library</code> 
-		provides 2D/3D finite elements approximations of advection-diffusion-reaction equations, Navier-Stokes equations, nonlinear elastostatic and elastodynamics, and fluid-structure interaction problems.  
-		<br />  <br /> 
-		<code class="highlighter-rouge">RB_library</code>  
-		implements Galerkin and least-squares RB methods, POD, greedy algoritm, EIM, DEIM, MDEIM etc. 
-		<br /> <br /> 
-		<code class="highlighter-rouge">Problems</code> contains a gallery of tests, examples and applications.
-		<br /> <br /> 
-		<p><a class="button tiny radius" href="http://redbkit.github.io/redbKIT/getting-started/">More ›</a></p>
-
-	</div>
-
-	<div class="medium-4 columns">
-		
-		<ul class="small-block-grid-1">
-  		<li><a href="https://github.com/redbKIT/redbKIT/releases"><img src="http://redbkit.github.io/redbKIT/images/DownloadHome2.png" alt="" /></a></li>
-		</ul>
-
-		<h2 class="font-size-h2 t10"> How to get it </h2>
-
-		redbKIT is free and distributed under a BSD License. You can directly download the current release or clone the git repository.
-		<br /> <br /> 
-		<p><a class="button tiny radius" href="http://redbkit.github.io/redbKIT/download-install/">More ›</a></p>
-	</div>
-
-	
+			<div>
+  <!-- -->
+<ul id="markdown-toc">
+  <li><a href="#rblibrary" id="markdown-toc-rblibrary">RB_library</a></li>
+  <li><a href="#femlibrary" id="markdown-toc-femlibrary">FEM_library</a></li>
+  <li><a href="#problems" id="markdown-toc-problems">Problems</a></li>
+  <li><a href="#usage" id="markdown-toc-usage">Usage</a></li>
+</ul>
 
 </div>
-<!-- /.row -->
 
+<p>redbKIT is a <a href="http://www.mathworks.com/products/matlab/">MATLAB</a> library for finite element simulation and reduced-order modeling of PDEs.</p>
+
+<p><code class="highlighter-rouge">redbKIT</code> consists of three main packages: <a href="https://github.com/redbKIT/redbKIT/tree/master/RB_library"><code class="highlighter-rouge">RB_library</code></a>, <a href="https://github.com/redbKIT/redbKIT/tree/master/FEM_library"><code class="highlighter-rouge">FEM_library</code></a> and <a href="https://github.com/redbKIT/redbKIT/tree/master/Problems"><code class="highlighter-rouge">Problems</code></a>, which are briefly described below.</p>
+
+<h2 id="rblibrary">RB_library</h2>
+
+<p>The <code class="highlighter-rouge">RB_library</code> includes straightforward implementations of many of the algorithms presented in Chapters 3, 6, 7 and 10 of the book</p>
+
+<blockquote>
+  <p><a href="http://www.springer.com/us/book/9783319154305#aboutBook"><strong>[QMN16] A. Quarteroni, A. Manzoni, F. Negri. Reduced Basis Methods for Partial Differential Equations. An Introduction</strong>, Springer, 2016.</a></p>
+</blockquote>
+
+<p>Notable examples are the following:</p>
+
+<ul>
+  <li>proper orthogonal decomposition</li>
+  <li>greedy algorithm</li>
+  <li>radial basis function interpolation of stability factors</li>
+  <li>Galerkin and least-squares reduced basis methods</li>
+  <li>the empirical interpolation method and its discrete variant</li>
+</ul>
+
+<p>The implementation is almost independent of the underlying high-fidelity approximation, provided that the high-fidelity model is described in a specified format. Here, we rely on the finite element method as high-fidelity approximation. See below.</p>
+
+<p>As of Release 2.0, an implementation of the Matrix Discrete Empirical Interpolation Method (see <a href="http://www.sciencedirect.com/science/article/pii/S0021999115006543">[NMA15]</a>) as well as an example of its application to the Helmholtz equation are provided.</p>
+
+<h2 id="femlibrary">FEM_library</h2>
+
+<p>Provides a flexible implementation for the following families of problems:</p>
+
+<ul>
+  <li>
+    <p>2D/3D steady and unsteady diffusion-transport-reaction equations, with P1/P2 finite elements and SUPG stabilized P1 finite elements.</p>
+  </li>
+  <li>2D/3D steady and unsteady  Navier-Stokes equations approximated by
+    <ul>
+      <li>P2-P1 or P1Bubble-P1 finite elements for velocity and pressure spaces, respectively;</li>
+      <li>P1-P1 finite elements stabilized with the SUPG stabilization (implemented as in the framework of the Variational MultiScale Method).</li>
+    </ul>
+
+    <p>For the steady case, Newton iterations are provided. For the unsteady case, time advancing is performed via BDF integrator, while the convection term can be treated either implicitly (with Newton subiterations) or with a semi-implicit scheme with extrapolation of the convective term.</p>
+  </li>
+  <li>
+    <p>2D/3D steady and unsteady structural problem. Both linear elasticity and nonlinear hyperelastic St. Venant Kirchhoff, nearly incompressible Neo-Hookean  and Raghavan-Vorp material models are implemented. For the steady case, a basic Newton algorithm with backtracking is provided. In the unsteady case, time advancing is performed via the generalized-$\alpha$ scheme suitably combined with Newton subiterations in the nonlinear case.</p>
+  </li>
+  <li>2D/3D Fluid-Structure Interaction (FSI) problems. The solver implements the following numerical approximations of the FSI problem:
+    <ul>
+      <li>(a) monolithic geometric convective explicit with semi-implicit fluid and linear/nonlinear structure</li>
+      <li>(b) monolithic fully-implicit</li>
+    </ul>
+
+    <p>In both cases:</p>
+
+    <ul>
+      <li>a condensed formulation is employed, i.e. only internal and interface fluid velocity, fluid pressure, and internal solid displacement are considered as degrees of freedom. In case (a), internal fluid displacement DoFs are automatically uncoupled from the Fluid-Solid problem. In case (b), since shape derivatives in the Jacobian matrix are not taken into account,  the mesh motion problem is only one-way coupled with the Fluid-Solid problem.</li>
+      <li>the fluid equations are approximated in time by means of a BDF scheme. Space discretization for the velocity can be either P2, P2Bubble or P1 with SUPG stabilization.</li>
+      <li>the structure can be either linear or nonlinear; time discretization is performed via the Newmark scheme.</li>
+      <li>for the mesh motion problem, we use the Solid Extension Mesh Motion technique with Jacobian-based stiffening.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>The package can load linear triangular and tetrahedral meshes either in the .msh format or in the <a href="http://www.mathworks.com/products/pde/index.html?s_tid=gn_loc_drop">MATLAB Partial Differential Equation Toolbox(R)</a> format. Results can be either visualized in MATLAB or exported in the (binary) <a href="http://www.vtk.org/wp-content/uploads/2015/04/file-formats.pdf">VTK format</a> for post-processing with <a href="http://www.paraview.org/">Paraview</a>.</p>
+
+<p>The assembly routines for the FE vectors and matrices are written in C code using suitable mex interfaces.  For this reason, before using the library you first need to compile the FE assemblers, as explained in the INSTALL file.  Loops over the elements are parallelized via OpenMP, while the global assembly of  sparse matrices from local contributes can be speeded-up by installing the <a href="http://user.it.uu.se/~stefane/freeware">FAST package</a>.</p>
+
+<p>The default linear solver is Matlab backslash (sparse direct solver). If available, also <a href="http://mumps.enseeiht.fr/index.php?page=home">MUMPS</a> can be used in a straightforward fashion.  For moderately large size problems, a One-Level (geometric) Additive Schwarz preconditioner can be employed  in combination with a suitable iterative solver (usually gmres). In this case, mesh partitioning is done through the <a href="http://www.cerfacs.fr/algor/Softs/MESHPART/">Meshpart toolbox</a> and <a href="http://glaros.dtc.umn.edu/gkhome/metis/metis/overview">Metis library</a>.</p>
+
+<h2 id="problems">Problems</h2>
+
+<p>The <code class="highlighter-rouge">Problems</code> contains a gallery of tests, examples and applications which are described in the <a href="http://redbkit.github.io/redbKIT/probgallery/">Problems Gallery</a>.</p>
+
+<h2 id="usage">Usage</h2>
+
+<p>Start MATLAB(R) and navigate to the <code class="highlighter-rouge">redbKIT</code> folder. Then, type in the MATLAB prompt</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&gt;&gt; setPath
+</code></pre>
+</div>
+
+<p>to add the <a href="https://github.com/redbKIT/redbKIT/tree/master/FEM_library"><code class="highlighter-rouge">FEM_library/</code></a> and <a href="https://github.com/redbKIT/redbKIT/tree/master/RB_library"><code class="highlighter-rouge">RB_library/</code></a> folders to the current path.
+A welcome message should appear: you can now start using redbKIT!</p>
+
+<p>A gallery of applications is provided in the folder <a href="https://github.com/redbKIT/redbKIT/tree/master/Problems"><code class="highlighter-rouge">Problems/</code></a>.</p>
+
+<p>To check that the code is correctly working, please type in the MATLAB prompt</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&gt;&gt; cd Problems
+&gt;&gt; test_all
+</code></pre>
+</div>
+
+<p>The <code class="highlighter-rouge">test_all.m</code> functions launches a series of tests and generates a log file <code class="highlighter-rouge">test_log.txt</code>. If all the tests are marked as <em>passed</em>, you can start enjoying <code class="highlighter-rouge">redbKIT</code>. Otherwise, do not hesitate to contact us by email at <a href="&#109;&#097;&#105;&#108;&#116;&#111;:&#114;&#101;&#100;&#098;&#107;&#105;&#116;&#064;&#103;&#109;&#097;&#105;&#108;&#046;&#099;&#111;&#109;">&#114;&#101;&#100;&#098;&#107;&#105;&#116;&#064;&#103;&#109;&#097;&#105;&#108;&#046;&#099;&#111;&#109;</a>.</p>
 
 		</article>
 	</div><!-- /.medium-12.columns -->
 </div><!-- /.row -->
+
+
 
 
 	

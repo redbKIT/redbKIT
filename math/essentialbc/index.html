@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>redbKIT</title>
+	<title>Essential boundary conditions</title>
 	<link rel="stylesheet" type="text/css" href="http://redbkit.github.io/redbKIT/assets/css/styles_feeling_responsive.css">
 	<script src="http://redbkit.github.io/redbKIT/assets/js/modernizr.min.js"></script>
 
@@ -31,9 +31,9 @@
 
 
 	<!-- Facebook Open Graph -->
-	<meta property="og:title" content="redbKIT">
+	<meta property="og:title" content="Essential boundary conditions">
 	<meta property="og:description" content="»redbKIT:« a MATLAB library for reduced-order modeling of parametrized PDEs">
-	<meta property="og:url" content="http://redbkit.github.io/redbKIT/index.html">
+	<meta property="og:url" content="http://redbkit.github.io/redbKIT/math/essentialbc/">
 	<meta property="og:locale" content="en_EN">
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="redbKIT">
@@ -78,8 +78,31 @@
 	
 
 	
+        <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    TeX: {
+      equationNumbers: {
+        autoNumber: "AMS"
+      }
+    },
+    tex2jax: {
+      inlineMath: [ ['$','$'] ],
+      displayMath: [ ['$$','$$'] ],
+      processEscapes: true,
+    }
+  });
+</script>
+<script type="text/javascript"
+        src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { extensions: ["color.js"] }});
+</script>
+
+        
 </head>
-<body id="top-of-page" class="myfrontpage">
+<body id="top-of-page" class="page-fullwidth">
 	
 	<div id="navigation" class="sticky">
   <nav class="top-bar" role="navigation" data-topbar>
@@ -157,7 +180,7 @@
 
             
             
-              <li class="active"><a href="http://redbkit.github.io/redbKIT/">About</a></li>
+              <li><a href="http://redbkit.github.io/redbKIT/">About</a></li>
               <li class="divider"></li>
 
             
@@ -401,90 +424,218 @@
 
 
 
-
 	
 
 
 <div class="row t30">
-	<div class="small-14 columns">
+	<div class="medium-9 small-centered columns">
 		<article>
 			<header>
 				
-				<h1></h1>
+				<h1>Essential boundary conditions</h1>
 			</header>
 
 			
 
-			<div class="row t50">
-	
-	<div class="medium-4 columns">
-		
-		<ul class="small-block-grid-1">
-  		<li><a href="http://www.springer.com/us/book/9783319154305#aboutBook"><img src="http://redbkit.github.io/redbKIT/images/Back_Cover.png" alt="" /></a></li>
-		</ul>
+			<script type="math/tex; mode=display">\newcommand{\bm}[1]{\boldsymbol{\mathbf{#1}}}
+\newcommand{\bvec}[1]{\mathbf{#1}}
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\bu}{\mathbf{u}}
+\newcommand{\bmv}{\mathbf{v}}
+\newcommand{\bmw}{\mathbf{w}}
+\newcommand{\Nh}[1][]{N_{h,#1}}
+\newcommand{\bU}{\mathbf{U}}
+\newcommand{\bp}{\bvec{p}}
+\newcommand{\VV}{\mathbf{V}}
+\newcommand{\WW}{\mathbf{W}}
+\newcommand{\QQ}{\mathbf{Q}}
+\renewcommand{\AA}{\mathbf{A}}
+\newcommand{\BB}{\mathbf{B}}
+\newcommand{\FF}{\mathbf{F}}
+\newcommand{\GG}{\mathbf{G}}
+\newcommand{\CC}{\mathbf{C}}
+\newcommand{\MM}{\mathbf{M}}
+\newcommand{\XX}{\mathbf{X}}
+\newcommand{\KK}{\mathbf{K}}
+\newcommand{\UU}{\mathbf{U}}
+\newcommand{\II}{\mathbf{I}}
+\renewcommand{\SS}{\mathbf{S}}
+\newcommand{\HH}{\mathbf{H}}
+\newcommand{\DD}{\mathbf{D}}
+\newcommand{\NN}{\mathbf{N}}
+\newcommand{\bmg}{\mathbf{g}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\JJ}{\mathbf{J}}
+\newcommand{\RR}{\mathbf{R}}</script>
 
-		<h2 class="font-size-h2 t10"> What is redbKIT? </h2>
+<p>We describe here the way essential (also called Dirichlet) boundary conditions are imposed in the <code class="highlighter-rouge">redbKIT</code> library.</p>
 
-		redbKIT is a <a href="http://www.mathworks.com/products/matlab/">MATLAB</a> library for finite element simulation and reduced-order modeling of Partial Differential Equations. 
+<h2 id="poisson-problem">Poisson problem</h2>
 
-		In particular, it includes straightforward implementations of many of the algorithms presented in the companion book.
- 		<br /> <br /> 
-	<!--
-		<div class="medium-9 medium-centered small-5 small-centered columns">
-		<ul class="medium-block-grid-1">
-  			<li><a href="http://www.springer.com/us/book/9783319154305#aboutBook"><img src="http://redbkit.github.io/redbKIT/images/Back_Cover.png" alt=""></a></li>
-		</ul>
-		</div>
-	-->
+<p>For the sake of simplicity, we restrict the discussion to the following Poisson problem:</p>
 
-	<p><a class="button tiny radius" href="https://github.com/redbKIT/redbKIT">More ›</a></p>
+<blockquote>
+  <script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}  
+\left\{
+\begin{aligned}
+ - \Delta u &=  f & \qquad  \quad \text{in } & \Omega  \\
+u &= g  & \qquad \quad \text{on } &\Gamma = \partial \Omega.
+\end{aligned}
+\right.
+\label{eq:LaplStrong}
+\end{equation} %]]></script>
+</blockquote>
 
-	</div>
+<p>Its weak formulation reads: find 
+<script type="math/tex">u \in V = \{ v \in H^1(\Omega) : v|_{\Gamma} = g\}</script> 
+such that</p>
 
-	<div class="medium-4 columns">
-		
-<ul class="small-block-grid-1">
-  		<li><a href="http://redbkit.github.io/redbKIT/getting-started/"><img src="http://redbkit.github.io/redbKIT/images//simulations/ElasticBeamHome.png" alt="" /></a></li>
-		</ul>
+<script type="math/tex; mode=display">\begin{equation} 
+\underbrace{\int_{\Omega} \nabla u \cdot \nabla v \, d\Omega}_{ a(u,v)} = \underbrace{\int_{\Omega} fv \, d\Omega}_{F(v)} \qquad \forall v \in V_0 = H^1_0(\Omega).
+\label{eq:LaplWeak}
+\end{equation}</script>
 
-		<h2 class="font-size-h2 t10"> Features </h2>
+<h2 id="finite-element-approximation">Finite element approximation</h2>
 
-		redbKIT consists of three main packages
-		<br /> <br /> 
-		<code class="highlighter-rouge">FEM_library</code> 
-		provides 2D/3D finite elements approximations of advection-diffusion-reaction equations, Navier-Stokes equations, nonlinear elastostatic and elastodynamics, and fluid-structure interaction problems.  
-		<br />  <br /> 
-		<code class="highlighter-rouge">RB_library</code>  
-		implements Galerkin and least-squares RB methods, POD, greedy algoritm, EIM, DEIM, MDEIM etc. 
-		<br /> <br /> 
-		<code class="highlighter-rouge">Problems</code> contains a gallery of tests, examples and applications.
-		<br /> <br /> 
-		<p><a class="button tiny radius" href="http://redbkit.github.io/redbKIT/getting-started/">More ›</a></p>
+<p>We seek an approximate solution to \eqref{eq:LaplWeak} in a discrete space $X_h \subset H^1(\Omega)$ of dimension $N$ made of Lagrange finite elements. We denote by ${\phi_1, \dots, \phi_N}$ the nodal basis of $X_h$ and by 
+<script type="math/tex">\{ 
+\mathbf{n}_1, \dots, \mathbf{n}_N
+\}</script> 
+the associated nodes. We assume without loss of generality that the nodes located at the boundary are 
+<script type="math/tex">\{\mathbf{n}_1, \dots, \mathbf{n}_{N_\Gamma}\},</script>
+so that</p>
 
-	</div>
+<script type="math/tex; mode=display">V_{0h} = \text{span} \{ \phi_{N_\Gamma+1}, \dots, \phi_N \} = \{ v_h \in X_h \, : \, v_h|_{\Gamma} = 0 \}.</script>
 
-	<div class="medium-4 columns">
-		
-		<ul class="small-block-grid-1">
-  		<li><a href="https://github.com/redbKIT/redbKIT/releases"><img src="http://redbkit.github.io/redbKIT/images/DownloadHome2.png" alt="" /></a></li>
-		</ul>
+<p>Finally, we introduce the Lagrange interpolant of the essential data $g$, i.e.</p>
 
-		<h2 class="font-size-h2 t10"> How to get it </h2>
+<script type="math/tex; mode=display">g_h = \sum_{k=1}^{N_\Gamma} g(\mathbf{n}_k) \, \phi_k|_{\Gamma}</script>
 
-		redbKIT is free and distributed under a BSD License. You can directly download the current release or clone the git repository.
-		<br /> <br /> 
-		<p><a class="button tiny radius" href="http://redbkit.github.io/redbKIT/download-install/">More ›</a></p>
-	</div>
+<p>The finite element approximation reads:</p>
 
-	
+<blockquote>
+find $
+u_h \in V_h = \{ v_h \in X_h : v_h|_{\Gamma} = g_h\}
+$ 
+such that
 
-</div>
-<!-- /.row -->
+$$
+\begin{equation} 
+a(u_h,v_h) = F(v_h) \qquad \forall v \in V_{0h}.
+\label{eq:LaplWeakFE}
+\end{equation}
+$$
+</blockquote>
+
+<h2 id="algebraic-formulation">Algebraic formulation</h2>
+
+<p>At the algebraic level, we obtain the following linear system</p>
+
+<script type="math/tex; mode=display">\begin{equation}
+\AA \bu = \mathbf{f},
+\label{eq:LaplAlg}
+\end{equation}</script>
+
+<p>where $\AA \in \R^{N \times N}$ is the stiffness matrix, $\mathbf{f} \in \R^{N}$ is a vector encoding the action of the forcing term, $\bu \in \R^{N}$  is the vector of FE degrees of freedom (dofs), i.e.</p>
+
+<script type="math/tex; mode=display">u = \sum_{i=1}^N \bu_i \phi_i.</script>
+
+<p>To distinguish the interior degrees of freedom from those associated with Dirichlet data, we denote by</p>
+
+<script type="math/tex; mode=display">\bu = \begin{pmatrix} 
+\bu_{\Gamma}  \\[2pt] 
+\bu_{I} 
+\end{pmatrix}</script>
+
+<p>the vector of unknowns split in two subvectors, the one  ($\bu_\Gamma$) related with the nodes lying on the boundary $\Gamma$, and that  ($\bu_I$) related with the internal nodes. At the algebraic level, problem \eqref{eq:LaplWeakFE} reads</p>
+
+<blockquote>
+  <script type="math/tex; mode=display">% <![CDATA[
+\begin{pmatrix} 
+\II_{\Gamma \Gamma} & 0 \\
+\AA_{II} & \AA_{I\Gamma} \\[2pt] 
+\end{pmatrix} 
+\begin{pmatrix} 
+\bu_{\Gamma}  \\[2pt] 
+\bu_{I} 
+\end{pmatrix} 
+=
+\begin{pmatrix} 
+\mathbf{g} \\[2pt] 
+\mathbf{f}_{I}
+\end{pmatrix} %]]></script>
+</blockquote>
+
+<p>where 
+<script type="math/tex">\mathbf{g}_i = g(\mathbf{n}_i)</script>
+for $1 \leq i \leq N_{\Gamma}$.</p>
+
+<p>As the subsytem associated with the Dirichlet dofs is trivial ($\bu_{\Gamma} = \mathbf{g}$), it is natural to eliminate the essential dofs $\bu_{\Gamma}$, yielding</p>
+
+<blockquote>
+  <script type="math/tex; mode=display">\AA_{II} \bu_I = \mathbf{f}_I - \AA_{I\Gamma} \mathbf{g}.</script>
+</blockquote>
+
+<p>The resulting linear system enjoys the following remarkable properties:</p>
+
+<ul>
+  <li>if $\AA$ is symmetric, then also $\AA_{II}$ is symmetric;</li>
+  <li>it has minimal size $N-N_{\Gamma}$, since only internal dofs are unknowns;</li>
+  <li>$\AA$ and $\AA_{II}$ have different sparsity pattern.</li>
+</ul>
+
+<h2 id="extension-to-nonlinear-problems">Extension to nonlinear problems</h2>
+
+<p>We now consider the case of nonlinear PDEs, whose finite element approximation results in  a nonlinear system of equations</p>
+
+<script type="math/tex; mode=display">\RR(\bu) = \mathbf{0}.</script>
+
+<p>If such a system is solved by means of Newton’s method, at each iteration we are required to solve a linear system of the form</p>
+
+<script type="math/tex; mode=display">\JJ(\bu^{k}) \delta \bu = - \RR(\bu^k),</script>
+
+<p>and then set $\bu^{k+1} = \bu^k + \delta \bu$. In this case we impose essential boundary conditions as follows:</p>
+
+<blockquote>
+we first set 
+
+$$
+\bu^{0} = \begin{pmatrix} 
+\mathbf{g} \\[2pt] 
+\bu^0_{I} 
+\end{pmatrix};
+$$ 
+
+then, for $k=0,1,\dots$ until convergence, we solve 
+
+$$
+\JJ_{II}(\bu^{k}) \, \delta \bu_I = - \RR_I(\bu^k),
+$$
+
+and update $\bu^{k+1}$ as follows
+
+$$
+\bu^{k+1} = \bu^k +
+\begin{pmatrix} 
+\mathbf{0} \\[2pt] 
+\delta \bu_I 
+\end{pmatrix}.
+$$ 
+</blockquote>
+
+<h1 id="references">References</h1>
+
+<ul>
+  <li>Ern, Alexandre, and Jean-Luc Guermond. Theory and practice of finite elements. Vol. 159. Springer Science &amp; Business Media, 2013.</li>
+</ul>
 
 
 		</article>
 	</div><!-- /.medium-12.columns -->
 </div><!-- /.row -->
+
+
 
 
 	

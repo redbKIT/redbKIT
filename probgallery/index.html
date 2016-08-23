@@ -1,0 +1,722 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Problems Gallery</title>
+	<link rel="stylesheet" type="text/css" href="http://redbkit.github.io/redbKIT/assets/css/styles_feeling_responsive.css">
+	<script src="http://redbkit.github.io/redbKIT/assets/js/modernizr.min.js"></script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/webfont/1.5.18/webfont.js"></script>
+	<script>
+		WebFont.load({
+			google: {
+				families: [ 'Lato:400,700,400italic:latin', 'Volkhov::latin' ]
+			}
+		});
+	</script>
+
+	<noscript>
+		<link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic%7CVolkhov' rel='stylesheet' type='text/css'>
+	</noscript>
+
+
+	<!-- Search Engine Optimization -->
+	<meta name="description" content="»redbKIT:« a MATLAB library for reduced-order modeling of parametrized PDEs">
+  	
+	
+	
+	
+	
+
+
+	<!-- Facebook Open Graph -->
+	<meta property="og:title" content="Problems Gallery">
+	<meta property="og:description" content="»redbKIT:« a MATLAB library for reduced-order modeling of parametrized PDEs">
+	<meta property="og:url" content="http://redbkit.github.io/redbKIT/probgallery/">
+	<meta property="og:locale" content="en_EN">
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="redbKIT">
+	
+	
+
+
+	
+
+	<link type="text/plain" rel="author" href="http://redbkit.github.io/redbKIT/humans.txt">
+
+	
+
+	
+
+	<link rel="icon" sizes="32x32" href="http://redbkit.github.io/redbKIT/assets/img/favicon-32x32.png">
+
+	<link rel="icon" sizes="192x192" href="http://redbkit.github.io/redbKIT/assets/img/touch-icon-192x192.png">
+
+	<link rel="apple-touch-icon-precomposed" sizes="180x180" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-180x180-precomposed.png">
+
+	<link rel="apple-touch-icon-precomposed" sizes="152x152" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-152x152-precomposed.png">
+
+	<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-144x144-precomposed.png">
+
+	<link rel="apple-touch-icon-precomposed" sizes="120x120" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-120x120-precomposed.png">
+
+	<link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-114x114-precomposed.png">
+
+	
+	<link rel="apple-touch-icon-precomposed" sizes="76x76" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-76x76-precomposed.png">
+
+	<link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-72x72-precomposed.png">
+
+	<link rel="apple-touch-icon-precomposed" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-precomposed.png">	
+
+	<meta name="msapplication-TileImage" content="http://redbkit.github.io/redbKIT/assets/img/msapplication_tileimage.png">
+
+	<meta name="msapplication-TileColor" content="#fabb00">
+
+
+	
+
+	
+        <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    TeX: {
+      equationNumbers: {
+        autoNumber: "AMS"
+      }
+    },
+    tex2jax: {
+      inlineMath: [ ['$','$'] ],
+      displayMath: [ ['$$','$$'] ],
+      processEscapes: true,
+    }
+  });
+</script>
+<script type="text/javascript"
+        src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { extensions: ["color.js"] }});
+</script>
+
+        
+</head>
+<body id="top-of-page" class="page-fullwidth">
+	
+	<div id="navigation" class="sticky">
+  <nav class="top-bar" role="navigation" data-topbar>
+    <ul class="title-area">
+      <li class="name">
+      <h1 class="show-for-small-only"><a href="http://redbkit.github.io/redbKIT" class="icon-tree"> redbKIT</a></h1>
+    </li>
+       <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+      <li class="toggle-topbar menu-icon"><a href="#"><span>Navigation</span></a></li>
+    </ul>
+    <section class="top-bar-section">
+
+      <ul class="right">
+        
+
+              
+
+          
+          
+        
+
+              
+
+          
+          
+        
+
+              
+
+          
+          
+        
+
+              
+
+          
+          
+        
+
+              
+
+          
+          
+        
+
+              
+
+          
+          
+        
+
+              
+
+          
+          
+            
+            
+              <li class="divider"></li>
+              <li><a href="http://redbkit.github.io/redbKIT/contact/">Contact</a></li>
+
+            
+            
+          
+        
+        
+      </ul>
+
+      <ul class="left">
+        
+
+              
+
+          
+          
+
+            
+            
+              <li><a href="http://redbkit.github.io/redbKIT/">About</a></li>
+              <li class="divider"></li>
+
+            
+            
+          
+        
+
+              
+
+          
+          
+
+            
+            
+              <li><a href="http://redbkit.github.io/redbKIT/download-install/">Download and Install</a></li>
+              <li class="divider"></li>
+
+            
+            
+          
+        
+
+              
+
+          
+          
+
+            
+            
+              <li><a href="http://redbkit.github.io/redbKIT/getting-started/">Getting Started</a></li>
+              <li class="divider"></li>
+
+            
+            
+          
+        
+
+              
+
+          
+          
+
+            
+            
+              <li class="active"><a href="http://redbkit.github.io/redbKIT/probgallery/">Problems Gallery</a></li>
+              <li class="divider"></li>
+
+            
+            
+          
+        
+
+              
+
+          
+          
+
+            
+            
+              <li><a href="http://redbkit.github.io/redbKIT/contributors/">Development</a></li>
+              <li class="divider"></li>
+
+            
+            
+          
+        
+
+              
+
+          
+          
+
+            
+            
+
+              <li class="has-dropdown">
+                <a href="http://redbkit.github.io/redbKIT/documentation/">Documentation</a>
+
+                  <ul class="dropdown">
+                    
+
+                      
+
+
+			
+                      
+		      
+			<li class="has-dropdown">
+                <a href="http://redbkit.github.io/redbKIT/math/ADR/">Advection diffusion reaction</a>
+
+                  <ul class="dropdown">
+                    
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/AdvDiffReact/">Advection diffusion reaction equations</a></li>
+			
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/AdvDiffReactEx/">Simulation Setup</a></li>
+			
+</ul>
+ </li>
+		                          
+		      
+			
+
+                      
+
+
+			
+                      
+		      
+			<li class="has-dropdown">
+                <a href="http://redbkit.github.io/redbKIT/math/CFD/">Computational Fluid Dynamics</a>
+
+                  <ul class="dropdown">
+                    
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/NavierStokes/">Navier-Stokes equations</a></li>
+			
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/NavierStokesEx/">Simulation Setup</a></li>
+			
+</ul>
+ </li>
+		                          
+		      
+			
+
+                      
+
+
+			
+                      
+		      
+			<li class="has-dropdown">
+                <a href="http://redbkit.github.io/redbKIT/math/CSM/">Computational Solid Mechanics</a>
+
+                  <ul class="dropdown">
+                    
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/SolidMechanics/">Hyperelasticity: static and dynamics</a></li>
+			
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/SolidMechanicsEx/">Simulation Setup</a></li>
+			
+</ul>
+ </li>
+		                          
+		      
+			
+
+                      
+
+
+			
+                      
+		      
+			<li class="has-dropdown">
+                <a href="http://redbkit.github.io/redbKIT/math/FSI/">Fluid-Structure Interaction</a>
+
+                  <ul class="dropdown">
+                    
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/FSIsolver/">Monolithic FSI solver</a></li>
+			
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/FSIEx/">Simulation Setup</a></li>
+			
+</ul>
+ </li>
+		                          
+		      
+			
+
+                      
+
+
+			
+                      
+		      
+                      <li><a href="http://redbkit.github.io/redbKIT/math/essentialbc/">Essential Boundary Conditions</a></li>
+		                          
+		      
+			
+                  </ul>
+
+              </li>
+              <li class="divider"></li>
+            
+          
+        
+
+              
+
+          
+          
+        
+        
+      </ul>
+    </section>
+  </nav>
+</div><!-- /#navigation -->
+
+	
+
+	
+
+
+
+<div id="masthead-with-text">
+	<div class="row">
+		<div class="medium-9 small-centered columns">
+			<a id="forkme_banner" href="https://github.com/redbKIT/redbKIT">View on GitHub</a>
+			<section id="downloads">
+             			 <a class="zip_download_link" href="https://github.com/redbKIT/redbKIT/archive/v2.1.zip">Download this project as a .zip file</a>
+             			 <a class="tar_download_link" href="https://github.com/redbKIT/redbKIT/archive/v2.1.tar.gz">Download this project as a tar.gz file</a>
+			</section>
+			<div class="masthead-title"><b>redbKIT</b> <br/> <small>a MATLAB library for reduced-order modeling of PDEs</small></div>
+		</div> 
+	</div> 
+</div> 
+
+
+
+
+
+
+
+	
+
+
+<div class="row t30">
+	<div class="medium-9 small-centered columns">
+		<article>
+			<header>
+				
+				<h1>Problems Gallery</h1>
+			</header>
+
+			
+
+			<p>The <code class="highlighter-rouge">Problems</code> folder contains a gallery of tests, examples and applications which are listed below (if a problem is marked as <em>included in the testsuite</em>, it means that it is tested by the <code class="highlighter-rouge">test_all.m</code> function).</p>
+
+<div>
+  <!-- -->
+<ul id="markdown-toc">
+  <li><a href="#fem-adr-advection-diffusion-reaction-equations" id="markdown-toc-fem-adr-advection-diffusion-reaction-equations">FEM-ADR: Advection-diffusion-reaction equations</a></li>
+  <li><a href="#fem-cfd-fluid-dynamics" id="markdown-toc-fem-cfd-fluid-dynamics">FEM-CFD: Fluid dynamics</a></li>
+  <li><a href="#fem-csm-solid-mechanics" id="markdown-toc-fem-csm-solid-mechanics">FEM-CSM: Solid mechanics</a></li>
+  <li><a href="#fem-fsi-fluid-structure-interaction" id="markdown-toc-fem-fsi-fluid-structure-interaction">FEM-FSI: Fluid-Structure Interaction</a></li>
+  <li><a href="#reduced-basis-methods" id="markdown-toc-reduced-basis-methods">Reduced Basis Methods</a></li>
+  <li><a href="#rb---mdeim" id="markdown-toc-rb---mdeim">RB - MDEIM</a></li>
+</ul>
+
+</div>
+
+<h3 id="fem-adr-advection-diffusion-reaction-equations">FEM-ADR: Advection-diffusion-reaction equations</h3>
+
+<p><code class="highlighter-rouge">FEM_TestMetis</code> test Metis installation for mesh partitioning <em>(included in the testsuite)</em></p>
+
+<ul class="small-block-grid-4">
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/Metis4.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/Metis16.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/Metis64.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/Metis128.png" alt="" /></li>
+</ul>
+
+<p><code class="highlighter-rouge">FEM_Test_2DLaplacian</code> test convergence of 2D finite element approximation of the Laplacian in a square domain <em>(included in the testsuite)</em></p>
+
+<ul class="small-block-grid-4">
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/ConvergenceP1_2.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/Lapl2D_2.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/Lapl2D_3.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/Lapl2D_4.png" alt="" /></li>
+</ul>
+
+<p><code class="highlighter-rouge">FEM_Test_3DLaplacian</code> test convergence of 3D finite element approximation of the Laplacian in a cube <em>(included in the testsuite)</em></p>
+
+<ul class="small-block-grid-4">
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/Convergence3DP2_2.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/Lapl3D_1.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/Lapl3D_2.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/Lapl3D_3.png" alt="" /></li>
+</ul>
+
+<p><code class="highlighter-rouge">FEM_Test_ADRt_2D</code> example of 2D finite element approximation of a time-dependent advection-diffusion-reaction problem <em>(included in the testsuite)</em></p>
+
+<ul class="small-block-grid-4">
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/ADR_Test2D_1.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/ADR_Test2D_2.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/ADR_Test2D_3.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/ADR_Test2D_4.png" alt="" /></li>
+</ul>
+
+<p><code class="highlighter-rouge">FEM_Test_ADRt_3D</code> example of 3D finite element approximation of a time-dependent advection-diffusion-reaction problem <em>(included in the testsuite)</em></p>
+
+<ul class="small-block-grid-4">
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/ADR_Test3D_1.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/ADR_Test3D_2.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/ADR_Test3D_3.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/ADR_Test3D_4.png" alt="" /></li>
+</ul>
+
+<h3 id="fem-cfd-fluid-dynamics">FEM-CFD: Fluid dynamics</h3>
+<p><code class="highlighter-rouge">FEM_CFD_Steady_Test2D</code> solution of the steady 2D Navier-Stokes equations in a backward-facing step channel</p>
+
+<ul class="small-block-grid-2">
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/CFD_Steady2D_v.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/CFD_Steady2D_p.png" alt="" /></li>
+</ul>
+
+<p><code class="highlighter-rouge">FEM_CFD_Steady_Test3D</code> solution of the steady 3D Navier-Stokes equations around a bluff body (a description of the geometry is given <a href="http://www.sciencedirect.com/science/article/pii/S0898122114006075">here</a>)</p>
+
+<ul class="small-block-grid-2">
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/CFD_Steady3D_2.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/CFD_Steady3D.png" alt="" /></li>
+</ul>
+
+<p><code class="highlighter-rouge">FEM_CFD_Dfg2D</code> 2D unsteady Navier-Stokes equations: flow around a cylinder benchmark. For a detailed description of this problem see the <a href="http://www.featflow.de/en/benchmarks/cfdbenchmarking/flow.html">FeatFlow website</a>. <em>(included in the testsuite)</em></p>
+
+<ul class="small-block-grid-2">
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/CFD_Dfg2_1.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/Re100Fixed_Lift.png" alt="" /></li>
+</ul>
+
+<p><code class="highlighter-rouge">FEM_CFD_Dfg3D</code> 3D unsteady Navier-Stokes equations: flow around a cylinder benchmark. For a detailed description of this problem see the <a href="http://www.featflow.de/en/benchmarks/cfdbenchmarking/flow/dfg_flow3d.html">FeatFlow website</a>. <em>(included in the testsuite)</em></p>
+
+<ul class="small-block-grid-2">
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/Dfg3D_DD_2.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/Dfg3D_DD_3.png" alt="" /></li>
+</ul>
+
+<h3 id="fem-csm-solid-mechanics">FEM-CSM: Solid mechanics</h3>
+
+<p><code class="highlighter-rouge">FEM_CSM_Test2D</code> finite element approximation of the 2D steady linear elasticity equations <em>(included in the testsuite)</em></p>
+
+<ul class="small-block-grid-2">
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/CSM_Test2D_D.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/CSM_Test2D_VM.png" alt="" /></li>
+</ul>
+
+<p><code class="highlighter-rouge">FEM_CSM_Test3D</code> finite element approximation of the 3D hyper-elastic equations with Saint Venant-Kirchhoff constitutive law <em>(included in the testsuite)</em></p>
+
+<ul class="small-block-grid-2">
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/CSM_Test3D_D.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/CSM_Test3D_VM.png" alt="" /></li>
+</ul>
+
+<p><code class="highlighter-rouge">FEM_CSMt_Test2D</code> finite element approximation of the 2D nonlinear elastodynamics equations with different constitutive laws <em>(included in the testsuite)</em></p>
+
+<ul class="small-block-grid-3">
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/CSMt2D_2.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/CSMt2D_3.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/CSMt2D_4.png" alt="" /></li>
+</ul>
+
+<p><code class="highlighter-rouge">FEM_CSM_ShearCube</code> finite element approximation of a shear test on a cube with Saint Venant-Kirchhoff material model</p>
+
+<ul class="small-block-grid-2">
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/CSM_Shear_D.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/CSM_Shear_VM.png" alt="" /></li>
+</ul>
+
+<p><code class="highlighter-rouge">FEM_MeshMotion_test2D</code> mesh deformation of a 2D domain (square with a hole) using the harmonic- and solid-extension mesh motion techniques.</p>
+
+<ul class="small-block-grid-3">
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/MeshMotion_1.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/MeshMotion_2.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/MeshMotion_3.png" alt="" /></li>
+</ul>
+
+<h3 id="fem-fsi-fluid-structure-interaction">FEM-FSI: Fluid-Structure Interaction</h3>
+
+<p><code class="highlighter-rouge">FEM_FSI_Turek2D</code> numerical benchmarking of fluid-structure interaction between an elastic object and laminar incompressible flow. For a detailed description of this problem see the <a href="http://www.featflow.de/en/benchmarks/cfdbenchmarking/fsi_benchmark.html">FeatFlow website</a>.</p>
+
+<ul class="small-block-grid-2">
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/FSI_Turek2D_1.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/FSI_Turek2D_2.png" alt="" /></li>
+</ul>
+
+<p><code class="highlighter-rouge">FEM_FSI_ElasticBeam2D</code> 2D flow past an elastic beam attached to a fixed, rigid block. Details can be found <a href="https://www.google.ch/url?sa=t&amp;rct=j&amp;q=&amp;esrc=s&amp;source=web&amp;cd=1&amp;cad=rja&amp;uact=8&amp;ved=0ahUKEwjA78rw-PDNAhVBvBQKHeI5Cr0QFgghMAA&amp;url=http%3A%2F%2Fwww.ibrarian.net%2Fnavon%2Fpaper%2FCOMPUTATIONAL_MECHANICS_New_Trends_and_Applicatio.pdf%3Fpaperid%3D21694946&amp;usg=AFQjCNGaQU6FfrAKawt22WgAldOPp8DTqA&amp;sig2=d7v16pYE874StTrqJS5pzw&amp;bvm=bv.126993452,d.d24">here</a> and <a href="http://eu.wiley.com/WileyCDA/WileyTitle/productCd-0470978775.html">here</a>.</p>
+
+<ul class="small-block-grid-2">
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/FSI_Beam2D_2.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/FSI_Beam2D_1.png" alt="" /></li>
+</ul>
+
+<p><code class="highlighter-rouge">FEM_FSI_ElasticBeam3D</code> 3D version of the 2D flow past an elastic beam attached to a fixed, rigid block.</p>
+
+<ul class="small-block-grid-3">
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/FSI_Beam3D_3.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/FSI_Beam3D_7.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/FSI_Beam3D_6.png" alt="" /></li>
+</ul>
+
+<h3 id="reduced-basis-methods">Reduced Basis Methods</h3>
+<p><code class="highlighter-rouge">RB_Mixer</code> RB approximation of the steady heat conduction-convection problem described in Sects. 3.8, 6.6 and 7.2 of <strong>[QMN16]</strong></p>
+
+<ul class="small-block-grid-3">
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/NS_Sol2.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/RB_sol2_3rows_HQ.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/RB_sol2_3rows_HQ2.png" alt="" /></li>
+</ul>
+
+<p><code class="highlighter-rouge">RB_AffineDevice</code> RB approximation of the steady heat-transfer problem described in Sects. 8.3 and 9.1 of <strong>[QMN16]</strong> <em>(included in the testsuite)</em></p>
+
+<ul class="small-block-grid-3">
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/domain_Device2-crop.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/HD_relErr_GRB-crop.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/Device3_RB-crop.png" alt="" /></li>
+</ul>
+
+<p><code class="highlighter-rouge">RB_Beam</code> RB approximation of the linear elasticity problem described in Sect. 9.2 of <strong>[QMN16]</strong></p>
+
+<ul class="small-block-grid-1">
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/compare2-crop.png" alt="" /></li>
+</ul>
+
+<p><code class="highlighter-rouge">RB_Cookies</code> RB approximation of the steady diffusion problem described in Sect. 7.5 of <strong>[QMN16]</strong></p>
+
+<ul class="small-block-grid-4">
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/greedy_conv1-crop.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/greedy_conv2-crop.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/greedy_conv3-crop.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/greedy_conv4-crop.png" alt="" /></li>
+</ul>
+
+<p><code class="highlighter-rouge">RB_EIM_Gaussian</code> RB approximation of the nonaffine steady heat-transfer problem described in Sects. 8.4 and 10.5 of <strong>[QMN16]</strong> <em>(included in the testsuite)</em></p>
+
+<ul class="small-block-grid-4">
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/Sol2_S1-crop.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/Sol2_S2-crop.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/Sol2_S3-crop.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/Sol2_S4-crop.png" alt="" /></li>
+</ul>
+
+<p><code class="highlighter-rouge">Test_EIM_DEIM</code> Test and compare EIM and DEIM on the function defined in equation (3.36) of <a href="http://epubs.siam.org/doi/abs/10.1137/090766498">this paper</a> <em>(included in the testsuite)</em></p>
+
+<ul class="small-block-grid-2">
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/testEIMDEIM_1.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/testEIMDEIM_2.png" alt="" /></li>
+</ul>
+
+<p><code class="highlighter-rouge">RB_AcousticHorn_Affine</code> RB approximation of the (affine) Helmholtz equations modeling the propagation of a pressure wave into an acoustic horn. For a detailed description see <a href="http://www.sciencedirect.com/science/article/pii/S0021999115006543">[NMA15]</a></p>
+
+<ul class="small-block-grid-2">
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/AcousticHorn.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/Test1_Reflection_spectrum_Comparison-crop.png" alt="" /></li>
+</ul>
+
+<h3 id="rb---mdeim">RB - MDEIM</h3>
+<p><code class="highlighter-rouge">RB_AcousticHorn_NonAffine</code> RB approximation of the (nonaffine) Helmholtz equations modeling the propagation of a pressure wave into an acoustic horn. The geometry of the horn is parametrized with a Radial Basis Functions mapping. System approximation is performed via the <em>Matrix Discrete Empirical Interpolation</em> method, as detailed in <a href="http://www.sciencedirect.com/science/article/pii/S0021999115006543">[NMA15]</a></p>
+
+<ul class="small-block-grid-1">
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/atlas3-crop.png" alt="" /></li>
+</ul>
+
+		</article>
+	</div><!-- /.medium-12.columns -->
+</div><!-- /.row -->
+
+
+
+
+	
+	    <div id="up-to-top" class="row">
+      <div class="small-12 columns" style="text-align: right;">
+        <a class="iconfont" href="#top-of-page">&#xf108;</a>
+      </div><!-- /.small-12.columns -->
+    </div><!-- /.row -->
+
+      <div id="subfooter">
+        <nav class="row">
+          <section id="subfooter-left" class="small-12 medium-6 columns credits">
+            <p>Created by <a href="http://cmcs.epfl.ch/people/negri">Federico Negri</a> with <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> based on <a href="http://phlow.github.io/feeling-responsive/">Feeling Responsive</a>.</p>
+          </section>
+
+          <section id="subfooter-right" class="small-12 medium-6 columns">
+            <ul class="inline-list social-icons">
+            
+            </ul>
+          </section>
+        </nav>
+      </div><!-- /#subfooter -->
+    </footer>
+
+	
+
+	
+
+
+<script src="http://redbkit.github.io/redbKIT/assets/js/javascript.min.js"></script>
+
+
+
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-64466050-1', 'auto');
+  ga('set', 'anonymizeIp', true);
+  ga('send', 'pageview');
+
+</script>
+
+
+
+
+
+
+
+
+</body>
+<!--
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+-->
+</html>
+

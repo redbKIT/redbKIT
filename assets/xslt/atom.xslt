@@ -1,9 +1,14 @@
-<!doctype html>
-<html class="no-js" lang="en">
-<head>
-	<meta charset="utf-8">
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:atom="http://www.w3.org/2005/Atom">
+<xsl:output method="html" encoding="utf-8" />
+<xsl:template match="/atom:feed">
+	<xsl:text disable-output-escaping="yes">&lt;!DOCTYPE html &gt;</xsl:text>
+	<html>
+	<head>
+		<xsl:text disable-output-escaping="yes"><![CDATA[
+		<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>redbKIT</title>
+	<title>Atom Feed (Styled)</title>
 	<link rel="stylesheet" type="text/css" href="http://redbkit.github.io/redbKIT/assets/css/styles_feeling_responsive.css">
 	<script src="http://redbkit.github.io/redbKIT/assets/js/modernizr.min.js"></script>
 
@@ -31,9 +36,9 @@
 
 
 	<!-- Facebook Open Graph -->
-	<meta property="og:title" content="redbKIT">
+	<meta property="og:title" content="Atom Feed (Styled)">
 	<meta property="og:description" content="»redbKIT:« a MATLAB library for reduced-order modeling of parametrized PDEs">
-	<meta property="og:url" content="http://redbkit.github.io/redbKIT/index.html">
+	<meta property="og:url" content="http://redbkit.github.io/redbKIT/assets/xslt/atom.xslt">
 	<meta property="og:locale" content="en_EN">
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="redbKIT">
@@ -77,11 +82,11 @@
 
 	
 
-	
-</head>
-<body id="top-of-page" class="myfrontpage">
-	
-	<div id="navigation" class="sticky">
+		]]></xsl:text>
+	</head>
+	<body id="top-of-page">
+		<xsl:text disable-output-escaping="yes"><![CDATA[
+		<div id="navigation" class="sticky">
   <nav class="top-bar" role="navigation" data-topbar>
     <ul class="title-area">
       <li class="name">
@@ -157,7 +162,7 @@
 
             
             
-              <li class="active"><a href="http://redbkit.github.io/redbKIT/">About</a></li>
+              <li><a href="http://redbkit.github.io/redbKIT/">About</a></li>
               <li class="divider"></li>
 
             
@@ -376,9 +381,7 @@
   </nav>
 </div><!-- /#navigation -->
 
-	
-
-	
+		
 
 
 
@@ -401,94 +404,57 @@
 
 
 
-
-	
-
-
-<div class="row t30">
-	<div class="small-14 columns">
-		<article>
-			<header>
-				
-				<h1></h1>
-			</header>
-
-			
-
-			<div class="row t50">
-	
-	<div class="medium-4 columns">
 		
-		<ul class="small-block-grid-1">
-  		<li><a href="http://www.springer.com/us/book/9783319154305#aboutBook"><img src="http://redbkit.github.io/redbKIT/images/Back_Cover.png" alt="" /></a></li>
-		</ul>
 
-		<h2 class="font-size-h2 t10"> What is redbKIT? </h2>
 
-		redbKIT is a <a href="http://www.mathworks.com/products/matlab/">MATLAB</a> library for finite element simulation and reduced-order modeling of Partial Differential Equations. 
-
-		In particular, it includes straightforward implementations of many of the algorithms presented in the companion book.
- 		<br /> <br /> 
-	<!--
-		<div class="medium-9 medium-centered small-5 small-centered columns">
-		<ul class="medium-block-grid-1">
-  			<li><a href="http://www.springer.com/us/book/9783319154305#aboutBook"><img src="http://redbkit.github.io/redbKIT/images/Back_Cover.png" alt=""></a></li>
-		</ul>
-		</div>
-	-->
-
-	<p><a class="button tiny radius" href="https://github.com/redbKIT/redbKIT">More ›</a></p>
-
-	</div>
-
-	<div class="medium-4 columns">
-		
-<ul class="small-block-grid-1">
-  		<li><a href="http://redbkit.github.io/redbKIT/getting-started/"><img src="http://redbkit.github.io/redbKIT/images//simulations/ElasticBeamHome.png" alt="" /></a></li>
-		</ul>
-
-		<h2 class="font-size-h2 t10"> Features </h2>
-
-		redbKIT consists of three main packages
-		<br /> <br /> 
-		<code class="highlighter-rouge">FEM_library</code> 
-		provides 2D/3D finite elements approximations of advection-diffusion-reaction equations, Navier-Stokes equations, nonlinear elastostatic and elastodynamics, and fluid-structure interaction problems.  
-		<br />  <br /> 
-		<code class="highlighter-rouge">RB_library</code>  
-		implements Galerkin and least-squares RB methods, POD, greedy algoritm, EIM, DEIM, MDEIM etc. 
-		<br /> <br /> 
-		<code class="highlighter-rouge">Problems</code> contains a gallery of tests, examples and applications.
-		<br /> <br /> 
-		<p><a class="button tiny radius" href="http://redbkit.github.io/redbKIT/getting-started/">More ›</a></p>
-
-	</div>
-
-	<div class="medium-4 columns">
-		
-		<ul class="small-block-grid-1">
-  		<li><a href="https://github.com/redbKIT/redbKIT/releases"><img src="http://redbkit.github.io/redbKIT/images/DownloadHome2.png" alt="" /></a></li>
-		</ul>
-
-		<h2 class="font-size-h2 t10"> How to get it </h2>
-
-		redbKIT is free and distributed under a BSD License. You can directly download the current release or clone the git repository.
-		<br /> <br /> 
-		<p><a class="button tiny radius" href="http://redbkit.github.io/redbKIT/download-install/">More ›</a></p>
-	</div>
-
-	
-
+<div class="alert-box warning text-center"><p>This <a href="https://en.wikipedia.org/wiki/RSS" target="_blank">Atom feed</a> is meant to be used by <a href="https://en.wikipedia.org/wiki/Template:Aggregators" target="_blank">RSS reader applications and websites</a>.</p>
 </div>
-<!-- /.row -->
 
 
-		</article>
-	</div><!-- /.medium-12.columns -->
-</div><!-- /.row -->
 
+		]]></xsl:text>
+		<header class="t30 row">
+	<p class="subheadline"><xsl:value-of select="atom:subtitle" disable-output-escaping="yes" /></p>
+	<h1>
+		<xsl:element name="a">
+			<xsl:attribute name="href">
+				<xsl:value-of select="atom:id" />
+			</xsl:attribute>
+			<xsl:value-of select="atom:title" />
+		</xsl:element>
+	</h1>
+</header>
+<ul class="accordion row" data-accordion="">
+	<xsl:for-each select="atom:entry">
+		<li class="accordion-navigation">
+			<xsl:variable name="slug-id">
+				<xsl:call-template name="slugify">
+					<xsl:with-param name="text" select="atom:id" />
+				</xsl:call-template>
+			</xsl:variable>
+			<xsl:element name="a">
+				<xsl:attribute name="href"><xsl:value-of select="concat('#', $slug-id)"/></xsl:attribute>
+				<xsl:value-of select="atom:title"/>
+				<br/>
+				<small><xsl:value-of select="atom:updated"/></small>
+			</xsl:element>
+			<xsl:element name="div">
+				<xsl:attribute name="id"><xsl:value-of select="$slug-id"/></xsl:attribute>
+				<xsl:attribute name="class">content</xsl:attribute>
+				<h1>
+					<xsl:element name="a">
+						<xsl:attribute name="href"><xsl:value-of select="atom:id"/></xsl:attribute>
+						<xsl:value-of select="atom:title"/>
+					</xsl:element>
+				</h1>
+				<xsl:value-of select="atom:content" disable-output-escaping="yes" />
+			</xsl:element>
+		</li>
+	</xsl:for-each>
+</ul>
 
-	
-	    <div id="up-to-top" class="row">
+		<xsl:text disable-output-escaping="yes"><![CDATA[
+		    <div id="up-to-top" class="row">
       <div class="small-12 columns" style="text-align: right;">
         <a class="iconfont" href="#top-of-page">&#xf108;</a>
       </div><!-- /.small-12.columns -->
@@ -509,9 +475,7 @@
       </div><!-- /#subfooter -->
     </footer>
 
-	
-
-	
+		
 
 
 <script src="http://redbkit.github.io/redbKIT/assets/js/javascript.min.js"></script>
@@ -541,9 +505,18 @@
 
 
 
-</body>
-<!--
-<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
--->
-</html>
-
+		]]></xsl:text>
+	</body>
+	</html>
+</xsl:template>
+<xsl:template name="slugify">
+	<xsl:param name="text" select="''" />
+	<xsl:variable name="dodgyChars" select="' ,.#_-!?*:;=+|&amp;/\\'" />
+	<xsl:variable name="replacementChar" select="'-----------------'" />
+	<xsl:variable name="lowercase" select="'abcdefghijklmnopqrstuvwxyz'" />
+	<xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
+	<xsl:variable name="lowercased"><xsl:value-of select="translate( $text, $uppercase, $lowercase )" /></xsl:variable>
+	<xsl:variable name="escaped"><xsl:value-of select="translate( $lowercased, $dodgyChars, $replacementChar )" /></xsl:variable>
+	<xsl:value-of select="$escaped" />
+</xsl:template>
+</xsl:stylesheet>

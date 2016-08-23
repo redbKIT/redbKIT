@@ -1,0 +1,954 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Navier-Stokes equations</title>
+	<link rel="stylesheet" type="text/css" href="http://redbkit.github.io/redbKIT/assets/css/styles_feeling_responsive.css">
+	<script src="http://redbkit.github.io/redbKIT/assets/js/modernizr.min.js"></script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/webfont/1.5.18/webfont.js"></script>
+	<script>
+		WebFont.load({
+			google: {
+				families: [ 'Lato:400,700,400italic:latin', 'Volkhov::latin' ]
+			}
+		});
+	</script>
+
+	<noscript>
+		<link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic%7CVolkhov' rel='stylesheet' type='text/css'>
+	</noscript>
+
+
+	<!-- Search Engine Optimization -->
+	<meta name="description" content="»redbKIT:« a MATLAB library for reduced-order modeling of parametrized PDEs">
+  	
+	
+	
+	
+	
+
+
+	<!-- Facebook Open Graph -->
+	<meta property="og:title" content="Navier-Stokes equations">
+	<meta property="og:description" content="»redbKIT:« a MATLAB library for reduced-order modeling of parametrized PDEs">
+	<meta property="og:url" content="http://redbkit.github.io/redbKIT/math/NavierStokes/">
+	<meta property="og:locale" content="en_EN">
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="redbKIT">
+	
+	
+
+
+	
+
+	<link type="text/plain" rel="author" href="http://redbkit.github.io/redbKIT/humans.txt">
+
+	
+
+	
+
+	<link rel="icon" sizes="32x32" href="http://redbkit.github.io/redbKIT/assets/img/favicon-32x32.png">
+
+	<link rel="icon" sizes="192x192" href="http://redbkit.github.io/redbKIT/assets/img/touch-icon-192x192.png">
+
+	<link rel="apple-touch-icon-precomposed" sizes="180x180" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-180x180-precomposed.png">
+
+	<link rel="apple-touch-icon-precomposed" sizes="152x152" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-152x152-precomposed.png">
+
+	<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-144x144-precomposed.png">
+
+	<link rel="apple-touch-icon-precomposed" sizes="120x120" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-120x120-precomposed.png">
+
+	<link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-114x114-precomposed.png">
+
+	
+	<link rel="apple-touch-icon-precomposed" sizes="76x76" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-76x76-precomposed.png">
+
+	<link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-72x72-precomposed.png">
+
+	<link rel="apple-touch-icon-precomposed" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-precomposed.png">	
+
+	<meta name="msapplication-TileImage" content="http://redbkit.github.io/redbKIT/assets/img/msapplication_tileimage.png">
+
+	<meta name="msapplication-TileColor" content="#fabb00">
+
+
+	
+
+	
+        <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    TeX: {
+      equationNumbers: {
+        autoNumber: "AMS"
+      }
+    },
+    tex2jax: {
+      inlineMath: [ ['$','$'] ],
+      displayMath: [ ['$$','$$'] ],
+      processEscapes: true,
+    }
+  });
+</script>
+<script type="text/javascript"
+        src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { extensions: ["color.js"] }});
+</script>
+
+        
+</head>
+<body id="top-of-page" class="page-fullwidth">
+	
+	<div id="navigation" class="sticky">
+  <nav class="top-bar" role="navigation" data-topbar>
+    <ul class="title-area">
+      <li class="name">
+      <h1 class="show-for-small-only"><a href="http://redbkit.github.io/redbKIT" class="icon-tree"> redbKIT</a></h1>
+    </li>
+       <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+      <li class="toggle-topbar menu-icon"><a href="#"><span>Navigation</span></a></li>
+    </ul>
+    <section class="top-bar-section">
+
+      <ul class="right">
+        
+
+              
+
+          
+          
+        
+
+              
+
+          
+          
+        
+
+              
+
+          
+          
+        
+
+              
+
+          
+          
+        
+
+              
+
+          
+          
+        
+
+              
+
+          
+          
+        
+
+              
+
+          
+          
+            
+            
+              <li class="divider"></li>
+              <li><a href="http://redbkit.github.io/redbKIT/contact/">Contact</a></li>
+
+            
+            
+          
+        
+        
+      </ul>
+
+      <ul class="left">
+        
+
+              
+
+          
+          
+
+            
+            
+              <li><a href="http://redbkit.github.io/redbKIT/">About</a></li>
+              <li class="divider"></li>
+
+            
+            
+          
+        
+
+              
+
+          
+          
+
+            
+            
+              <li><a href="http://redbkit.github.io/redbKIT/download-install/">Download and Install</a></li>
+              <li class="divider"></li>
+
+            
+            
+          
+        
+
+              
+
+          
+          
+
+            
+            
+              <li><a href="http://redbkit.github.io/redbKIT/getting-started/">Getting Started</a></li>
+              <li class="divider"></li>
+
+            
+            
+          
+        
+
+              
+
+          
+          
+
+            
+            
+              <li><a href="http://redbkit.github.io/redbKIT/probgallery/">Problems Gallery</a></li>
+              <li class="divider"></li>
+
+            
+            
+          
+        
+
+              
+
+          
+          
+
+            
+            
+              <li><a href="http://redbkit.github.io/redbKIT/contributors/">Development</a></li>
+              <li class="divider"></li>
+
+            
+            
+          
+        
+
+              
+
+          
+          
+
+            
+            
+
+              <li class="has-dropdown">
+                <a href="http://redbkit.github.io/redbKIT/documentation/">Documentation</a>
+
+                  <ul class="dropdown">
+                    
+
+                      
+
+
+			
+                      
+		      
+			<li class="has-dropdown">
+                <a href="http://redbkit.github.io/redbKIT/math/ADR/">Advection diffusion reaction</a>
+
+                  <ul class="dropdown">
+                    
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/AdvDiffReact/">Advection diffusion reaction equations</a></li>
+			
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/AdvDiffReactEx/">Simulation Setup</a></li>
+			
+</ul>
+ </li>
+		                          
+		      
+			
+
+                      
+
+
+			
+                      
+		      
+			<li class="has-dropdown">
+                <a href="http://redbkit.github.io/redbKIT/math/CFD/">Computational Fluid Dynamics</a>
+
+                  <ul class="dropdown">
+                    
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/NavierStokes/">Navier-Stokes equations</a></li>
+			
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/NavierStokesEx/">Simulation Setup</a></li>
+			
+</ul>
+ </li>
+		                          
+		      
+			
+
+                      
+
+
+			
+                      
+		      
+			<li class="has-dropdown">
+                <a href="http://redbkit.github.io/redbKIT/math/CSM/">Computational Solid Mechanics</a>
+
+                  <ul class="dropdown">
+                    
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/SolidMechanics/">Hyperelasticity: static and dynamics</a></li>
+			
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/SolidMechanicsEx/">Simulation Setup</a></li>
+			
+</ul>
+ </li>
+		                          
+		      
+			
+
+                      
+
+
+			
+                      
+		      
+			<li class="has-dropdown">
+                <a href="http://redbkit.github.io/redbKIT/math/FSI/">Fluid-Structure Interaction</a>
+
+                  <ul class="dropdown">
+                    
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/FSIsolver/">Monolithic FSI solver</a></li>
+			
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/FSIEx/">Simulation Setup</a></li>
+			
+</ul>
+ </li>
+		                          
+		      
+			
+
+                      
+
+
+			
+                      
+		      
+                      <li><a href="http://redbkit.github.io/redbKIT/math/essentialbc/">Essential Boundary Conditions</a></li>
+		                          
+		      
+			
+                  </ul>
+
+              </li>
+              <li class="divider"></li>
+            
+          
+        
+
+              
+
+          
+          
+        
+        
+      </ul>
+    </section>
+  </nav>
+</div><!-- /#navigation -->
+
+	
+
+	
+
+
+
+<div id="masthead-with-text">
+	<div class="row">
+		<div class="medium-9 small-centered columns">
+			<a id="forkme_banner" href="https://github.com/redbKIT/redbKIT">View on GitHub</a>
+			<section id="downloads">
+             			 <a class="zip_download_link" href="https://github.com/redbKIT/redbKIT/archive/v2.1.zip">Download this project as a .zip file</a>
+             			 <a class="tar_download_link" href="https://github.com/redbKIT/redbKIT/archive/v2.1.tar.gz">Download this project as a tar.gz file</a>
+			</section>
+			<div class="masthead-title"><b>redbKIT</b> <br/> <small>a MATLAB library for reduced-order modeling of PDEs</small></div>
+		</div> 
+	</div> 
+</div> 
+
+
+
+
+
+
+
+	
+
+
+<div class="row t30">
+	<div class="medium-9 small-centered columns">
+		<article>
+			<header>
+				
+				<h1>Navier-Stokes equations</h1>
+			</header>
+
+			
+
+			<script type="math/tex; mode=display">\newcommand{\bm}[1]{\boldsymbol{\mathbf{#1}}}
+\newcommand{\bvec}[1]{\mathbf{#1}}
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\bmv}{\mathbf{v}}
+\newcommand{\bmw}{\mathbf{w}}
+\newcommand{\Nh}[1][]{N_{h,#1}}
+\newcommand{\bU}{\mathbf{U}}
+\newcommand{\bp}{\bvec{p}}
+\newcommand{\VV}{\mathbf{V}}
+\newcommand{\WW}{\mathbf{W}}
+\newcommand{\QQ}{\mathbf{Q}}
+\renewcommand{\AA}{\mathbf{A}}
+\newcommand{\BB}{\mathbf{B}}
+\newcommand{\FF}{\mathbf{F}}
+\newcommand{\GG}{\mathbf{G}}
+\newcommand{\CC}{\mathbf{C}}
+\newcommand{\MM}{\mathbf{M}}
+\newcommand{\XX}{\mathbf{X}}
+\newcommand{\KK}{\mathbf{K}}
+\newcommand{\UU}{\mathbf{U}}
+\newcommand{\II}{\mathbf{I}}
+\renewcommand{\SS}{\mathbf{S}}
+\newcommand{\HH}{\mathbf{H}}
+\newcommand{\DD}{\mathbf{D}}
+\newcommand{\NN}{\mathbf{N}}
+\newcommand{\bmg}{\mathbf{g}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\JJ}{\mathbf{J}}
+\newcommand{\RR}{\mathbf{R}}</script>
+
+<!--
+<div class="row">
+<div class="small-4 columns" markdown="1">
+<div class="panel radius" markdown="1">
+**Table of Contents**
+{: #toc }
+*  TOC
+{:toc}
+</div>
+</div>
+
+<div class="small-8 columns" markdown="1">
+-->
+<!--
+<div class="panel radius" markdown="1">
+**Table of Contents**
+-->
+<div>
+  <!-- -->
+<ul id="markdown-toc">
+  <li><a href="#id" id="markdown-toc-id">Unsteady Navier-Stokes equations</a></li>
+  <li><a href="#id" id="markdown-toc-id">Inf-Sup stable finite element approximation</a>    <ul>
+      <li><a href="#id" id="markdown-toc-id">Fully implicit BDF time discretization</a>        <ul>
+          <li><a href="#id" id="markdown-toc-id">Algebraic formulation and Newton iterations</a></li>
+        </ul>
+      </li>
+      <li><a href="#id" id="markdown-toc-id">Semi-implicit BDF time discretization</a>        <ul>
+          <li><a href="#id" id="markdown-toc-id">Algebraic formulation</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#id" id="markdown-toc-id">SUPG-stabilized finite element approximation</a>    <ul>
+      <li><a href="#id" id="markdown-toc-id">Semi-implicit BDF time discretization</a>        <ul>
+          <li><a href="#id" id="markdown-toc-id">Algebraic formulation</a></li>
+        </ul>
+      </li>
+      <li><a href="#id" id="markdown-toc-id">Fully implicit BDF time discretization</a>        <ul>
+          <li><a href="#id" id="markdown-toc-id">Algebraic formulation and Newton iterations</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#references" id="markdown-toc-references">References</a></li>
+</ul>
+
+</div>
+
+<h1 id="id">Unsteady Navier-Stokes equations</h1>
+
+<p>Let $\Omega \subset \mathbb{R}^{d}$ ($d=2,3$) be an open bounded domain with piecewise smooth boundary $\Gamma = \partial \Omega$. The latter is decomposed into Dirichlet and Neumann components such that $\Gamma = \Gamma_D \cup \Gamma_N$. The Navier-Stokes equations for an incompressible, homogeneous, Newtonian fluid read:</p>
+
+<blockquote>
+  <script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}  
+\left\{
+\begin{aligned}
+ \rho \frac{\partial \bmv}{\partial t} + \rho \bmv \cdot \nabla \bmv   - \nabla \cdot \bm{\sigma}(\bmv, p) &=  \bm{0} & \qquad  \quad \text{in } & \Omega \times (0,T) \\
+\nabla \cdot \bmv &= 0  & \qquad \quad \text{in } &\Omega\times (0,T)\\
+ \bmv &=  \bm{g} & \text{on } &\Gamma_{D} \times (0,T)\\
+ \bm{\sigma}(\bmv, p) \bm{n} &= \bvec{h} & \text{on } &\Gamma_{N}\times (0,T) \\
+  \bmv(0) &= \bmv_0 & \text{in } &\Omega,
+\end{aligned}
+\right.
+\label{eq:NSt_cont_form}
+\end{equation} %]]></script>
+</blockquote>
+
+<p>where $\bmv=\bmv(\mathbf{x},t)$ is the fluid velocity, 
+$p=p(\bvec{x},t)$ the pressure, $\bm{n}$ the (outward directed) normal unit vector to $\Gamma_N$, $\rho$ the fluid density and $\bm{\sigma}$ is the stress tensor defined as
+\begin{equation} \label{eq:NSt_stress_tensor}
+\bm{\sigma}(\bmv, p) = -p \mathbf{I} + 2 \mu \bm{\epsilon}(\bmv).
+\end{equation}
+Here $\mu$ denotes the dynamic viscosity of the fluid (the kinematic viscosity is given by $\nu = \mu / \rho$), while 
+\begin{equation} \label{eq:NSt_strain_tensor}
+\bm{\epsilon}(\bmv) = \frac{1}{2} \big( \nabla \bmv + \nabla \bmv ^T \big)
+\end{equation}
+is the strain tensor. The functions $\bm{g} = \bm{g}(\bx, t)$, $\bm{h} = \bm{h}(\bx, t)$  indicate the Dirichlet and Neumann data, while $\bmv_0 = \bmv_0(\bx)$ is the initial condition.</p>
+
+<p>Let us introduce the following functional spaces: 
+<script type="math/tex">V_D = \{ \bmw \in [H^1(\Omega)]^d : \bmw|_{\Gamma_D} = \bm{h}\}</script>
+<script type="math/tex">V =  \{ \bmw \in [H^1(\Omega)]^d : \bmw|_{\Gamma_D} = \mathbf{0} \}</script>
+and $M = L^2(\Omega)$. The weak formulation of \eqref{eq:NSt_cont_form} reads: for all $t \in (0,T]$, find $(\bmv(t), p(t)) \in V_D \times M$ such that
+\begin{equation}
+ \label{eq:NSt_weak_form}
+ \left(  \rho \frac{\partial \bmv}{\partial t}, \bmw \right) + (\rho \bmv \cdot \nabla \bmv ,\bmw) + (\mu (\nabla \bmv + \nabla \bmv^T),\nabla \bmw) - (p, \nabla \cdot \bmw)  + (\nabla \cdot \bmv,q)   = (\bm{h}, \bmw)_{\Gamma_N}
+\end{equation}
+for all $ (\bmw,q) \in V \times M$, with $\bmv(0) = \bmv_0$.</p>
+
+<h1 id="id">Inf-Sup stable finite element approximation</h1>
+
+<p>Let us introduce a FE  partition <script type="math/tex">\mathcal{T}_h</script> of the domain  $\Omega$ from which we construct conforming finite element spaces $V_h \subset V$ and $M_h \subset M$. For the discrete version of problem \eqref{eq:NSt_weak_form} to be well-posed, it is well known that the velocity and pressure spaces $V_h$ and $M_h$ need to fulfill an inf-sup condition
+\begin{equation}  \label{eq:NSt_infsup}
+\inf_{q_h \in M_h} \sup_{\bmw_h \in V_h} \frac{(q_h, \nabla \cdot \bmw_h)}{|\bmw_h|_V |q_h|_M} \geq \bar{\beta} &gt; 0.
+\end{equation}</p>
+
+<p>Two different choices of stable finite element spaces are implemented in <code class="highlighter-rouge">redbKIT</code>: $\mathbb{P}_2$-$\mathbb{P}_1$ and  $\mathbb{P}_1^{\text{bubble}}$-$\mathbb{P}_1$ velocity-pressure spaces.</p>
+
+<p>The semi-discrete formulation of the Navier-Stokes equations reads: 
+for all $t \in (0,T]$, find $(\bmv_h, p_h) \in V_{D,h} \times M_h$ such that</p>
+
+<script type="math/tex; mode=display">\begin{multline} \label{eq:NSt_weak_STABLEh}
+ \left(  \rho \frac{\partial \bmv_h}{\partial t}, \bmw_h \right) + ( \rho \bmv_h \cdot \nabla \bmv_h ,\bmw_h) + (\mu (\nabla \bmv_h + \nabla \bmv^T_h),\nabla \bmw_h) - (p_h, \nabla \cdot \bmw_h)  \\ + (\nabla \cdot \bmv_h,q_h)    =  (\bm{h}, \bmw)_{\Gamma_N}
+\end{multline}</script>
+
+<p>for all $(\bmw_h,q_h) \in V_h \times M_h$, with $\bmv_h(0) = \bmv_0$.</p>
+
+<h2 id="id">Fully implicit BDF time discretization</h2>
+
+<p>For the time discretization of \eqref{eq:NSt_weak_STABLEh} we consider the  Backward Differentiation Formula (BDF) scheme. To begin with, we partition the time interval $[0,T]$ into $N_t$ subintervals of equal size $\Delta t = T / N_t$ and denote by $t_n = n \Delta t$, for $n = 0 , \dots, N_t$ the discrete time instances. Moreover, we denote by $\bmv_h^n$ and $p_h^n$ the approximations of $\bmv_h$ and $p_h$ at time $t_n$, respectively. We approximate the time derivative of the velocity as</p>
+
+<script type="math/tex; mode=display">\frac{\partial \bmv_h }{\partial t} \approx \frac{\alpha \bmv_h^{n+1} - \bmv_h^{n,\sigma}}{\Delta t}.</script>
+
+<p>where (limiting ourselves to BDF schemes of order $\sigma = 1,2$)</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\bmv_h^{n,\sigma} = 
+\begin{cases} 
+\bmv_h^n, & \text{ if } n \geq 0, \quad \text{for } \sigma =1 \text{ (BDF1)}, \\
+2\bmv_h^n - \tfrac{1}{2}\bmv_h^{n-1}, & \text{ if } n \geq 1, \quad \text{for } \sigma =2 \text{ (BDF2)},
+\end{cases} %]]></script>
+
+<p>and</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\alpha = 
+\begin{cases} 
+1, &   \text{ for } \sigma =1 \text{ (BDF1)}, \\
+\tfrac{3}{2}, &  \text{ for } \sigma =2 \text{ (BDF2)}.
+\end{cases} %]]></script>
+
+<p>The (fully discrete, implicit)  BDF approximation of the Navier-Stokes equations reads: 
+given $\bmv_h^{n}, \dots, \bmv_h^{n+1-\sigma}$, for $n \geq \sigma-1$ find $(\bmv_h^{n+1}, p_h^{n+1}) \in V_{h} \times M_h$ such that</p>
+
+<p><script type="math/tex">\begin{multline} \label{eq:NSt_BDF_STABLE}
+   \left(  \rho \frac{ \alpha \bmv_h^{n+1} - \bmv_h^{n,\sigma}}{\Delta t}, \bmw_h \right) + \left(\rho \bmv_h^{n+1} \cdot \nabla \bmv_h^{n+1} ,\bmw_h\right) + \left(\mu (\nabla \bmv_h^{n+1} + (\nabla \bmv^{n+1}_h)^T),\nabla \bmw_h\right) \\ - \left(p_h^{n+1}, \nabla \cdot \bmw_h\right)  + \left(\nabla \cdot \bmv_h^{n+1},q_h\right)  =  g( (\bmw_h, q_h); t_{n+1} ) + (\bm{h}^{n+1}, \bmw_h)_{\Gamma_N}
+\end{multline}</script>
+for all $(\bmw_h,q_h) \in V_h \times M_h$. Here, the functional $g(\cdot;t) : V_h \times M_h \rightarrow \mathbb{R}$ encodes the action of the nonhomogeneous Dirichlet condition $\bmv_h|_{\Gamma_D} = \bm{h}(t)$.</p>
+
+<h3 id="id">Algebraic formulation and Newton iterations</h3>
+
+<p>We denote by <script type="math/tex">\{\bm{\varphi}_i\}_{i=1}^{\Nh[v]}</script> and <script type="math/tex">\{\eta_k\}_{k=1}^{\Nh[p]}</script> Lagrangian FE bases for $V_h$ and $M_h$ respectively. We also denote by <script type="math/tex">\bmv^n_h \in \mathbb{R}^{\Nh[v]}</script> and <script type="math/tex">\bp^n_h \in \mathbb{R}^{\Nh[p]}</script> the vectors of coefficients in the expansions of $\bm{v}^n_h$ and $p_h^n$ with respect to the FE bases. Finally, we set <script type="math/tex">\bU_h^n = (\bmv_h^n, \bp^n_h) \in \mathbb{R}^{\Nh}</script>.  The algebraic formulation of \eqref{eq:NSt_BDF_STABLE} reads:
+ given <script type="math/tex">\bU_h^{n}, \dots, \bU_h^{n+1-\sigma}</script>, for <script type="math/tex">n \geq \sigma-1</script> find <script type="math/tex">\bU^{n+1}_h \in \mathbb{R}^{\Nh}</script> such that</p>
+
+<blockquote>
+  <script type="math/tex; mode=display">\begin{equation} 
+\frac{ \rho \alpha }{\Delta t}\MM    \bU^{n+1}_h  + \AA   \bU^{n+1}_h +  \mathbf{c}(  \bU^{n+1}_h) = \frac{\rho}{\Delta t} \MM\bU_h^{n,\sigma} + \bm{f}(t_{n+1}).
+\label{eq:NSt_BDF_STABLE_ALGtierI}
+\end{equation}</script>
+</blockquote>
+
+<p>The right-hand side term $\bm{f}(t_{n+1})$ encodes the action of Dirichlet and Neumann boundary conditions  (as well as body forces, if any). The $\Nh \times \Nh$ block-partitioned matrices $\MM$ and $\AA$  are defined  as</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation} 
+\MM = \begin{pmatrix} \MM_v & 0 \\ 0 & 0 \end{pmatrix}, \qquad \AA = \begin{pmatrix} \mu \KK & \BB^T \\ -\BB & 0 \end{pmatrix},
+\end{equation} %]]></script>
+
+<p>where <script type="math/tex">\MM_v \in \R^{\Nh[v] \times \Nh[v]}</script> is the velocity mass matrix, <script type="math/tex">\KK \in \R^{\Nh[v] \times \Nh[v]}</script> is the velocity stiffness matrix, <script type="math/tex">\BB \in \R^{\Nh[v] \times \Nh[v]}</script> is the divergence matrix. The nonlinear convective term  <script type="math/tex">\mathbf{c}(\bU^{n+1}_h)</script> is defined as</p>
+
+<p>where <script type="math/tex">\widetilde{\mathbf{c}}(\bmv_h^{n+1})</script> is given by</p>
+
+<script type="math/tex; mode=display">\begin{equation}
+(\widetilde{\mathbf{c}}(\bmv_h^{n+1}))_{i} = \left( \rho \bmv_h^{n+1} \cdot \nabla \bmv_h^{n+1}, \bm{\varphi}_i\right) \qquad i = 1, \dots, \Nh[v].
+\end{equation}</script>
+
+<p>At each timestep, the nonlinear system \eqref{eq:NSt_BDF_STABLE_ALGtierI} is solved by means of Newton’s method: given $\bU_h^{n+1,0} = \bU_h^{n}$, for $k=0,1,\dots$ until convergence we seek $\delta \bU$ such that</p>
+
+<blockquote>
+  <script type="math/tex; mode=display">\begin{equation}
+\JJ(\bU_h^{n+1,k}) \, \delta \bU = - \RR(\bU_h^{n+1,k}),
+\end{equation}</script>
+</blockquote>
+
+<p>and then set $\bU_h^{n+1,k+1} = \bU_h^{n+1,k} + \delta \bU$. Here,</p>
+
+<blockquote>
+  <script type="math/tex; mode=display">\begin{equation}
+\JJ  = \frac{ \rho \alpha }{\Delta t}\MM   + \AA  +  \CC_1(  \bU^{n+1,k}_h) + \CC_2(  \bU^{n+1,k}_h)
+\end{equation}</script>
+</blockquote>
+
+<p>and</p>
+
+<blockquote>
+  <script type="math/tex; mode=display">\begin{equation}
+\RR  = \frac{ \rho }{\Delta t}\MM \left( \alpha \bU^{n+1,k}_h - \bU^{n,\sigma}_h \right)  + \AA \bU^{n+1,k}_h +  \mathbf{c}(  \bU^{n+1,k}_h) - \bm{f}(t_{n+1}).
+\end{equation}</script>
+</blockquote>
+
+<p>The convective matrices <script type="math/tex">\CC_1(\bU_h)</script> and <script type="math/tex">\CC_2(\bU_h)</script> are defined  as</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation} 
+\CC_1(\bU_h) = \begin{pmatrix} \widetilde{\CC}_1(\bmv_h) & 0 \\ 0 & 0 \end{pmatrix}, \qquad \CC_2(\bU_h) = \begin{pmatrix} \widetilde{\CC}_2(\bmv_h) & 0 \\ 0 & 0 \end{pmatrix}
+\end{equation} %]]></script>
+
+<p>with</p>
+
+<script type="math/tex; mode=display">\begin{equation}
+(\widetilde{\CC}_1(\bmv_h))_{ij} = \left( \rho \bmv_h \cdot \nabla \bm{\varphi}_j, \bm{\varphi}_i\right), \qquad (\widetilde{\CC}_2(\bmv_h))_{ij} = \left( \rho \bm{\varphi}_j \cdot \nabla \bmv_h, \bm{\varphi}_i\right)
+\end{equation}</script>
+
+<p>for $\qquad i,j = 1, \dots, \Nh[v]$.</p>
+
+<h2 id="id">Semi-implicit BDF time discretization</h2>
+
+<p>We now consider the BDF scheme with semi-implicit treatment of the convective term. This approach allows to mitigate the computational burden associated to the use of a fully implicit BDF scheme by linearizing the nonlinear convective terms. The linearization is done by extrapolating the convective velocity via an extrapolation formula of the same order of the BDF used.</p>
+
+<p>We approximate the convective velocity at time $t^{n+1}$ with the Lagrange polynomial interpolating  <script type="math/tex">\bmv^n_h, \dots, \bmv^{n-\sigma+1}_h</script> evaluated at time $t_{n+1}$. We thus obtain the following expression for the extrapolated velocity at time $t^{n+1}$</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}  \label{eq:NSt_extrV}
+\bmv_h^{n,*} = 
+\begin{cases} 
+\bmv_h^n, & \text{ if } n \geq 0, \quad \text{for } \sigma =1 \text{ (BDF1)}, \\
+2\bmv_h^n - \bmv_h^{n-1}, & \text{ if } n \geq 1, \quad \text{for } \sigma =2 \text{ (BDF2)}.
+\end{cases}
+\end{equation} %]]></script>
+
+<p>The (fully discrete) semi-implicit BDF approximation of the Navier-Stokes equations reads: 
+given $\bmv_h^{n}, \dots, \bmv_h^{n+1-\sigma}$, for $n \geq \sigma-1$ find $(\bmv_h^{n+1}, p_h^{n+1}) \in V_{h} \times M_h$ such that</p>
+
+<script type="math/tex; mode=display">\begin{multline} \label{eq:NSt_BDF_STABLEsi}
+   \left(  \rho \frac{ \alpha \bmv_h^{n+1} - \bmv_h^{n,\sigma}}{\Delta t}, \bmw_h \right) + \left(\rho \bmv_h^{n,*} \cdot \nabla \bmv_h^{n+1} ,\bmw_h\right) + \left(\mu (\nabla \bmv_h^{n+1} + (\nabla \bmv^{n+1}_h)^T),\nabla \bmw_h\right) \\ - \left(p_h^{n+1}, \nabla \cdot \bmw_h\right)  + \left(\nabla \cdot \bmv_h^{n+1},q_h\right)  =  g( (\bmw_h, q_h); t_{n+1} ) + (\bm{h}^{n+1}, \bmw_h)_{\Gamma_N}
+\end{multline}</script>
+
+<p>for all $(\bmw_h,q_h) \in V_h \times M_h$.</p>
+
+<h3 id="id">Algebraic formulation</h3>
+
+<p>At the algebraic level, we obtain the following linear system to be solved at each timestep:</p>
+
+<blockquote>
+  <script type="math/tex; mode=display">\begin{equation} \label{eq:NSt_BDF_STABLEsi_ALGtierI}
+\left(\frac{ \rho \alpha }{\Delta t}\MM   + \AA    +  \CC_1(  \bU^{n,*}_h) \right) \bU^{n+1}_h = \frac{\rho}{\Delta t} \MM\bU_h^{n,\sigma} + \bm{f}(t_{n+1}) .
+\end{equation}</script>
+</blockquote>
+
+<h1 id="id">SUPG-stabilized finite element approximation</h1>
+
+<p>Low-order approximation spaces (such as  $\mathbb{P}_1$-$\mathbb{P}_1$ spaces) represent an attractive option for the apprimation of Navier-Stokes equations, since they mitigate the required computational effort; however, they do not satisfy the inf-sup condition \eqref{eq:NSt_infsup}. As a remedy, one can resorts to suitable pressure stabilizations, which allow to circumvent \eqref{eq:NSt_infsup}. Nevertheless, pressure stabilizations turn out to be inappropriate when dealing with advection dominated flows, since in this case additional terms are required to enhance the stability with respect to the convective terms and to control the incompressibility constraint.</p>
+
+<p>For these reasons, we resort to the streamline upwind Petrov-Galerkin (SUPG) stabilization – formulated as in the Variational Multiscale   framework –  which satisfies all these requisites.  To this end, let us first introduce the finite element space</p>
+
+<script type="math/tex; mode=display">X_h^r = \{ w_h \in C^0(\overline{\Omega}) : w_h|_{K} \in \mathbb{P}^r \ \forall K \in \mathcal{T}_h \}.</script>
+
+<p>Then, we define  $V_h = V \cap [X_h^r]^d$, <script type="math/tex">V_{D,h} = V_D \cap [X_h^r]^d</script> and $M_h = M \cap X_h^r$; note that we use equal-order FE spaces for the velocity and pressure variables. We also introduce the strong residuals $\bm{r}_M(\bmv_h,p_h)$ and $r_C(\bmv_h)$ of the momentum and continuity equations, respectively:
+\begin{equation} \label{eq:NSt_ResM}
+\bm{r}_M(\bmv_h,p_h) = \rho \frac{\partial \bmv_h}{ \partial t}  + \rho \bmv_h \cdot \nabla \bmv_h + \nabla p - \mu \Delta \bmv_h,
+\end{equation}
+\begin{equation} \label{eq:NSt_ResC}
+r_C(\bmv_h) =  \nabla \cdot \bmv_h.
+\end{equation}</p>
+
+<p>The semi-discrete SUPG   formulation of the Navier-Stokes equations reads: 
+for all $t \in (0,T]$, find $(\bmv_h, p_h) \in V_{D,h} \times M_h$ such that</p>
+
+<script type="math/tex; mode=display">\begin{multline} \label{eq:NSt_weak_SUPGh}
+ \left(  \rho \frac{\partial \bmv_h}{\partial t}, \bmw_h \right) + ( \rho \bmv_h \cdot \nabla \bmv_h ,\bmw_h) + (\mu (\nabla \bmv_h + \nabla \bmv^T_h),\nabla \bmw_h) - (p_h, \nabla \cdot \bmw_h)  + (\nabla \cdot \bmv_h,q_h)  \\[3pt] + \sum_{K \in \mathcal{T}_h} (\tau_M  \bm{r}_M(\bmv_h,p_h), \rho \bmv_h \cdot \nabla \bmw_h + \nabla q_h)_{K} + \sum_{K \in \mathcal{T}_h} (\tau_C  r_C(\bmv_h), \nabla \cdot \bmw_h)_{K} =  0
+\end{multline}</script>
+
+<p>for all $(\bmw_h,q_h) \in V_h \times M_h$, with $\bmv_h(0) = \bmv_0$.</p>
+
+<p>The stabilization parameters $\tau_M = \tau_M(\bmv_h)$ and $\tau_C = \tau_C(\bmv_h)$ are defined (element-wise) as:</p>
+
+<script type="math/tex; mode=display">\begin{equation}  \label{eq:NSt_tauMC}
+\tau_M  = \bigg( \frac{\rho^2\sigma^2}{(\Delta t)^2} + \rho^2 \bmv_h  \cdot \bvec{G}_K \bmv_h  + C_I \mu^2 \bvec{G}_K : \bvec{G}_K \bigg)^{-1/2}, \qquad
+\tau_C  = \big(\tau_M \bvec{g}_K \cdot \bvec{g}_K\big)^{-1},
+\end{equation}</script>
+
+<p>where $C_I = 60 \cdot 2^{r-2}$, $\sigma$ is a constant equal to the order of the time discretization and $\Delta t$ is the time step that will be chosen for the time discretization. Moreover, $\bvec{G}_K$ and $\bvec{g}_K$ are  metric tensors of the computational domain, which can be derived from the inverse Jacobian of the mapping between the reference and physical elements as</p>
+
+<script type="math/tex; mode=display">(\bvec{g}_K)_{i} = \sum_{j=1}^d \frac{\partial \xi_j}{\partial x_i}, \qquad
+(\bvec{G}_K)_{ij} = \sum_{l=1}^d \frac{\partial \xi_l}{\partial x_i} \frac{\partial \xi_l}{\partial x_j}, \qquad i,j = 1,\dots, d,</script>
+
+<p>being $\xi_i$ and $x_i$ the reference and physical coordinates, respectively.</p>
+
+<h2 id="id">Semi-implicit BDF time discretization</h2>
+
+<p>For the time discretization of \eqref{eq:NSt_weak_SUPGh} we first consider the  BDF scheme with semi-implicit treatment of the convective terms proposed in [Forti, Dede; 2015].</p>
+
+<p>The (fully discrete) semi-implicit BDF-SUPG approximation of the Navier-Stokes equations reads: 
+given $\bmv_h^{n}, \dots, \bmv_h^{n+1-\sigma}$, for $n \geq \sigma-1$ find $(\bmv_h^{n+1}, p_h^{n+1}) \in V_{h} \times M_h$ such that</p>
+
+<script type="math/tex; mode=display">\begin{multline} \label{eq:NSt_BDF_SUPG}
+   \left(  \rho \frac{ \alpha \bmv_h^{n+1} - \bmv_h^{n,\sigma}}{\Delta t}, \bmw_h \right) + \left(\rho \bmv_h^{n,*} \cdot \nabla \bmv_h^{n+1} ,\bmw_h\right) + \left(\mu (\nabla \bmv_h^{n+1} + (\nabla \bmv^{n+1}_h)^T),\nabla \bmw_h\right) \\ - \left(p_h^{n+1}, \nabla \cdot \bmw_h\right)  + \left(\nabla \cdot \bmv_h^{n+1},q_h\right)  + \sum_{K} (\tau_M ^* \bm{r}_M^*(\bmv_h^{n+1},p_h^{n+1}), \rho \bmv_h^{n,*} \cdot \nabla \bmw_h  + \nabla q_h)_{K} \\   + \sum_{K} (\tau_C^*  r_C(\bmv_h^{n+1}), \nabla \cdot \bmw_h)_{K} =  g( (\bmw_h, q_h); t_{n+1} ) \qquad \forall (\bmw_h,q_h) \in V_h \times M_h,
+\end{multline}</script>
+
+<p>where</p>
+
+<script type="math/tex; mode=display">\begin{equation} \label{eq:NSt_ResMd}
+\bm{r}_M^*(\bmv_h^{n+1},p_h^{n+1}) = \rho \frac{\alpha \bmv_h^{n+1} - \bmv_h^{n,\sigma}}{ \Delta t}  + \rho \bmv_h^{n,*} \cdot \nabla \bmv_h^{n+1} + \nabla p^{n+1} - \mu \Delta \bmv_h^{n+1}
+\end{equation}</script>
+
+<p>is the residual of the momentum equation, and</p>
+
+<script type="math/tex; mode=display">\begin{equation}  \label{eq:NSt_tauMCd}
+\tau_M^*  = \bigg( \frac{\rho^2 \sigma^2}{(\Delta t)^2} + \rho^2 \bmv_h^{n,*}  \cdot \bvec{G}_K \bmv_h^{n,*}  + C_I \mu^2 \bvec{G}_K : \bvec{G}_K \bigg)^{-1/2}, \qquad
+\tau_C^*  = \big(\tau_M^* \bvec{g}_K \cdot \bvec{g}_K \big)^{-1}
+\end{equation}</script>
+
+<p>are the stabilization parameters.</p>
+
+<h3 id="id">Algebraic formulation</h3>
+
+<p>The algebraic formulation of \eqref{eq:NSt_BDF_SUPG} reads: given <script type="math/tex">\bU_h^{n}, \dots, \bU_h^{n+1-\sigma}</script>, for <script type="math/tex">n \geq \sigma-1</script> find <script type="math/tex">\bU^{n+1}_h \in \mathbb{R}^{\Nh}</script> such that</p>
+
+<blockquote>
+  <script type="math/tex; mode=display">\begin{multline} \label{eq:NSt_BDF_SUPG_ALGtierI}
+\left(\frac{ \rho \alpha }{\Delta t}\MM   + \AA +  \CC(\bU_h^{*})  + \SS(\bU_h^{n,*}) \right)  \bU^{n+1}_h  \\ = \frac{\rho}{\Delta t} \MM\bU_h^{n,\sigma} + \mathbf{f}(t_{n+1}) + \bvec{f}^S(\bU^{n,*}_h, \bU_h^{n,\sigma}) .
+\end{multline}</script>
+</blockquote>
+
+<p>The matrix <script type="math/tex">\SS(\bU^{n,*}_h) \in \mathbb{R}^{\Nh \times \Nh}</script> encoding the SUPG operator is defined as</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\SS(\bU_h^{n,*}) = 
+\begin{pmatrix} 
+\SS_{vv}(\bmv_h^{n,*}) & \SS_{vp}(\bmv_h^{n,*}) \\[2pt] 
+\SS_{pv}(\bmv_h^{n,*}) & \SS_{pp}(\bmv_h^{n,*}) 
+\end{pmatrix}, %]]></script>
+
+<p>with</p>
+
+<script type="math/tex; mode=display">\begin{gather*}
+\left(\SS_{vv}(\bmv_h^{n,*})\right)_{ij} = \left( \tau_M^* \left(\tfrac{\rho \alpha}{ \Delta t}\bm{\varphi}_j  + \rho \bmv_h^{n,*} \cdot \nabla \bm{\varphi}_j  - \mu \Delta \bm{\varphi}_j\right), \rho \bmv_h^{n,*} \cdot \nabla \bm{\varphi}_i\right) + \left( \tau_C^* \nabla \cdot \bm{\varphi}_j, \nabla \cdot \bm{\varphi}_i\right), \\[5pt]
+\left(\SS_{pv}(\bmv_h^{n,*})\right)_{kj} = \left( \tau_M^*\left(\tfrac{\rho \alpha}{ \Delta t}\bm{\varphi}_j  + \rho \bmv_h^{n,*} \cdot \nabla \bm{\varphi}_j - \mu \Delta \bm{\varphi}_j\right), \nabla \eta_k \right),\\[5pt]
+\left(\SS_{vp}(\bmv_h^{n,*})\right)_{ik} = \left( \tau_M^*   \nabla \eta_k , \rho \bmv_h^{n,*} \cdot \nabla \bm{\varphi}_i\right), \qquad 
+\left(\SS_{pp}(\bmv_h^{n,*}) \right)_{kl} = \left(  \tau_M^* \nabla \eta_l, \nabla \eta_k \right),
+\end{gather*}</script>
+
+<p>for $i,j=1, \dots, \Nh[v]$ and $k,l=1,\dots, \Nh[p]$.
+The SUPG contribute to the right-hand side is instead given by <script type="math/tex">\mathbf{f}^S(\bU_h^{n,*}, \bU_h^{n,\sigma}) = (\mathbf{f}^S_v ,  \mathbf{f}^S_p)^T</script>, where</p>
+
+<script type="math/tex; mode=display">(\mathbf{f}^S_v)_i  = \left( \tau_M^* \tfrac{\rho}{\Delta t} \bmv_h^{n,\sigma}, \rho \bmv_h^{n,*} \cdot \nabla \bm{\varphi}_i \right), \qquad (\mathbf{f}^S_p)_k  = \left( \tau_M^* \tfrac{\rho}{\Delta t} \bmv_h^{n,\sigma}, \nabla \eta_k \right).</script>
+
+<p>Thanks to the semi-implicit treatment of the nonlinear terms, the fully-discrete system \eqref{eq:NSt_BDF_SUPG} yields a linear problem – rather than a nonlinear one – to be solved at each time $t_n$. Moreover, the matrices $\MM$ and $\AA$ are constant in time and independent of <script type="math/tex">\bU_h^{n,*}</script>, so that they can be assembled once and for all at $t=t_0$. On the other hand, the matrices $\CC$ and $\SS$ depend on <script type="math/tex">\bU_h^{n,*}</script> and need to be assembled at each time step.</p>
+
+<h2 id="id">Fully implicit BDF time discretization</h2>
+
+<p>For the time discretization of \eqref{eq:NSt_weak_SUPGh}, we now consider the fully implicit BDF scheme.</p>
+
+<p>The (fully discrete) implicit BDF-SUPG approximation of the Navier-Stokes equations reads: 
+given $\bmv_h^{n}, \dots, \bmv_h^{n+1-\sigma}$, for $n \geq \sigma-1$ find $(\bmv_h^{n+1}, p_h^{n+1}) \in V_{h} \times M_h$ such that</p>
+
+<script type="math/tex; mode=display">\begin{multline} \label{eq:NSt_BDF_SUPGfi}
+   \left(  \rho \frac{ \alpha \bmv_h^{n+1} - \bmv_h^{n,\sigma}}{\Delta t}, \bmw_h \right) + \left(\rho \bmv_h^{n+1} \cdot \nabla \bmv_h^{n+1} ,\bmw_h\right) + \left(\mu (\nabla \bmv_h^{n+1} + (\nabla \bmv^{n+1}_h)^T),\nabla \bmw_h\right) \\ - \left(p_h^{n+1}, \nabla \cdot \bmw_h\right)  + \left(\nabla \cdot \bmv_h^{n+1},q_h\right)  + \sum_{K} (\tau_M \bm{r}_M(\bmv_h^{n+1},p_h^{n+1}), \rho \bmv_h^{n+1} \cdot \nabla \bmw_h  + \nabla q_h)_{K} \\   + \sum_{K} (\tau_C   r_C(\bmv_h^{n+1}), \nabla \cdot \bmw_h)_{K} =  g( (\bmw_h, q_h); t_{n+1} ) + (\bm{h}^{n+1}, \bmw_h) \qquad \forall (\bmw_h,q_h) \in V_h \times M_h,
+\end{multline}</script>
+
+<p>where</p>
+
+<script type="math/tex; mode=display">\begin{equation}  
+\bm{r}_M(\bmv_h^{n+1},p_h^{n+1}) = \rho \frac{\alpha \bmv_h^{n+1} - \bmv_h^{n,\sigma}}{ \Delta t}  + \rho \bmv_h^{n+1} \cdot \nabla \bmv_h^{n+1} + \nabla p^{n+1} - \mu \Delta \bmv_h^{n+1}
+\end{equation}</script>
+
+<p>is the residual of the momentum equation.</p>
+
+<h3 id="id">Algebraic formulation and Newton iterations</h3>
+
+<p>The algebraic formulation of \eqref{eq:NSt_BDF_SUPGfi} reads:
+ given <script type="math/tex">\bU_h^{n}, \dots, \bU_h^{n+1-\sigma}</script>, for <script type="math/tex">n \geq \sigma-1</script> find <script type="math/tex">\bU^{n+1}_h \in \mathbb{R}^{\Nh}</script> such that</p>
+
+<blockquote>
+  <script type="math/tex; mode=display">\begin{equation}
+\RR(\bU^{n+1}_h) =  \frac{ \rho }{\Delta t}\MM   \left(\alpha\bU^{n+1}_h  - \bU_h^{n,\sigma} \right) + \AA   \bU^{n+1}_h +  \mathbf{c}(  \bU^{n+1}_h) + \mathbf{s}(  \bU^{n+1}_h) - \bm{f}(t_{n+1}) = \mathbf{0}.
+\label{eq:NSt_BDF_SUPGfi_ALGtierI}
+\end{equation}</script>
+</blockquote>
+
+<p>The nonlinear term  <script type="math/tex">\mathbf{s}(\bU^{n+1}_h)</script>  accounts for the SUPG stabilization.</p>
+
+<p>At each timestep, this nonlinear system of equations is solved by means of Newton’s method: given $\bU_h^{n+1,0} = \bU_h^{n}$, for $k=0,1,\dots$ until convergence we seek $\delta \bU$ such that</p>
+
+<blockquote>
+  <script type="math/tex; mode=display">\begin{equation}
+\JJ(\bU_h^{n+1,k}) \, \delta \bU = - \RR(\bU_h^{n+1,k}),
+\end{equation}</script>
+</blockquote>
+
+<p>and then set $\bU_h^{n+1,k+1} = \bU_h^{n+1,k} + \delta \bU$. Here,</p>
+
+<blockquote>
+  <script type="math/tex; mode=display">\begin{equation}
+\JJ  = \frac{ \rho \alpha }{\Delta t}\MM   + \AA  +  \CC_1(  \bU^{n+1,k}_h) + \CC_2(  \bU^{n+1,k}_h) + \frac{\partial \mathbf{s}}{\partial \bU} \left( {\bU^{n+1,k}_h} \right).
+\end{equation}</script>
+</blockquote>
+
+<h1 id="references">References</h1>
+
+<p>Navier-Stokes equations:</p>
+
+<ul>
+  <li>A. Quarteroni and A. Valli. Numerical Approximation of Partial Differential Equations. Springer-Verlag, Berlin-Heidelberg, 1994.</li>
+  <li>H.C. Elman, D.J. Silvester, and A.J. Wathen. Finite Elements and Fast Iterative Solvers with Applications in Incompressible Fluid Dynamics. Oxford University Press, New York, 2004.</li>
+</ul>
+
+<p>SUPG stabilization:</p>
+
+<ul>
+  <li>T.J.R. Hughes, G. Scovazzi, and L.P. Franca. Multiscale and stabilized methods. Wiley Online Library, 2004.</li>
+  <li>Y. Bazilevs, V.M. Calo, J.A. Cottrell, T.J.R. Hughes, A. Reali, and G. Scovazzi. Variational multiscale residual-based turbulence modeling for large eddy simulation of incompressible flows. Comput. Methods Appl. Mech. Engrg., 197(1-4):173 - 201, 2007.</li>
+</ul>
+
+<p>Semi-implicit treatment of the convective term:</p>
+
+<ul>
+  <li>P. Gervasio, F. Saleri, and A. Veneziani. Algebraic fractional-step schemes with spectral methods for the incompressible Navier–Stokes equations. J. Comput. Phys., 214(1):347–365, 2006.</li>
+  <li>D. Forti and L. Dede. Semi-implicit BDF time discretization of the Navier-Stokes equations with VMS-LES modeling in a high performance computing framework. Comput. Fluids, 117(0):168–182, 2015.</li>
+</ul>
+
+<p>BDF time discretization:</p>
+
+<ul>
+  <li>K. Eleda Brenan, S.L. Campbell, and L. R. Petzold. Numerical Solution of Initial-Value Problems in Differential-Algebraic Equations. SIAM, Philadelphia, 1996.</li>
+  <li>A. Quarteroni, R. Sacco, and F. Saleri. Numerical Mathematics. Springer, New York, second edition, 2007.</li>
+</ul>
+
+		</article>
+	</div><!-- /.medium-12.columns -->
+</div><!-- /.row -->
+
+
+
+
+	
+	    <div id="up-to-top" class="row">
+      <div class="small-12 columns" style="text-align: right;">
+        <a class="iconfont" href="#top-of-page">&#xf108;</a>
+      </div><!-- /.small-12.columns -->
+    </div><!-- /.row -->
+
+      <div id="subfooter">
+        <nav class="row">
+          <section id="subfooter-left" class="small-12 medium-6 columns credits">
+            <p>Created by <a href="http://cmcs.epfl.ch/people/negri">Federico Negri</a> with <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> based on <a href="http://phlow.github.io/feeling-responsive/">Feeling Responsive</a>.</p>
+          </section>
+
+          <section id="subfooter-right" class="small-12 medium-6 columns">
+            <ul class="inline-list social-icons">
+            
+            </ul>
+          </section>
+        </nav>
+      </div><!-- /#subfooter -->
+    </footer>
+
+	
+
+	
+
+
+<script src="http://redbkit.github.io/redbKIT/assets/js/javascript.min.js"></script>
+
+
+
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-64466050-1', 'auto');
+  ga('set', 'anonymizeIp', true);
+  ga('send', 'pageview');
+
+</script>
+
+
+
+
+
+
+
+
+</body>
+<!--
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+-->
+</html>
+

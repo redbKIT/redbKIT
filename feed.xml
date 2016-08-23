@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://redbkit.github.io/redbKIT/assets/xslt/rss.xslt" ?>
+<?xml-stylesheet type="text/css" href="http://redbkit.github.io/redbKIT/assets/css/rss.css" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>redbKIT</title>
+		<description>»redbKIT:« a MATLAB library for reduced-order modeling of parametrized PDEs</description>
+		<link>http://redbkit.github.io/redbKIT/</link>
+		<atom:link href="http://redbkit.github.io/redbKIT/feed.xml" rel="self" type="application/rss+xml" />
+		
+	</channel>
+</rss>

@@ -1,0 +1,746 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Advection Diffusion Reaction Equations</title>
+	<link rel="stylesheet" type="text/css" href="http://redbkit.github.io/redbKIT/assets/css/styles_feeling_responsive.css">
+	<script src="http://redbkit.github.io/redbKIT/assets/js/modernizr.min.js"></script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/webfont/1.5.18/webfont.js"></script>
+	<script>
+		WebFont.load({
+			google: {
+				families: [ 'Lato:400,700,400italic:latin', 'Volkhov::latin' ]
+			}
+		});
+	</script>
+
+	<noscript>
+		<link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic%7CVolkhov' rel='stylesheet' type='text/css'>
+	</noscript>
+
+
+	<!-- Search Engine Optimization -->
+	<meta name="description" content="»redbKIT:« a MATLAB library for reduced-order modeling of parametrized PDEs">
+  	
+	
+	
+	
+	
+
+
+	<!-- Facebook Open Graph -->
+	<meta property="og:title" content="Advection Diffusion Reaction Equations">
+	<meta property="og:description" content="»redbKIT:« a MATLAB library for reduced-order modeling of parametrized PDEs">
+	<meta property="og:url" content="http://redbkit.github.io/redbKIT/math/AdvDiffReact/">
+	<meta property="og:locale" content="en_EN">
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="redbKIT">
+	
+	
+
+
+	
+
+	<link type="text/plain" rel="author" href="http://redbkit.github.io/redbKIT/humans.txt">
+
+	
+
+	
+
+	<link rel="icon" sizes="32x32" href="http://redbkit.github.io/redbKIT/assets/img/favicon-32x32.png">
+
+	<link rel="icon" sizes="192x192" href="http://redbkit.github.io/redbKIT/assets/img/touch-icon-192x192.png">
+
+	<link rel="apple-touch-icon-precomposed" sizes="180x180" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-180x180-precomposed.png">
+
+	<link rel="apple-touch-icon-precomposed" sizes="152x152" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-152x152-precomposed.png">
+
+	<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-144x144-precomposed.png">
+
+	<link rel="apple-touch-icon-precomposed" sizes="120x120" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-120x120-precomposed.png">
+
+	<link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-114x114-precomposed.png">
+
+	
+	<link rel="apple-touch-icon-precomposed" sizes="76x76" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-76x76-precomposed.png">
+
+	<link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-72x72-precomposed.png">
+
+	<link rel="apple-touch-icon-precomposed" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-precomposed.png">	
+
+	<meta name="msapplication-TileImage" content="http://redbkit.github.io/redbKIT/assets/img/msapplication_tileimage.png">
+
+	<meta name="msapplication-TileColor" content="#fabb00">
+
+
+	
+
+	
+        <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    TeX: {
+      equationNumbers: {
+        autoNumber: "AMS"
+      }
+    },
+    tex2jax: {
+      inlineMath: [ ['$','$'] ],
+      displayMath: [ ['$$','$$'] ],
+      processEscapes: true,
+    }
+  });
+</script>
+<script type="text/javascript"
+        src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { extensions: ["color.js"] }});
+</script>
+
+        
+</head>
+<body id="top-of-page" class="page-fullwidth">
+	
+	<div id="navigation" class="sticky">
+  <nav class="top-bar" role="navigation" data-topbar>
+    <ul class="title-area">
+      <li class="name">
+      <h1 class="show-for-small-only"><a href="http://redbkit.github.io/redbKIT" class="icon-tree"> redbKIT</a></h1>
+    </li>
+       <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+      <li class="toggle-topbar menu-icon"><a href="#"><span>Navigation</span></a></li>
+    </ul>
+    <section class="top-bar-section">
+
+      <ul class="right">
+        
+
+              
+
+          
+          
+        
+
+              
+
+          
+          
+        
+
+              
+
+          
+          
+        
+
+              
+
+          
+          
+        
+
+              
+
+          
+          
+        
+
+              
+
+          
+          
+        
+
+              
+
+          
+          
+            
+            
+              <li class="divider"></li>
+              <li><a href="http://redbkit.github.io/redbKIT/contact/">Contact</a></li>
+
+            
+            
+          
+        
+        
+      </ul>
+
+      <ul class="left">
+        
+
+              
+
+          
+          
+
+            
+            
+              <li><a href="http://redbkit.github.io/redbKIT/">About</a></li>
+              <li class="divider"></li>
+
+            
+            
+          
+        
+
+              
+
+          
+          
+
+            
+            
+              <li><a href="http://redbkit.github.io/redbKIT/download-install/">Download and Install</a></li>
+              <li class="divider"></li>
+
+            
+            
+          
+        
+
+              
+
+          
+          
+
+            
+            
+              <li><a href="http://redbkit.github.io/redbKIT/getting-started/">Getting Started</a></li>
+              <li class="divider"></li>
+
+            
+            
+          
+        
+
+              
+
+          
+          
+
+            
+            
+              <li><a href="http://redbkit.github.io/redbKIT/probgallery/">Problems Gallery</a></li>
+              <li class="divider"></li>
+
+            
+            
+          
+        
+
+              
+
+          
+          
+
+            
+            
+              <li><a href="http://redbkit.github.io/redbKIT/contributors/">Development</a></li>
+              <li class="divider"></li>
+
+            
+            
+          
+        
+
+              
+
+          
+          
+
+            
+            
+
+              <li class="has-dropdown">
+                <a href="http://redbkit.github.io/redbKIT/documentation/">Documentation</a>
+
+                  <ul class="dropdown">
+                    
+
+                      
+
+
+			
+                      
+		      
+			<li class="has-dropdown">
+                <a href="http://redbkit.github.io/redbKIT/math/ADR/">Advection diffusion reaction</a>
+
+                  <ul class="dropdown">
+                    
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/AdvDiffReact/">Advection diffusion reaction equations</a></li>
+			
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/AdvDiffReactEx/">Simulation Setup</a></li>
+			
+</ul>
+ </li>
+		                          
+		      
+			
+
+                      
+
+
+			
+                      
+		      
+			<li class="has-dropdown">
+                <a href="http://redbkit.github.io/redbKIT/math/CFD/">Computational Fluid Dynamics</a>
+
+                  <ul class="dropdown">
+                    
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/NavierStokes/">Navier-Stokes equations</a></li>
+			
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/NavierStokesEx/">Simulation Setup</a></li>
+			
+</ul>
+ </li>
+		                          
+		      
+			
+
+                      
+
+
+			
+                      
+		      
+			<li class="has-dropdown">
+                <a href="http://redbkit.github.io/redbKIT/math/CSM/">Computational Solid Mechanics</a>
+
+                  <ul class="dropdown">
+                    
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/SolidMechanics/">Hyperelasticity: static and dynamics</a></li>
+			
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/SolidMechanicsEx/">Simulation Setup</a></li>
+			
+</ul>
+ </li>
+		                          
+		      
+			
+
+                      
+
+
+			
+                      
+		      
+			<li class="has-dropdown">
+                <a href="http://redbkit.github.io/redbKIT/math/FSI/">Fluid-Structure Interaction</a>
+
+                  <ul class="dropdown">
+                    
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/FSIsolver/">Monolithic FSI solver</a></li>
+			
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/FSIEx/">Simulation Setup</a></li>
+			
+</ul>
+ </li>
+		                          
+		      
+			
+
+                      
+
+
+			
+                      
+		      
+                      <li><a href="http://redbkit.github.io/redbKIT/math/essentialbc/">Essential Boundary Conditions</a></li>
+		                          
+		      
+			
+                  </ul>
+
+              </li>
+              <li class="divider"></li>
+            
+          
+        
+
+              
+
+          
+          
+        
+        
+      </ul>
+    </section>
+  </nav>
+</div><!-- /#navigation -->
+
+	
+
+	
+
+
+
+<div id="masthead-with-text">
+	<div class="row">
+		<div class="medium-9 small-centered columns">
+			<a id="forkme_banner" href="https://github.com/redbKIT/redbKIT">View on GitHub</a>
+			<section id="downloads">
+             			 <a class="zip_download_link" href="https://github.com/redbKIT/redbKIT/archive/v2.1.zip">Download this project as a .zip file</a>
+             			 <a class="tar_download_link" href="https://github.com/redbKIT/redbKIT/archive/v2.1.tar.gz">Download this project as a tar.gz file</a>
+			</section>
+			<div class="masthead-title"><b>redbKIT</b> <br/> <small>a MATLAB library for reduced-order modeling of PDEs</small></div>
+		</div> 
+	</div> 
+</div> 
+
+
+
+
+
+
+
+	
+
+
+<div class="row t30">
+	<div class="medium-9 small-centered columns">
+		<article>
+			<header>
+				
+				<h1>Advection Diffusion Reaction Equations</h1>
+			</header>
+
+			
+
+			<script type="math/tex; mode=display">\newcommand{\bm}[1]{\boldsymbol{\mathbf{#1}}}
+\newcommand{\bvec}[1]{\mathbf{#1}}
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\bu}{\mathbf{u}}
+\newcommand{\bb}{\mathbf{b}}
+\newcommand{\bmv}{\mathbf{v}}
+\newcommand{\bmw}{\mathbf{w}}
+\newcommand{\Nh}{N_h}
+\newcommand{\bU}{\mathbf{U}}
+\newcommand{\bp}{\bvec{p}}
+\newcommand{\VV}{\mathbf{V}}
+\newcommand{\WW}{\mathbf{W}}
+\newcommand{\QQ}{\mathbf{Q}}
+\renewcommand{\AA}{\mathbf{A}}
+\newcommand{\BB}{\mathbf{B}}
+\newcommand{\FF}{\mathbf{F}}
+\newcommand{\GG}{\mathbf{G}}
+\newcommand{\CC}{\mathbf{C}}
+\newcommand{\MM}{\mathbf{M}}
+\newcommand{\XX}{\mathbf{X}}
+\newcommand{\KK}{\mathbf{K}}
+\newcommand{\UU}{\mathbf{U}}
+\newcommand{\II}{\mathbf{I}}
+\renewcommand{\SS}{\mathbf{S}}
+\newcommand{\HH}{\mathbf{H}}
+\newcommand{\DD}{\mathbf{D}}
+\newcommand{\NN}{\mathbf{N}}
+\newcommand{\bmg}{\mathbf{g}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\JJ}{\mathbf{J}}
+\newcommand{\RR}{\mathbf{R}}</script>
+
+<div>
+  <!-- -->
+<ul id="markdown-toc">
+  <li><a href="#id" id="markdown-toc-id">Steady problems</a>    <ul>
+      <li><a href="#id" id="markdown-toc-id">Strong formulation</a></li>
+      <li><a href="#id" id="markdown-toc-id">Weak formulation</a></li>
+      <li><a href="#id" id="markdown-toc-id">Finite element approximation</a></li>
+    </ul>
+  </li>
+  <li><a href="#id" id="markdown-toc-id">Unsteady problems</a>    <ul>
+      <li><a href="#id" id="markdown-toc-id">Strong and weak formulations</a></li>
+      <li><a href="#id" id="markdown-toc-id">Finite element approximation</a></li>
+      <li><a href="#id" id="markdown-toc-id">Time discretization</a></li>
+    </ul>
+  </li>
+  <li><a href="#references" id="markdown-toc-references">References</a></li>
+</ul>
+
+</div>
+
+<h1 id="id">Steady problems</h1>
+
+<p>We introduce steady advection-diffusion-reaction equations and their finite element approximation as implemented in <code class="highlighter-rouge">redbKIT</code>.</p>
+
+<h2 id="id">Strong formulation</h2>
+
+<p>Let $\Omega \subset \mathbb{R}^{d}$ ($d=2,3$) be an open bounded domain with piecewise smooth boundary $\Gamma = \partial \Omega$. The latter is decomposed into Dirichlet ($\Gamma_D$), Neumann ($\Gamma_N$) and Robin ($\Gamma_R$) components such that $\Gamma = \Gamma_D \cup \Gamma_N \cup \Gamma_R$. We consider the following advection-diffusion-reaction PDE:</p>
+
+<blockquote>
+  <script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}  
+\left\{
+\begin{aligned}
+  - \text{div}( \mu  \nabla u) + \bb \cdot \nabla u + c u \ &=  s & \qquad  \quad \text{in } & \Omega \\
+ u &=  g & \text{on } &\Gamma_{D}\\
+ \mu \nabla u \bm{n} &= r & \text{on } &\Gamma_{N} \\
+ \mu \nabla u \bm{n} + \alpha u &= \gamma & \text{on } &\Gamma_{R} \\
+\end{aligned}
+\right.
+\label{eq:ADRstrong}
+\end{equation} %]]></script>
+</blockquote>
+
+<p>where $\mu : \mathbb{R}^d \rightarrow \mathbb{R}$  is the diffusion coefficient, $\bm{b}  : \mathbb{R}^d \rightarrow \mathbb{R}^d$ is a given velocity (convective) field, $c : \mathbb{R}^d \rightarrow \mathbb{R}$ is a reaction coefficient,  $s: \mathbb{R}^d \rightarrow \mathbb{R}^d$ is a distributed source term,  $g(\bx)$, $r(\bx)$, $\alpha(\bx)$, and $\gamma(\bx)$ are given scalar-valued functions; here $\bm{n}$ denotes the outward unit normal on $\partial \Omega$.</p>
+
+<h2 id="id">Weak formulation</h2>
+
+<p>Let us introduce the following functional spaces:</p>
+
+<script type="math/tex; mode=display">V_D = \{ v \in H^1(\Omega): v|_{\Gamma_D} = g\},</script>
+
+<script type="math/tex; mode=display">V = \{ v \in H^1(\Omega): v|_{\Gamma_D} = 0\}.</script>
+
+<p>The weak formulation of \eqref{eq:ADRstrong} reads:</p>
+
+<blockquote>
+find $u \in V_D $ such that
+\begin{equation}
+ \label{eq:ADRweak}
+a(u,v) = F(v) \qquad \forall v \in V,
+\end{equation}
+where
+
+$$
+a(u,v) = \int_{\Omega} \left( \mu \nabla u \cdot \nabla v + \bb \cdot \nabla u v + cu v \right) \,d\Omega + \int_{\Gamma_R} \alpha u v \, d\Gamma
+$$
+
+and 
+
+$$
+F(v) = \int_{\Omega} s v \, d\Omega +  \int_{\Gamma_N} r v \, d\Gamma + \int_{\Gamma_R} \gamma v \, d\Gamma.
+$$
+
+</blockquote>
+
+<h2 id="id">Finite element approximation</h2>
+
+<p>Let us introduce a FE  partition <script type="math/tex">\mathcal{T}_h</script> of the domain  $\Omega$ from which we construct a conforming finite element space $X_h \subset H^1(\Omega)$. We also define $V_h = X_h \cap V$ and $V_{Dh} = X_h \cap V_D$. The FE approximation of \eqref{eq:ADRweak} reads: find $u_h \in  V_{Dh}$ such that</p>
+
+<script type="math/tex; mode=display">\begin{equation}
+ \label{eq:ADRweakFE}
+a(u_h,v_h) = F(v_h) \qquad \forall v \in V_h.
+\end{equation}</script>
+
+<p>We denote by <script type="math/tex">\{\varphi_i\}_{i=1}^{\Nh}</script> a Lagrangian FE basis for $X_h$; $\bu \in \mathbb{R}^{\Nh}$ is the vector of coefficients in the expansion of $u_h$ with respect to the FE basis functions, i.e.</p>
+
+<script type="math/tex; mode=display">u_h = \sum_{j=1}^{N_h} \bu_j \varphi_j.</script>
+
+<p>The algebraic formulation of \eqref{eq:ADRweakFE} reads:</p>
+
+<blockquote>
+find $\bu \in \R^{N_h}$ such that
+
+$$
+\begin{equation}
+ \label{eq:ADRweakFEalg}
+\AA \bu = \mathbf{f}.
+\end{equation}
+$$
+
+where 
+
+$$
+\AA_{ij} = a(\varphi_j, \varphi_i), \qquad \mathbf{f}_i = F(\varphi_i), \qquad 1 \leq i,j \leq N_h.
+$$
+</blockquote>
+
+<p>The assembly of the matrix $\AA$ and the right-hand side vector $\mathbf{f}$ is performed by the <code class="highlighter-rouge">ADR_Assembler</code> function. Once the system has been assembled, Dirichlet boundary conditions should be imposed; a detailed description of this step can be found <a href="/math/essentialbc/">here</a>.</p>
+
+<p>The resulting linear system can be solved using the <code class="highlighter-rouge">LinearSolver</code> class, which provides a flexible layer for both direct and (preconditioned) iterative solvers.</p>
+
+<h1 id="id">Unsteady problems</h1>
+
+<p>We now consider the time-dependent version of  problem \eqref{eq:ADRstrong}.</p>
+
+<h2 id="id">Strong and weak formulations</h2>
+
+<p>The strong form of unsteady advection-diffusion-reaction equations can be stated as follows: find $u : \R^{d} \times [0,T] \rightarrow \R$ such that</p>
+
+<blockquote>
+  <script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}  
+\left\{
+\begin{aligned}
+  \frac{\partial u}{\partial t}- \text{div}( \mu  \nabla u) + \bb \cdot \nabla u + c u \ &=  s & \qquad  \quad \text{in } & \Omega \times (0,T) \\
+ u &=  g & \text{on } &\Gamma_{D} \times (0,T)\\
+ \mu \nabla u \bm{n} &= r & \text{on } &\Gamma_{N} \times (0,T)\\
+ \mu \nabla u \bm{n} + \alpha u &= \gamma & \text{on } &\Gamma_{R} \times (0,T) \\
+  u(\cdot , 0) &= u_0 & \text{in } &\Omega,
+\end{aligned}
+\right.
+\label{eq:ADRtstrong}
+\end{equation} %]]></script>
+</blockquote>
+
+<p>Note that all the problem coeffients ($\mu$, $\bb$, $c$, $s$, $g$, $r$, $\alpha$, $\gamma$) might depend on time $t$. The weak formulation of \eqref{eq:ADRtstrong} reads:</p>
+
+<blockquote>
+for all $t \in (0,T]$, find $u = u(t) \in V_D$ such that 
+
+\begin{equation}
+ \label{eq:ADRtweak}
+\left(\frac{\partial u}{\partial t} , v\right) + a(u,v) = F(v) \qquad \forall v \in V,
+\end{equation}
+
+with $u(0) = u_0$. 
+
+</blockquote>
+
+<h2 id="id">Finite element approximation</h2>
+
+<p>At the algebraic level, the finite element approximation of problem \eqref{eq:ADRtweak} leads to the following first-order linear dynamical system: given $\bu_0 \in \R^{N_h}$, for all $t \in (0,T]$, find $\bu = \bu(t) \in \R^{N_h}$ such that</p>
+
+<p>\begin{equation}
+ \label{eq:ADRtweakAlg}
+\MM \frac{d \bu}{d t} + \AA(t) \bu  = \mathbf{f}(t),
+\end{equation}</p>
+
+<p>where the mass matrix $\MM$ is defined as</p>
+
+<script type="math/tex; mode=display">\MM_{ij} = \left( \varphi_j, \varphi_i \right), \qquad 1 \leq i,j \leq N_h.</script>
+
+<h2 id="id">Time discretization</h2>
+
+<p>For the time discretization of \eqref{eq:ADRtweakAlg} we consider the  Backward Differentiation Formula (BDF) scheme. To begin with, we partition the time interval $[0,T]$ into $N_t$ subintervals of equal size $\Delta t = T / N_t$ and denote by $t_n = n \Delta t$, for $n = 0 , \dots, N_t$ the discrete time instances. Moreover, we denote by $\bu_n$ the approximation of $\bu$ at time $t_n$. We approximate the time derivative of $u$ as</p>
+
+<script type="math/tex; mode=display">\frac{\partial \bu }{\partial t}\bigg|_{t=t_n} \approx \frac{\alpha \bu^{n+1} - \bu^{n,\sigma}}{\Delta t}</script>
+
+<p>where (limiting ourselves to BDF schemes of order $\sigma = 1,2,3$)</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\bu^{n,\sigma} = 
+\begin{cases} 
+\bu^n, & \text{ if } n \geq 0, \quad \text{for } \sigma =1 \text{ (BDF1)}, \\
+2\bu^n - \tfrac{1}{2}\bu^{n-1}, & \text{ if } n \geq 1, \quad \text{for } \sigma =2 \text{ (BDF2)}, \\
+3\bu^n - \tfrac{3}{2}\bu^{n-1} + \tfrac{1}{3}\bu^{n-1}, & \text{ if } n \geq 2, \quad \text{for } \sigma =3 \text{ (BDF3)},
+\end{cases} %]]></script>
+
+<p>and</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\alpha = 
+\begin{cases} 
+1, &   \text{ for } \sigma =1 \text{ (BDF1)}, \\
+\tfrac{3}{2}, &  \text{ for } \sigma =2 \text{ (BDF2)}, \\
+\tfrac{11}{6}, &  \text{ for } \sigma =3 \text{ (BDF3)}.
+\end{cases} %]]></script>
+
+<p>We end up with following fully-dicrete scheme:  given $\bu^{n}, \dots, \bu^{n+1-\sigma}$, for $n \geq \sigma-1$ find $\bu^{n+1}$ such that</p>
+
+<blockquote>
+  <script type="math/tex; mode=display">\begin{equation}
+ \label{eq:ADRtweakAlgT}
+\left( \frac{\alpha}{\Delta t} \MM +  \AA(t_{n+1}) \right) \bu^{n+1}  = \frac{1}{\Delta t} \MM \bu^{n, \sigma} + \mathbf{f}(t_{n+1}).
+\end{equation}</script>
+</blockquote>
+
+<h1 id="references">References</h1>
+
+<p>Navier-Stokes equations:</p>
+
+<ul>
+  <li>K. Eleda Brenan, S.L. Campbell, and L. R. Petzold. Numerical Solution of Initial-Value Problems in Differential-Algebraic Equations. SIAM, Philadelphia, 1996.</li>
+  <li>A. Quarteroni and A. Valli. Numerical Approximation of Partial Differential Equations. Springer-Verlag, Berlin-Heidelberg, 1994.</li>
+  <li>A. Quarteroni, R. Sacco, and F. Saleri. Numerical Mathematics. Springer, New York, second edition, 2007.</li>
+</ul>
+
+
+		</article>
+	</div><!-- /.medium-12.columns -->
+</div><!-- /.row -->
+
+
+
+
+	
+	    <div id="up-to-top" class="row">
+      <div class="small-12 columns" style="text-align: right;">
+        <a class="iconfont" href="#top-of-page">&#xf108;</a>
+      </div><!-- /.small-12.columns -->
+    </div><!-- /.row -->
+
+      <div id="subfooter">
+        <nav class="row">
+          <section id="subfooter-left" class="small-12 medium-6 columns credits">
+            <p>Created by <a href="http://cmcs.epfl.ch/people/negri">Federico Negri</a> with <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> based on <a href="http://phlow.github.io/feeling-responsive/">Feeling Responsive</a>.</p>
+          </section>
+
+          <section id="subfooter-right" class="small-12 medium-6 columns">
+            <ul class="inline-list social-icons">
+            
+            </ul>
+          </section>
+        </nav>
+      </div><!-- /#subfooter -->
+    </footer>
+
+	
+
+	
+
+
+<script src="http://redbkit.github.io/redbKIT/assets/js/javascript.min.js"></script>
+
+
+
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-64466050-1', 'auto');
+  ga('set', 'anonymizeIp', true);
+  ga('send', 'pageview');
+
+</script>
+
+
+
+
+
+
+
+
+</body>
+<!--
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+-->
+</html>
+

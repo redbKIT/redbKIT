@@ -1,0 +1,899 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Monolithic FSI solver</title>
+	<link rel="stylesheet" type="text/css" href="http://redbkit.github.io/redbKIT/assets/css/styles_feeling_responsive.css">
+	<script src="http://redbkit.github.io/redbKIT/assets/js/modernizr.min.js"></script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/webfont/1.5.18/webfont.js"></script>
+	<script>
+		WebFont.load({
+			google: {
+				families: [ 'Lato:400,700,400italic:latin', 'Volkhov::latin' ]
+			}
+		});
+	</script>
+
+	<noscript>
+		<link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic%7CVolkhov' rel='stylesheet' type='text/css'>
+	</noscript>
+
+
+	<!-- Search Engine Optimization -->
+	<meta name="description" content="A short introduction to the FSI models implemented in the FEM_Library">
+  	
+	
+	
+	
+	
+
+
+	<!-- Facebook Open Graph -->
+	<meta property="og:title" content="Monolithic FSI solver">
+	<meta property="og:description" content="A short introduction to the FSI models implemented in the FEM_Library">
+	<meta property="og:url" content="http://redbkit.github.io/redbKIT/math/FSIsolver/">
+	<meta property="og:locale" content="en_EN">
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="redbKIT">
+	
+	
+
+
+	
+
+	<link type="text/plain" rel="author" href="http://redbkit.github.io/redbKIT/humans.txt">
+
+	
+
+	
+
+	<link rel="icon" sizes="32x32" href="http://redbkit.github.io/redbKIT/assets/img/favicon-32x32.png">
+
+	<link rel="icon" sizes="192x192" href="http://redbkit.github.io/redbKIT/assets/img/touch-icon-192x192.png">
+
+	<link rel="apple-touch-icon-precomposed" sizes="180x180" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-180x180-precomposed.png">
+
+	<link rel="apple-touch-icon-precomposed" sizes="152x152" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-152x152-precomposed.png">
+
+	<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-144x144-precomposed.png">
+
+	<link rel="apple-touch-icon-precomposed" sizes="120x120" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-120x120-precomposed.png">
+
+	<link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-114x114-precomposed.png">
+
+	
+	<link rel="apple-touch-icon-precomposed" sizes="76x76" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-76x76-precomposed.png">
+
+	<link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-72x72-precomposed.png">
+
+	<link rel="apple-touch-icon-precomposed" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-precomposed.png">	
+
+	<meta name="msapplication-TileImage" content="http://redbkit.github.io/redbKIT/assets/img/msapplication_tileimage.png">
+
+	<meta name="msapplication-TileColor" content="#fabb00">
+
+
+	
+
+	
+        <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    TeX: {
+      equationNumbers: {
+        autoNumber: "AMS"
+      }
+    },
+    tex2jax: {
+      inlineMath: [ ['$','$'] ],
+      displayMath: [ ['$$','$$'] ],
+      processEscapes: true,
+    }
+  });
+</script>
+<script type="text/javascript"
+        src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { extensions: ["color.js"] }});
+</script>
+
+        
+</head>
+<body id="top-of-page" class="page-fullwidth">
+	
+	<div id="navigation" class="sticky">
+  <nav class="top-bar" role="navigation" data-topbar>
+    <ul class="title-area">
+      <li class="name">
+      <h1 class="show-for-small-only"><a href="http://redbkit.github.io/redbKIT" class="icon-tree"> redbKIT</a></h1>
+    </li>
+       <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+      <li class="toggle-topbar menu-icon"><a href="#"><span>Navigation</span></a></li>
+    </ul>
+    <section class="top-bar-section">
+
+      <ul class="right">
+        
+
+              
+
+          
+          
+        
+
+              
+
+          
+          
+        
+
+              
+
+          
+          
+        
+
+              
+
+          
+          
+        
+
+              
+
+          
+          
+        
+
+              
+
+          
+          
+        
+
+              
+
+          
+          
+            
+            
+              <li class="divider"></li>
+              <li><a href="http://redbkit.github.io/redbKIT/contact/">Contact</a></li>
+
+            
+            
+          
+        
+        
+      </ul>
+
+      <ul class="left">
+        
+
+              
+
+          
+          
+
+            
+            
+              <li><a href="http://redbkit.github.io/redbKIT/">About</a></li>
+              <li class="divider"></li>
+
+            
+            
+          
+        
+
+              
+
+          
+          
+
+            
+            
+              <li><a href="http://redbkit.github.io/redbKIT/download-install/">Download and Install</a></li>
+              <li class="divider"></li>
+
+            
+            
+          
+        
+
+              
+
+          
+          
+
+            
+            
+              <li><a href="http://redbkit.github.io/redbKIT/getting-started/">Getting Started</a></li>
+              <li class="divider"></li>
+
+            
+            
+          
+        
+
+              
+
+          
+          
+
+            
+            
+              <li><a href="http://redbkit.github.io/redbKIT/probgallery/">Problems Gallery</a></li>
+              <li class="divider"></li>
+
+            
+            
+          
+        
+
+              
+
+          
+          
+
+            
+            
+              <li><a href="http://redbkit.github.io/redbKIT/contributors/">Development</a></li>
+              <li class="divider"></li>
+
+            
+            
+          
+        
+
+              
+
+          
+          
+
+            
+            
+
+              <li class="has-dropdown">
+                <a href="http://redbkit.github.io/redbKIT/documentation/">Documentation</a>
+
+                  <ul class="dropdown">
+                    
+
+                      
+
+
+			
+                      
+		      
+			<li class="has-dropdown">
+                <a href="http://redbkit.github.io/redbKIT/math/ADR/">Advection diffusion reaction</a>
+
+                  <ul class="dropdown">
+                    
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/AdvDiffReact/">Advection diffusion reaction equations</a></li>
+			
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/AdvDiffReactEx/">Simulation Setup</a></li>
+			
+</ul>
+ </li>
+		                          
+		      
+			
+
+                      
+
+
+			
+                      
+		      
+			<li class="has-dropdown">
+                <a href="http://redbkit.github.io/redbKIT/math/CFD/">Computational Fluid Dynamics</a>
+
+                  <ul class="dropdown">
+                    
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/NavierStokes/">Navier-Stokes equations</a></li>
+			
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/NavierStokesEx/">Simulation Setup</a></li>
+			
+</ul>
+ </li>
+		                          
+		      
+			
+
+                      
+
+
+			
+                      
+		      
+			<li class="has-dropdown">
+                <a href="http://redbkit.github.io/redbKIT/math/CSM/">Computational Solid Mechanics</a>
+
+                  <ul class="dropdown">
+                    
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/SolidMechanics/">Hyperelasticity: static and dynamics</a></li>
+			
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/SolidMechanicsEx/">Simulation Setup</a></li>
+			
+</ul>
+ </li>
+		                          
+		      
+			
+
+                      
+
+
+			
+                      
+		      
+			<li class="has-dropdown">
+                <a href="http://redbkit.github.io/redbKIT/math/FSI/">Fluid-Structure Interaction</a>
+
+                  <ul class="dropdown">
+                    
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/FSIsolver/">Monolithic FSI solver</a></li>
+			
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/FSIEx/">Simulation Setup</a></li>
+			
+</ul>
+ </li>
+		                          
+		      
+			
+
+                      
+
+
+			
+                      
+		      
+                      <li><a href="http://redbkit.github.io/redbKIT/math/essentialbc/">Essential Boundary Conditions</a></li>
+		                          
+		      
+			
+                  </ul>
+
+              </li>
+              <li class="divider"></li>
+            
+          
+        
+
+              
+
+          
+          
+        
+        
+      </ul>
+    </section>
+  </nav>
+</div><!-- /#navigation -->
+
+	
+
+	
+
+
+
+<div id="masthead-with-text">
+	<div class="row">
+		<div class="medium-9 small-centered columns">
+			<a id="forkme_banner" href="https://github.com/redbKIT/redbKIT">View on GitHub</a>
+			<section id="downloads">
+             			 <a class="zip_download_link" href="https://github.com/redbKIT/redbKIT/archive/v2.1.zip">Download this project as a .zip file</a>
+             			 <a class="tar_download_link" href="https://github.com/redbKIT/redbKIT/archive/v2.1.tar.gz">Download this project as a tar.gz file</a>
+			</section>
+			<div class="masthead-title"><b>redbKIT</b> <br/> <small>a MATLAB library for reduced-order modeling of PDEs</small></div>
+		</div> 
+	</div> 
+</div> 
+
+
+
+
+
+
+
+	
+
+
+<div class="row t30">
+	<div class="medium-9 small-centered columns">
+		<article>
+			<header>
+				
+				<h1>Monolithic FSI solver</h1>
+			</header>
+
+			
+			<p class="teaser">
+				A short introduction to the FSI models implemented in the FEM_Library
+			</p>
+			
+
+			<p><script type="math/tex">\newcommand{\bm}[1]{\boldsymbol{\mathbf{#1}}}
+\newcommand{\bvec}[1]{\mathbf{#1}}
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\bd}{\mathbf{d}}
+\newcommand{\bv}{\dot{\mathbf{d}}}
+\newcommand{\ba}{\ddot{\mathbf{d}}}
+\newcommand{\bmw}{\mathbf{w}}
+\newcommand{\bmv}{\mathbf{v}}
+\newcommand{\Nh}{N_h}
+\newcommand{\bU}{\mathbf{U}}
+\newcommand{\bp}{\bvec{p}}
+\newcommand{\VV}{\mathbf{V}}
+\newcommand{\WW}{\mathbf{W}}
+\newcommand{\QQ}{\mathbf{Q}}
+\renewcommand{\AA}{\mathbf{A}}
+\newcommand{\BB}{\mathbf{B}}
+\newcommand{\CC}{\mathbf{B}}
+\newcommand{\EE}{\mathbf{E}}
+\newcommand{\FF}{\mathbf{F}}
+\newcommand{\FFi}{\mathbf{f}^i}
+\newcommand{\FFe}{\mathbf{f}^e}
+\newcommand{\GG}{\mathbf{G}}
+\newcommand{\CC}{\mathbf{C}}
+\newcommand{\MM}{\mathbf{M}}
+\newcommand{\XX}{\mathbf{X}}
+\newcommand{\KK}{\mathbf{K}}
+\newcommand{\UU}{\mathbf{U}}
+\newcommand{\II}{\mathbf{I}}
+\renewcommand{\SS}{\mathbf{S}}
+\newcommand{\HH}{\mathbf{H}}
+\newcommand{\DD}{\mathbf{D}}
+\newcommand{\NN}{\mathbf{N}}
+\newcommand{\bmg}{\mathbf{g}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\JJ}{\mathbf{J}}
+\newcommand{\RR}{\mathbf{R}}
+\newcommand{\PP}{\mathbf{P}}</script></p>
+<div>
+  <!-- -->
+<ul id="markdown-toc">
+  <li><a href="#problem-definition" id="markdown-toc-problem-definition">Problem definition</a></li>
+  <li><a href="#space-and-time-discretization" id="markdown-toc-space-and-time-discretization">Space and time discretization</a>    <ul>
+      <li><a href="#newton-method-on-the-fully-coupled-system" id="markdown-toc-newton-method-on-the-fully-coupled-system">Newton method on the fully coupled system</a></li>
+      <li><a href="#decoupling-of-the-geometry-problem" id="markdown-toc-decoupling-of-the-geometry-problem">Decoupling of the geometry problem</a></li>
+      <li><a href="#monolithic-geometryconvective-explicit-scheme" id="markdown-toc-monolithic-geometryconvective-explicit-scheme">Monolithic Geometry–Convective Explicit Scheme</a></li>
+      <li><a href="#preconditioner" id="markdown-toc-preconditioner">Preconditioner</a></li>
+    </ul>
+  </li>
+  <li><a href="#references" id="markdown-toc-references">References</a></li>
+</ul>
+
+</div>
+
+<h1 id="problem-definition">Problem definition</h1>
+
+<p>The fluid-structure interaction (FSI) model that we consider here consists in a two-fields problem, where the incompressible Navier-Stokes equations written in the Arbitrary Lagrangian Eulerian (ALE) form are coupled with the nonlinear elastodynamics equation modeling the solid deformation. Because of the ALE approach we employ, a third non-physical geometry (or mesh motion) problem is introduced. The latter accounts for the fluid domain deformation, which in turn defines the ALE map.</p>
+
+<p>Let $\Omega^F$ and $\Omega^S$ be the domains occupied by the fluid and the solid in their reference configuration. We denote by $\Gamma = \partial \Omega^F \cap \partial \Omega^S$ the fluid-structure interface on the reference configuration. At any time $t$, the domain occupied by the fluid $\Omega^F(t)$ can be retrieved form $\Omega^F$ by the ALE mapping</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+  \mathcal{A}_t : \,\, &\Omega^F \rightarrow \Omega^F(t)  \\
+&\XX \mapsto \mathcal{A}_t(\XX) = \XX + \bd^G(\XX),
+\end{aligned} %]]></script>
+
+<p>where $\bd^G$ represents the displacement of the fluid domain.</p>
+
+<p>The coupled FSI problem thus consists in the following set of equations:</p>
+
+<blockquote>
+Navier-Stokes in ALE form governing the fluid problem:
+
+$$
+\left\{
+\begin{aligned}
+  &amp; \rho^F \frac{\partial \bmv^F}{\partial t}\Big|_{\XX}  + (\bmv^F  - \mathbf{w}^G) \cdot \nabla \bmv^F   - \nabla \cdot \bm{\sigma}^F(\bmv^F, p^F) =  \bm{0}    &amp; \text{ in } &amp;\Omega^F(t) \\
+&amp;\nabla \cdot \bmv^F = 0  &amp; \text{ in } &amp;\Omega^F(t)
+\end{aligned}
+\right.
+$$
+
+Nonlinear elastodynamics equation governing the solid dynamics:
+
+$$
+ \rho^S  \frac{\partial^2 \mathbf{d}^S}{\partial t^2} \,  - \nabla \cdot \PP(\mathbf{d}^S)    =  \mathbf{0}  \quad  \text{ in } \,\, \Omega^S 
+$$
+
+
+Coupling at the FS interface $\Gamma$:
+
+$$ 
+\left\{
+\begin{aligned}
+&amp;\mathbf{v}^F =  \frac{\partial \mathbf{d}^S}{\partial t}   \\[5pt]
+&amp;\bm{\sigma}^F(\bmv^F,p^F) \mathbf{n}^F +   \bm{\sigma}^S(\mathbf{d}^S) \mathbf{n}^S = 0
+\end{aligned}
+\right.
+$$
+
+Linear elasticity equations modeling the mesh motion problem:
+
+$$
+ \left\{
+\begin{aligned}
+&amp; - \nabla \cdot \bm{\sigma}^G(\bd^G)    =  \mathbf{0} &amp;\text{ in } &amp; \Omega^F\\
+&amp; \mathbf{d}^G   =  \mathbf{d}^S \,\,\, &amp;\text{on } &amp;\Gamma
+\end{aligned}
+\right.
+$$
+
+</blockquote>
+
+<p>where $\bm{\sigma}^F(\bmv^F, p^F) = -p^F \mathbf{I} + 2 \mu^F \bm{\epsilon}(\bmv^F)$ is the fluid Cauchy stress tensor, $\bm{\sigma}^S(\mathbf{d}^S) = J^{-1} \PP \FF^T $ is the solid Cauchy stress tensor, and</p>
+
+<script type="math/tex; mode=display">\bmw^G = \frac{\partial \bd^G}{\partial t}\Big|_{\XX}</script>
+
+<p>is the fluid mesh velocity. Both fluid and solid equations are complemented by appropriate initial and boundary conditions.</p>
+
+<h1 id="space-and-time-discretization">Space and time discretization</h1>
+
+<p>The field equations are discretized in space and time according to the following recipe:</p>
+
+<ul>
+  <li>We assume matching spatial discretizations between fluid and structure at the interface.</li>
+  <li>For the fluid velocity and pressure we use either $\mathbb{P}_2$-$\mathbb{P}_1$ finite elements or SUPG stabilized $\mathbb{P}_1$-$\mathbb{P}_1$ finite elements (see Bazilevs <em>et al</em> (2013) for the formulation of SUPG in the ALE setting); a BDF time-integrator is employed for the momentum equation.</li>
+  <li>The solid displacement is discretized using the same finite element space as for the fluid velocity; for the time integration, we use the Newmark scheme.</li>
+  <li>The fluid displacement is discretized using the same finite element space as for the fluid velocity.</li>
+</ul>
+
+<p>As a result, we end up with a set of nonlinear algebraic equations for the residual forces in the interior of the geometry, fluid and solid fields</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}
+\begin{aligned}
+ \RR^{F,n+1}_I(\bmv^{F,n+1}, p^{F,n+1}, \bd^{G,n+1})   & = \mathbf{0} \\
+ \RR^{S,n+1}_I(\bd^{S,n+1})   & = \mathbf{0} \\
+ \RR^{G,n+1}_I(\bd^{G,n+1}, \bd^{S,n+1}_\Gamma)   & = \mathbf{0}.
+\end{aligned}
+\end{equation} %]]></script>
+
+<p>The subscript $\Gamma$ at the structural displacement $\bd^{S,n+1}_\Gamma$ denotes the displacement restricted to the FSI interface. Equivalently, the subscript $I$ denotes system quantities from the respective field’s interior. At the  the interface $\Gamma$ the equilibrium of stresses yields</p>
+
+<script type="math/tex; mode=display">\begin{equation}
+\RR^{F,n+1}_\Gamma(\bmv^{F,n+1}, p^{F,n+1}, \bd^{G,n+1})  + \RR^{S,n+1}_\Gamma(\bd^{S,n+1})   = \mathbf{0},
+\end{equation}</script>
+
+<p>while the discrete version of the kinematic coupling (continuity of the velocity) reads</p>
+
+<script type="math/tex; mode=display">\begin{equation}
+\bmv_\Gamma^{F,n+1} = \bv_\Gamma^{S,n} + \frac{\gamma}{\beta \Delta t} \bd^{S,n+1}_\Gamma - \Delta t \gamma \bm{\xi}^{S,n}_{\Gamma} + \Delta t (1-\gamma) \ba^{S,n}_\Gamma.
+\label{eq:FSI11}
+\end{equation}</script>
+
+<p>Finally, the fluid domain deformation follows the structural displacement  at the interface (geometric adherence)</p>
+
+<script type="math/tex; mode=display">\begin{equation}
+\bd_\Gamma^{G,n+1} = \bd_\Gamma^{S,n+1}.
+\label{eq:FSI12}
+\end{equation}</script>
+
+<p>Combining equations \eqref{eq:FSI11} and \eqref{eq:FSI12}, we find that the fluid interface displacement follows form the fluid interface velocity:</p>
+
+<script type="math/tex; mode=display">\bd^{G,n+1}_\Gamma = \bd^{S,n+1}_\Gamma = \frac{\beta \Delta t}{\gamma} \left( \bmv_\Gamma^{F,n+1} - \bv_\Gamma^{S,n}  + \Delta t \gamma \bm{\xi}^{S,n}_{\Gamma} - \Delta t (1-\gamma) \ba^{S,n}_\Gamma \right).</script>
+
+<h2 id="newton-method-on-the-fully-coupled-system">Newton method on the fully coupled system</h2>
+
+<p>To solve the nonlinear FSI problem applying the Newton method, the field residuals are combined to obtain the residual of the FSI problem (we drop the timestep superscript $n+1$ from now on)</p>
+
+<blockquote>
+  <script type="math/tex; mode=display">\begin{equation}
+\RR^{FSI} = 
+\begin{pmatrix} 
+\RR^{F}_I\\
+\RR^{F}_\Gamma + \RR^{S}_\Gamma\\
+\RR^{S}_I\\
+\RR^{G}_I\\
+\end{pmatrix}
+ = \mathbf{0}.
+\end{equation}</script>
+</blockquote>
+
+<p>In the following, the fluid pressure variable $p^F$ is dropped from the notation, as it is understood that $\bmv^F$ represents all unknowns of the fluid field (with $p^F$ included in $\bmv^F_I$).</p>
+
+<p>The Jacobian of the FSI residual (to be used within the Newton method) is derived in the following. To begin with, we denote by</p>
+
+<script type="math/tex; mode=display">\FF = \frac{\partial \RR^F}{\partial \bmv^F}, \qquad \SS = \frac{\partial \RR^S}{\partial \bd^S}, \qquad \GG = \frac{\partial \RR^G}{\partial \bd^G},</script>
+
+<p>the Jacobians of the fluid, solid and geometry residuals with respect to fluid, solid and fluid displacement variables, respectively.  Then, we introduce the linearization of the solid residual with respect to the fluid velocity</p>
+
+<script type="math/tex; mode=display">\frac{\partial \RR^S}{\partial \bmv^F} =  \frac{\partial \RR^S}{\partial \bd_\Gamma^S} \frac{\partial \bd_\Gamma^S}{\partial \bmv^F_\Gamma} = \begin{pmatrix} \frac{\partial \RR^S_I}{\partial \bmv^F} \\ \frac{\partial \RR^S_\Gamma}{\partial \bmv^F} \end{pmatrix} \frac{\partial \bd_\Gamma^S}{\partial \bmv^F_\Gamma} = \begin{pmatrix} \tau \SS_{I\Gamma} \\ \tau \SS_{\Gamma \Gamma} \end{pmatrix}</script>
+
+<p>where</p>
+
+<script type="math/tex; mode=display">\tau = \frac{\partial \bd_\Gamma^S}{\partial \bmv^F_\Gamma} = \tfrac{\beta \Delta t}{\gamma}.</script>
+
+<p>Finally, we introduce the linearization of the fluid residual with respect to the mesh deformation, which yields the so-called shape derivatives</p>
+
+<script type="math/tex; mode=display">\FF^G = \frac{\partial \RR^F}{\partial \bd^G}.</script>
+
+<p>The $k$-th step of the Newton scheme reads</p>
+
+<blockquote>
+  <script type="math/tex; mode=display">\begin{equation}
+\JJ^{FSI}(\bU^{n+1}_k) \, \delta \bU = -\RR^{FSI}(\bU^{n+1}_k),
+\label{eq:FSI20}
+\end{equation}</script>
+</blockquote>
+
+<p>where</p>
+
+<script type="math/tex; mode=display">\bU = 
+\begin{pmatrix} 
+\bmv^F_I\\
+\bmv^F_\Gamma\\
+\bd^{S}_I\\
+\bd^{G}_I\\
+\end{pmatrix}</script>
+
+<p>is the vector of all unknowns, and the Jacobian matrix is given by</p>
+
+<blockquote>
+  <script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}
+\JJ^{FSI} = \begin{pmatrix} 
+\FF_{II} & \FF_{I\Gamma} + \tau \FF_{I\Gamma}^G & 0 & \FF_{II}^G\\
+\FF_{\Gamma I} & \FF_{\Gamma \Gamma} + \tau \SS_{\Gamma \Gamma} + \tau \FF_{\Gamma \Gamma}^G & \SS_{\Gamma I} & \FF_{\Gamma I}^G\\
+0 & \tau \SS_{I \Gamma}  & \SS_{II} & 0\\
+0 & \tau \GG_{I \Gamma} & 0 & \GG_{II}
+\end{pmatrix}.
+\label{eq:FSI21}
+\end{equation} %]]></script>
+</blockquote>
+
+<h2 id="decoupling-of-the-geometry-problem">Decoupling of the geometry problem</h2>
+
+<p>We note that omitting the shape derivatives $\FF^G$ decouples the geometry problem from the rest of the linear system \eqref{eq:FSI20}. Indeed, assuming that $\FF^G \approx 0$, the Jacobian matrix becomes</p>
+
+<blockquote>
+  <script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}
+\JJ^{FSI} \approx \begin{pmatrix} 
+\FF_{II} & \FF_{I\Gamma}  & 0 & 0\\
+\FF_{\Gamma I} & \FF_{\Gamma \Gamma} + \tau \SS_{\Gamma \Gamma}  & \SS_{\Gamma I} & 0\\
+0 & \tau \SS_{I \Gamma}  & \SS_{II} & 0\\
+0 & \tau \GG_{I \Gamma} & 0 & \GG_{II}
+\end{pmatrix},
+\label{eq:FSI22}
+\end{equation} %]]></script>
+</blockquote>
+
+<p>which reduces system \eqref{eq:FSI20} to the following</p>
+
+<blockquote>
+
+Fluid-Structure coupled problem:
+$$
+\begin{equation}
+\begin{pmatrix} 
+\FF_{II} &amp; \FF_{I\Gamma} &amp; 0 \\
+\FF_{\Gamma I} &amp; \FF_{\Gamma \Gamma} + \tau \SS_{\Gamma \Gamma} &amp; \SS_{\Gamma I} \\
+0 &amp; \tau \SS_{I \Gamma}  &amp; \SS_{II}
+\end{pmatrix}
+\begin{pmatrix} 
+\delta \bmv_{I}^F \\
+\delta \bmv_{\Gamma}^F \\
+\delta \mathbf{d}_I^S\\
+\end{pmatrix}
+\label{eq:FSI23}
+\end{equation}
+=
+- \begin{pmatrix} 
+\RR^{F}_I\\
+\RR^{F}_\Gamma + \RR^{S}_\Gamma\\
+\RR^{S}_I\\
+\end{pmatrix}.
+$$
+
+Geometric problem:
+
+$$ 
+\GG_{II} \mathbf{d}^G_I = - \GG_{I\Gamma} \mathbf{d}^S_{\Gamma}.
+$$
+</blockquote>
+
+<p>At each (quasi-)Newton iteration, this approach (that we refer to as <em>monolithic fully-implicit</em>) requires to:</p>
+
+<ol>
+  <li>assemble $\RR^F$ and $\FF$ on the deformed fluid mesh</li>
+  <li>assemble $\RR^S$ and $\SS$ on the undeformed solid mesh</li>
+  <li>form  and solve system \eqref{eq:FSI23}</li>
+  <li>update the solution</li>
+  <li>solve the mesh motion (geometric) problem</li>
+  <li>move the mesh</li>
+</ol>
+
+<p>Note that the matrix $\GG_{II}$ is assembled and factorized once and for all at the beginning of the simulation, thus leading to significant computational savings. This approach is often referred to as <em>quasi-direct coupling</em>, see e.g. Bazilevs <em>et al</em> (2013) and references therein.</p>
+
+<h2 id="monolithic-geometryconvective-explicit-scheme">Monolithic Geometry–Convective Explicit Scheme</h2>
+
+<p>With the aim of decreasing the computational costs entailed by the <em>monolithic fully-implicit</em> scheme, we introduce the so-called  <em>Monolithic Geometry–Convective Explicit (GCE)</em> scheme. The latter is easily obtained by:</p>
+
+<ol>
+  <li>linearizing the fluid convective term using a BDF extrapolation as already described <a href="/math/NavierStokes/">here</a>;</li>
+  <li>treating the geometry problem explicitly.</li>
+</ol>
+
+<p>We refer to Crosetto <em>et al</em> (2011) for further details.</p>
+
+<!--
+By this approach, system \eqref{eq:FSI20} reduces to the following
+
+<blockquote>
+
+Fluid-Structure coupled problem:
+$$
+\begin{equation}
+\begin{pmatrix} 
+\FF_{II}(\bd^{G,n}) & \FF_{I\Gamma}(\bd^{G,n}) & 0 \\
+\FF_{\Gamma I}(\bd^{G,n}) & \FF_{\Gamma \Gamma}(\bd^{G,n}) + \tau \SS_{\Gamma \Gamma} & \SS_{\Gamma I} \\
+0 & \tau \SS_{I \Gamma}  & \SS_{II}
+\end{pmatrix}
+\begin{pmatrix} 
+\delta \bmv_{I}^F \\
+\delta \bmv_{\Gamma}^F \\
+\delta \mathbf{d}_I^S\\
+\end{pmatrix}
+\label{eq:FSI25}
+\end{equation}
+=
+- \begin{pmatrix} 
+\RR^{F}_I(\bd^{G,n})\\
+\RR^{F}_\Gamma(\bd^{G,n}) + \RR^{S}_\Gamma\\
+\RR^{S}_I\\
+\end{pmatrix}.
+$$
+
+Geometric problem (to be solved after the Newton loop):
+
+$$ 
+\GG_{II} \mathbf{d}^{G,n+1}_I = - \GG_{I\Gamma} \mathbf{d}^{S,n+1}_{\Gamma}.
+$$
+</blockquote>
+-->
+
+<h2 id="preconditioner">Preconditioner</h2>
+
+<p>At each time step, the coupled linear system \eqref{eq:FSI23} is solved monolithically by means of either a direct or an iterative solver. 
+In the latter case, we employ the GMRES with a one-level additive
+Schwarz (AS) preconditioner that preconditions the entire system together, following 
+the approach proposed in Barker and Cai (2010), Wu and Cai (2014).</p>
+
+<p>To this end, we generate a decomposition of the mesh which is completely independent
+of the physical variables defined at a given mesh point. As a result, a subdomain may
+contain both fluid and solid elements.</p>
+
+<ul class="small-block-grid-2">
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/DD_FSI_4.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/DD_FSI_2.png" alt="" /></li>
+</ul>
+
+<p>To build the AS preconditioner for the Jacobian matrix, we first partition the domain $\Omega = \Omega^F \cap \Omega^S$ into overlapping subdomains $\Omega_k^\delta$, $k=1\dots,K$, featuring an overlap of size $\delta \geq h$. We then build suitable restriction matrices $\RR_k \in \mathbb{R}^{\Nh^k \times \Nh}$ so that the local matrices $\JJ_k = \RR_k \JJ \RR_k^T \in \mathbb{R}^{\Nh^k \times \Nh^k}$ correspond to the restriction of $\JJ \in \R^{\Nh \times Nh}$ to the subdomains $\Omega_k^\delta$.  The AS preconditioner is then defined as</p>
+
+<script type="math/tex; mode=display">\PP^{-1}_{AS} =   \sum_{k=1}^{K}  \RR_k^T \JJ_k^{-1} \RR_k,</script>
+
+<p>$\JJ_k^{-1}$ being the inverse of $\JJ_k$, here computed by means of an exact LU factorization; each local preconditioner is then applied in parallel.</p>
+
+<h1 id="references">References</h1>
+
+<ul>
+  <li>Y. Bazilevs, K. Takizawa, and T. E. Tezduyar. Computational fluid-structure interaction: methods and applications. John Wiley &amp; Sons, 2013.</li>
+  <li>P. Crosetto, S. Deparis, G. Fourestey, and A. Quarteroni. Parallel algorithms for fluid-structure interaction problems in haemodynamics. SIAM Journal on Scientific Computing, 33(4):1598-1622, 2011.</li>
+  <li>M. W. Gee,  U. Küttler, and W. A. Wall. Truly monolithic algebraic multigrid for fluid–structure interaction. International Journal for Numerical Methods in Engineering 85(8):987-1016, 2011.</li>
+  <li>D. Forti. Parallel Algorithms for the Solution of Large-Scale Fluid-Structure Interaction Problems in Hemodynamics. PhD thesis, EPFL, Lausanne, 2016.</li>
+</ul>
+
+<p>Solid-extension mesh motion technique:</p>
+
+<ul>
+  <li>Stein, K., Tezduyar, T., Benney, R.: Mesh moving techniques for fluid-structure interactions with large displacements. J. Appl. Mech. 70(1), 58–63 (2003).</li>
+  <li>Stein, K., Tezduyar, T., Benney, R.: Automatic mesh update with the solid-extension mesh moving technique. Comput. Meth. Appl. Mech. Engrg. 193(21), 2019–2032 (2004).</li>
+</ul>
+
+<p>Preconditioner:</p>
+
+<ul>
+  <li>A.T. Barker and X.C. Cai. Scalable parallel methods for monolithic coupling in fluid-structure interaction with application to blood flow modeling. J. Comput. Phys., 229(3):642–659, 2010.</li>
+  <li>Y. Wu and X.C. Cai. A fully implicit domain decomposition based ALE framework for three-dimensional fluid-structure interaction with application in blood flow computation. J. Comput. Phys., 258:524–537, 2014.</li>
+</ul>
+
+		</article>
+	</div><!-- /.medium-12.columns -->
+</div><!-- /.row -->
+
+
+
+
+	
+	    <div id="up-to-top" class="row">
+      <div class="small-12 columns" style="text-align: right;">
+        <a class="iconfont" href="#top-of-page">&#xf108;</a>
+      </div><!-- /.small-12.columns -->
+    </div><!-- /.row -->
+
+      <div id="subfooter">
+        <nav class="row">
+          <section id="subfooter-left" class="small-12 medium-6 columns credits">
+            <p>Created by <a href="http://cmcs.epfl.ch/people/negri">Federico Negri</a> with <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> based on <a href="http://phlow.github.io/feeling-responsive/">Feeling Responsive</a>.</p>
+          </section>
+
+          <section id="subfooter-right" class="small-12 medium-6 columns">
+            <ul class="inline-list social-icons">
+            
+            </ul>
+          </section>
+        </nav>
+      </div><!-- /#subfooter -->
+    </footer>
+
+	
+
+	
+
+
+<script src="http://redbkit.github.io/redbKIT/assets/js/javascript.min.js"></script>
+
+
+
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-64466050-1', 'auto');
+  ga('set', 'anonymizeIp', true);
+  ga('send', 'pageview');
+
+</script>
+
+
+
+
+
+
+
+
+</body>
+<!--
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+-->
+</html>
+

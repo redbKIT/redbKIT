@@ -1,0 +1,2 @@
+User-agent: *
+Sitemap: http://redbkit.github.io/redbKIT/sitemap.xml
