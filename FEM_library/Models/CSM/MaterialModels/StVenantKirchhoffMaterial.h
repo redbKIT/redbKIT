@@ -20,6 +20,10 @@ void StVenantKirchhoffMaterial_forces(mxArray* plhs[], const mxArray* prhs[]);
 
 void StVenantKirchhoffMaterial_jacobian(mxArray* plhs[], const mxArray* prhs[]);
 
+void StVenantKirchhoffMaterial_jacobianFast3D(mxArray* plhs[], const mxArray* prhs[]);
+
+void StVenantKirchhoffMaterial_jacobianFast2D(mxArray* plhs[], const mxArray* prhs[]);
+
 void StVenantKirchhoffMaterial_stress(mxArray* plhs[], const mxArray* prhs[]);
 
 #endif

@@ -38,6 +38,10 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     }
     
     char *Material_Model = mxArrayToString(prhs[1]);
+    double* dim_ptr = mxGetPr(prhs[0]);
+    int dim     = (int)(dim_ptr[0]);
+    /*mxFree(dim_ptr);*/
+
     
     if (strcmp(Material_Model, "Linear_forces")==0)
     {
@@ -70,9 +74,23 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
             StVenantKirchhoffMaterial_forces(plhs, prhs);
     }
     
-    if (strcmp(Material_Model, "StVenantKirchhoff_jacobian")==0)
+    if (strcmp(Material_Model, "StVenantKirchhoff_jacobianSlow")==0)
     {
             StVenantKirchhoffMaterial_jacobian(plhs, prhs);
+    }
+    
+    if (strcmp(Material_Model, "StVenantKirchhoff_jacobian")==0)
+    {
+        if (dim == 2)
+        {
+            StVenantKirchhoffMaterial_jacobianFast2D(plhs, prhs);
+        }
+        
+        if (dim == 3)
+        {
+            StVenantKirchhoffMaterial_jacobianFast3D(plhs, prhs);
+        }
+        
     }
     
     if (strcmp(Material_Model, "StVenantKirchhoff_stress")==0)
@@ -121,6 +139,7 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     }
     
     mxFree(Material_Model);
+
 }
 /*************************************************************************/
 
