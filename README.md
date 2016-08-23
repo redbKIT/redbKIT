@@ -8,13 +8,13 @@ In particular, it includes straightforward implementations of many of the algori
 
 `redbKIT` consists of three main packages: [`RB_library`](https://github.com/redbKIT/redbKIT/tree/master/RB_library), [`FEM_library`](https://github.com/redbKIT/redbKIT/tree/master/FEM_library) and [`Problems`](https://github.com/redbKIT/redbKIT/tree/master/Problems).
 
-For further details please visit [rebKIT website](http://redbkit.github.io/redbKIT/).
+For further details please visit [redbKIT website](http://redbkit.github.io/redbKIT/).
 
 
 Download and Installation
 -------
 
-To install the library, please follow the instructions contained in the INSTALL file or visit [rebKIT website](http://redbkit.github.io/redbKIT/download-install/).
+To install the library, please follow the instructions contained in the INSTALL file or visit [redbKIT website](http://redbkit.github.io/redbKIT/download-install/).
 
 License
 -------
