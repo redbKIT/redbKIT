@@ -2,7 +2,7 @@
 
 % Source term
 data.force{1} = @(x, y, t, param)(0.*x.*y);
-data.force{2} = @(x, y, t, param)(-10^3*2 + 0.*x.*y);
+data.force{2} = @(x, y, t, param)(-10^3*2 * (t>0) + 0.*x.*y);
 
 % Dirichlet
 data.bcDir{1} = @(x, y, t, param)(0.*x.*y); 
@@ -48,7 +48,7 @@ data.options.NonlinearSolver.maxIt       = 12;
 % Time options
 data.time.t0         = 0;
 data.time.dt         = 0.005;
-data.time.tf         = 0.4;
+data.time.tf         = 2;
 data.time.gamma      = 1/2;
 data.time.beta       = 1/4;
 data.time.alpha_m    = 0;

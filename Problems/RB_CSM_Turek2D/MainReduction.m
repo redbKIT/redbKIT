@@ -15,7 +15,7 @@ delete('Snapshots/DisplacementSnapshots.h5')
 %% ========================================================================
 % DATA
 dim      =  2;
-fem      =  'P1';
+fem      =  'P2';
 
 mu_bar = [];
 
@@ -180,7 +180,7 @@ RedMeshObject =  ReducedMesh( MESH, fem, 'CSM' );
 RedMeshObject.AppendInternalDoFs( IDEIM_int );
 RedMeshObject.AppendInternalDoFs( IDEIM_ext );
 RedMeshObject.Build( DATA );
-RedMeshObject.ExportToVtk( 'Figures/', 'Test');
+RedMeshObject.ExportToVtk( 'Figures/', 'Turek2D');
 
 ROM.Red_Mesh = RedMeshObject.M_Red_Mesh;
 
