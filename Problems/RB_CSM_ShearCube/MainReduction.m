@@ -14,7 +14,7 @@ delete('Snapshots/DisplacementSnapshots.h5')
 %% ========================================================================
 % DATA
 dim      =  3;
-fem      =  'P1';
+fem      =  'P2';
 
 % Parameters range
 P = 3;% Yuoung modulus, Poisson Coefficient, External load
@@ -29,13 +29,10 @@ Training_Parameters  = bsxfun(@plus,mu_min,bsxfun(@times,mu_cube,(mu_max-mu_min)
 
 OfflineTraining.Solution.h5_filename       = 'Snapshots/DisplacementSnapshots.h5';
 OfflineTraining.Solution.h5_section        = 'Displacement';
-%OfflineTraining.Solution.SamplingFrequency = 1;
 
 OfflineTraining.System.h5_filename                      = 'Snapshots/SystemSnapshots.h5';
 OfflineTraining.System.InternalForces.h5_section        = 'F_int';
-%OfflineTraining.System.InternalForces.SamplingFrequency = 1;
 OfflineTraining.System.ExternalForces.h5_section        = 'F_ext';
-%OfflineTraining.System.ExternalForces.SamplingFrequency = 1;
 
 tol_POD_U    = 1e-4;
 tol_POD_Fext = 1e-4;
@@ -141,7 +138,7 @@ RedMeshObject =  ReducedMesh( MESH, fem, 'CSM' );
 RedMeshObject.AppendInternalDoFs( IDEIM_int );
 RedMeshObject.AppendInternalDoFs( IDEIM_ext );
 RedMeshObject.Build( DATA );
-RedMeshObject.ExportToVtk( 'FiguresRM/', 'Prova');
+RedMeshObject.ExportToVtk( 'FiguresRM/', 'ShearCube');
 
 ROM.Red_Mesh = RedMeshObject.M_Red_Mesh;
             
@@ -150,7 +147,7 @@ ROM.Red_Mesh = RedMeshObject.M_Red_Mesh;
 
 %testing Parameters
 mu_test_Dimension   = 5; % number of samples
-mu_cube              = lhsdesign(mu_test_Dimension,P); % generate normalized design
+mu_cube             = lhsdesign(mu_test_Dimension,P); % generate normalized design
 Testing_Parameters  = bsxfun(@plus,mu_min,bsxfun(@times,mu_cube,(mu_max-mu_min)));
 
 
