@@ -94,6 +94,7 @@ fprintf('-------------------------------------------\n');
 
 if export_h5
     DispSnap_h5  = HDF5_DenseMultiCVector(Training_Options.h5_filename, Training_Options.h5_section, length(MESH.internal_dof));
+    DispSnap_h5.append( u0(MESH.internal_dof) );
 end
 
 %% Generate Domain Decomposition (if required)
