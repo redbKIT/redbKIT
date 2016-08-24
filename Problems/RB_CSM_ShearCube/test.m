@@ -1,3 +1,5 @@
+function [] = test()
+
 %   This file is part of redbKIT.
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch>   
@@ -5,11 +7,11 @@
 clc
 clear all
 
-[~,~,~] = mkdir('Snapshots');
-[~,~,~] = mkdir('Figures');
+[~,~,~] = mkdir('SnapshotsTest');
+[~,~,~] = mkdir('FiguresTest');
 
-delete('Snapshots/SystemSnapshots.h5')
-delete('Snapshots/DisplacementSnapshots.h5')
+delete('SnapshotsTest/SystemSnapshots.h5')
+delete('SnapshotsTest/DisplacementSnapshots.h5')
 
 %% ========================================================================
 % DATA
@@ -23,14 +25,14 @@ mu_max = [ 7*10^4   0.4  2000];
 mu_bar = [ 6.5*10^4 0.35 1500]; 
     
 % Training Parameters
-mu_train_Dimension   = 50; % number of samples
+mu_train_Dimension   = 10; % number of samples
 mu_cube              = lhsdesign(mu_train_Dimension,P); % generate normalized design
 Training_Parameters  = bsxfun(@plus,mu_min,bsxfun(@times,mu_cube,(mu_max-mu_min)));
 
-OfflineTraining.Solution.h5_filename       = 'Snapshots/DisplacementSnapshots.h5';
+OfflineTraining.Solution.h5_filename       = 'SnapshotsTest/DisplacementSnapshots.h5';
 OfflineTraining.Solution.h5_section        = 'Displacement';
 
-OfflineTraining.System.h5_filename                      = 'Snapshots/SystemSnapshots.h5';
+OfflineTraining.System.h5_filename                      = 'SnapshotsTest/SystemSnapshots.h5';
 OfflineTraining.System.InternalForces.h5_section        = 'F_int';
 OfflineTraining.System.ExternalForces.h5_section        = 'F_ext';
 
@@ -46,7 +48,7 @@ tol_POD_Fint = 1e-4;
 for i = 1 : mu_train_Dimension
 
     CSM_Solver(dim, elements, vertices, boundaries, fem, 'datafileR', ...
-               Training_Parameters(i,:), ['Figures/TrainingTierI_', num2str(i)], [], OfflineTraining.Solution);
+               Training_Parameters(i,:), ['FiguresTest/TrainingTierI_', num2str(i)], [], OfflineTraining.Solution);
 
 end
 
@@ -76,7 +78,7 @@ ROM.V = V;
 for i = 1 : mu_train_Dimension
 
     CSM_POD_Solver(dim, elements, vertices, boundaries, fem, 'datafileR', ...
-               Training_Parameters(i,:), ['Figures/TrainingTierII_', num2str(i)], [], OfflineTraining.System, ROM.V);
+               Training_Parameters(i,:), ['FiguresTest/TrainingTierII_', num2str(i)], [], OfflineTraining.System, ROM.V);
 
 end
 
@@ -138,7 +140,7 @@ RedMeshObject =  ReducedMesh( MESH, fem, 'CSM' );
 RedMeshObject.AppendInternalDoFs( IDEIM_int );
 RedMeshObject.AppendInternalDoFs( IDEIM_ext );
 RedMeshObject.Build( DATA );
-RedMeshObject.ExportToVtk( 'FiguresRM/', 'ShearCube');
+RedMeshObject.ExportToVtk( 'FiguresTest/', 'ShearCube');
 
 ROM.Red_Mesh = RedMeshObject.M_Red_Mesh;
             
@@ -146,7 +148,7 @@ ROM.Red_Mesh = RedMeshObject.M_Red_Mesh;
 % Solve POD-DEIM ROM
 
 %testing Parameters
-mu_test_Dimension   = 20; % number of samples
+mu_test_Dimension   = 5; % number of samples
 mu_cube             = lhsdesign(mu_test_Dimension,P); % generate normalized design
 Testing_Parameters  = bsxfun(@plus,mu_min,bsxfun(@times,mu_cube,(mu_max-mu_min)));
 
@@ -155,7 +157,7 @@ for i = 1 : mu_test_Dimension
 
     tmp_time = tic;
     U_ROM = CSM_PODDEIM_Solver(dim, elements, vertices, boundaries, fem, 'datafileR', ...
-               Testing_Parameters(i,:), ['Figures/TestingTierIII_', num2str(i)], [], ROM);
+               Testing_Parameters(i,:), ['FiguresTest/TestingTierIII_', num2str(i)], [], ROM);
     time_ROM(i) = toc(tmp_time);
        
     tmp_time = tic;
@@ -171,3 +173,10 @@ fprintf('\n\n*** Average Relative Error on the displacement = %2.3f%% \n', mean(
 fprintf('\n*** Average FOM Time-to-Solution = %1.2e s\n', mean(time_FOM) );
 fprintf('\n*** Average ROM Time-to-Solution = %1.2e s\n\n', mean(time_ROM) );
 %% ========================================================================
+
+close all;
+
+[~,~,~] = rmdir('SnapshotsTest', 's');
+[~,~,~] = rmdir('FiguresTest', 's');
+
+end
