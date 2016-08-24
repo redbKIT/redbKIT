@@ -35,13 +35,8 @@ void StVenantKirchhoffMaterial_forces(mxArray* plhs[], const mxArray* prhs[])
     double* phi = mxGetPr(prhs[9]);
     double* gradrefphi = mxGetPr(prhs[10]);
     
-    double gradphi[dim][nln][NumQuadPoints];
     double* elements  = mxGetPr(prhs[4]);
-    
-    double GradV[dim][dim];
-    double GradU[dim][dim];
-    double GradUh[dim][dim][NumQuadPoints];
-    
+        
     double Id[dim][dim];
     int d1,d2;
     for (d1 = 0; d1 < dim; d1 = d1 + 1 )
@@ -56,13 +51,6 @@ void StVenantKirchhoffMaterial_forces(mxArray* plhs[], const mxArray* prhs[])
         }
     }
     
-    double F[dim][dim][NumQuadPoints];
-    double E[dim][dim][NumQuadPoints];
-    double dP[dim][dim];
-    double P_Uh[dim][dim];
-    
-    double dF[dim][dim];
-    double dE[dim][dim];
     
     double* material_param = mxGetPr(prhs[2]);
     double Young = material_param[0];
@@ -73,11 +61,23 @@ void StVenantKirchhoffMaterial_forces(mxArray* plhs[], const mxArray* prhs[])
     /* Assembly: loop over the elements */
     int ie;
     
-#pragma omp parallel for shared(invjac,detjac,elements,myRrows,myRcoef,U_h) private(gradphi,F,E,dP,P_Uh,dF,dE,GradV,GradU,GradUh,ie,k,l,q,d1,d2) firstprivate(phi,gradrefphi,w,numRowsElements,nln2,nln,NumNodes,Id,mu,lambda)
+#pragma omp parallel for shared(invjac,detjac,elements,myRrows,myRcoef,U_h) private(ie,k,l,q,d1,d2) firstprivate(phi,w,numRowsElements,nln2,nln,NumNodes,Id,mu,lambda)
     
     for (ie = 0; ie < noe; ie = ie + 1 )
-    {             
+    {
+        
+        double gradphi[NumQuadPoints][dim][nln];
+
+        double GradV[dim][dim];
+        double GradUh[NumQuadPoints][dim][dim];
+        
+        double F[NumQuadPoints][dim][dim];
+        double E[NumQuadPoints][dim][dim];
+        double P_Uh[dim][dim];
+        double FE[NumQuadPoints][dim][dim];
+                
         double traceE[NumQuadPoints];
+        
         for (q = 0; q < NumQuadPoints; q = q + 1 )
         {
             /* Compute Gradient of Basis functions*/
@@ -85,10 +85,10 @@ void StVenantKirchhoffMaterial_forces(mxArray* plhs[], const mxArray* prhs[])
             {
                 for (d1 = 0; d1 < dim; d1 = d1 + 1 )
                 {
-                    gradphi[d1][k][q] = 0;
+                    gradphi[q][d1][k] = 0;
                     for (d2 = 0; d2 < dim; d2 = d2 + 1 )
                     {
-                        gradphi[d1][k][q] = gradphi[d1][k][q] + INVJAC(ie,d1,d2)*GRADREFPHI(k,q,d2);
+                        gradphi[q][d1][k] = gradphi[q][d1][k] + INVJAC(ie,d1,d2)*GRADREFPHI(k,q,d2);
                     }
                 }
             }
@@ -97,23 +97,33 @@ void StVenantKirchhoffMaterial_forces(mxArray* plhs[], const mxArray* prhs[])
             {
                 for (d2 = 0; d2 < dim; d2 = d2 + 1 )
                 {
-                    GradUh[d1][d2][q] = 0;
+                    GradUh[q][d1][d2] = 0;
                     for (k = 0; k < nln; k = k + 1 )
                     {
                         int e_k;
                         e_k = (int)(elements[ie*numRowsElements + k] + d1*NumNodes - 1);
-                        GradUh[d1][d2][q] = GradUh[d1][d2][q] + U_h[e_k] * gradphi[d2][k][q];
+                        GradUh[q][d1][d2] = GradUh[q][d1][d2] + U_h[e_k] * gradphi[q][d2][k];
                     }
-                    F[d1][d2][q]  = Id[d1][d2] + GradUh[d1][d2][q];
+                    F[q][d1][d2]  = Id[d1][d2] + GradUh[q][d1][d2];
                 }
             }
-            compute_GreenStrainTensor(dim, NumQuadPoints, F, Id, E, q );
-            traceE[q] = TraceQ(dim, NumQuadPoints, E, q);
+
+            MatrixProductAlphaT1(dim, 1.0, F[q], F[q], E[q] );
+            for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+            {
+                for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+                {
+                    E[q][d1][d2] = 0.5 * ( E[q][d1][d2] - Id[d1][d2] );
+                }
+            }
+            traceE[q] = Trace(dim, E[q]);
+            
+            MatrixProduct(dim, F[q], E[q], FE[q] );
+
         }
 
-        int iii = 0;
         int ii = 0;
-        int a, b, i_c, j_c;
+        int a, i_c, j_c;
         
         /* loop over test functions --> a */
         for (a = 0; a < nln; a = a + 1 )
@@ -136,19 +146,17 @@ void StVenantKirchhoffMaterial_forces(mxArray* plhs[], const mxArray* prhs[])
                     
                     for (d2 = 0; d2 < dim; d2 = d2 + 1 )
                     {
-                        GradV[i_c][d2] = gradphi[d2][a][q];
+                        GradV[i_c][d2] = gradphi[q][d2][a];
                     }
                     
-                    double P1[dim][dim];
                     for (d1 = 0; d1 < dim; d1 = d1 + 1 )
                     {
                         for (d2 = 0; d2 < dim; d2 = d2 + 1 )
                         {
-                            P1[d1][d2] =  ( 2 * mu * E[d1][d2][q] + lambda * traceE[q] * Id[d1][d2] );
+                            P_Uh[d1][d2] =  ( 2 * mu * FE[q][d1][d2] + lambda * traceE[q] * F[q][d1][d2] );
                         }
                     }
                     
-                    MatrixProductQ1(dim, NumQuadPoints, F, P1, P_Uh, q);  
                     rloc  = rloc + Mdot( dim, GradV, P_Uh) * w[q];
                 }
                                             
