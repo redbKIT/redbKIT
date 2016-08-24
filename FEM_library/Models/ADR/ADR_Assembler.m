@@ -1,4 +1,4 @@
-function [A, F, M] = ADR_Assembler(MESH, DATA, FE_SPACE, OPERATOR, TC_d, TC_t, subdomain, t)
+function [A, F, M] = ADR_Assembler(MESH, DATA, FE_SPACE, OPERATOR, TC_d, TC_t, subdomain, t, stabilization, dt)
 %ADR_ASSEMBLER assembler for 2D/3D ADR equations
 %
 %   [A, F] = ADR_ASSEMBLER(MESH, DATA, FE_SPACE) given MESH and 
@@ -43,6 +43,14 @@ end
 
 if nargin < 8
     t = [];
+end
+
+if nargin < 9
+    stabilization = [];
+end
+
+if nargin < 10
+    dt = 1;
 end
 
 if ~isempty(subdomain)    
@@ -141,14 +149,43 @@ switch MESH.dim
         b = [bx by bz];
 end
 
-
-%% C assembly, returns matrices in sparse vector format
-[Arows, Acols, Acoef, Mcoef, Rrows, Rcoef] = ADR_assembler_C_omp(MESH.dim, OPERATOR, TC_d, TC_t, MESH.elements, FE_SPACE.numElemDof, mu, b, si, f,...
-    FE_SPACE.quad_weights, MESH.invjac(index_subd,:,:), MESH.jac(index_subd), FE_SPACE.phi, FE_SPACE.dphi_ref);
-
-%% Build sparse matrices and rhs
-A    = GlobalAssemble(Arows,Acols,Acoef,MESH.numNodes,MESH.numNodes);
-M    = GlobalAssemble(Arows,Acols,Mcoef,MESH.numNodes,MESH.numNodes);
-F    = GlobalAssemble(Rrows,1,Rcoef,MESH.numNodes,1);
+%% Assembly
+if isempty( stabilization )
+    
+    % C assembly, returns matrices in sparse vector format
+    [Arows, Acols, Acoef, Mcoef, Rrows, Rcoef] = ADR_assembler_C_omp(MESH.dim, OPERATOR, TC_d, TC_t, MESH.elements, FE_SPACE.numElemDof, mu, b, si, f,...
+        FE_SPACE.quad_weights, MESH.invjac(index_subd,:,:), MESH.jac(index_subd), FE_SPACE.phi, FE_SPACE.dphi_ref);
+    
+    % Build sparse matrices and rhs
+    A    = GlobalAssemble(Arows,Acols,Acoef,MESH.numNodes,MESH.numNodes);
+    M    = GlobalAssemble(Arows,Acols,Mcoef,MESH.numNodes,MESH.numNodes);
+    F    = GlobalAssemble(Rrows,1,Rcoef,MESH.numNodes,1);
+    
+else
+        
+    switch stabilization
+       
+        case 'SUPG'
+            
+            % C assembly, returns matrices in sparse vector format
+            [Arows, Acols, Acoef, Mcoef, Rrows, Rcoef] = ADR_SUPGassembler_C_omp(MESH.dim, stabilization, dt, MESH.elements, FE_SPACE.numElemDof, mu, b, si, f,...
+                FE_SPACE.quad_weights, MESH.invjac(index_subd,:,:), MESH.jac(index_subd), FE_SPACE.phi, FE_SPACE.dphi_ref);
+            
+            M = [];
+            
+        case 'SUPGt'
+            
+            % C assembly, returns matrices in sparse vector format
+            [Arows, Acols, Acoef, Mcoef, Rrows, Rcoef] = ADR_SUPGassembler_C_omp(MESH.dim, stabilization, dt, MESH.elements, FE_SPACE.numElemDof, mu, b, si, f,...
+                FE_SPACE.quad_weights, MESH.invjac(index_subd,:,:), MESH.jac(index_subd), FE_SPACE.phi, FE_SPACE.dphi_ref);
+        
+            M    = GlobalAssemble(Arows,Acols,Mcoef,MESH.numNodes,MESH.numNodes);
+    end
+    
+    % Build sparse matrices and rhs
+    A    = GlobalAssemble(Arows,Acols,Acoef,MESH.numNodes,MESH.numNodes);
+    F    = GlobalAssemble(Rrows,1,Rcoef,MESH.numNodes,1);
+    
+end
 
 return

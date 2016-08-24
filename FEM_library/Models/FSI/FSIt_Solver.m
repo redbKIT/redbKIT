@@ -20,7 +20,7 @@ function [X, MESH, DATA] = FSIt_Solver(dim, meshFluid, meshSolid, fem_F, fem_S, 
 %   - a condensed formulation is employed, i.e. only internal and interface
 %   fluid velocity, fluid pressure, and internal solid displacement are
 %   considered as degrees of freedom. See, e.g., the following paper
-%    "Gee et al., Truly monolithic algebraic multigrid for fluid?structure 
+%    "Gee et al., Truly monolithic algebraic multigrid for fluid-structure 
 %     interaction, IJNME 2011."
 %   - the coupling is treated in a monolithic way
 %   - the fluid equations are approximated in time by means of a
@@ -44,7 +44,7 @@ function [X, MESH, DATA] = FSIt_Solver(dim, meshFluid, meshSolid, fem_F, fem_S, 
 %   - a condensed formulation is employed, i.e. only internal and interface
 %   fluid velocity, fluid pressure, and internal solid displacement are
 %   considered as degrees of freedom. See, e.g., the following paper
-%    "Gee et al., Truly monolithic algebraic multigrid for fluid?structure 
+%    "Gee et al., Truly monolithic algebraic multigrid for fluid-structure 
 %     interaction, IJNME 2011."
 %   - the coupling is treated in a monolithic way
 %   - the fluid equations are approximated in time by means of a

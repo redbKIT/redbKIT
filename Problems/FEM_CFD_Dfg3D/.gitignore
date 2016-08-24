@@ -2,3 +2,6 @@
 Results/
 mesh_old/
 ResultsTest/
+mesh/fluid_L2.msh
+mesh/fluid_L3.msh
+mesh/fluid_L4.msh

@@ -39,16 +39,18 @@ dependencies{2} = {};
 source_files{3} = {'FEM_library/Models/CSM/','CSM_assembler_ExtForces.c'};
 dependencies{3} = {};
 source_files{4} = {'FEM_library/Models/CFD/','CFD_assembler_C_omp.c'};
-dependencies{4} = {'../CSM/MaterialModels/Tools.c'};
+dependencies{4} = {'../../Core/Tools.c'};
 source_files{5} = {'FEM_library/Models/CFD/','CFD_assembler_ExtForces.c'};
 dependencies{5} = {};
 source_files{6} = {'FEM_library/Models/CSM/','CSM_assembler_C_omp.c'};
-dependencies{6} = {'MaterialModels/Tools.c', 'MaterialModels/NeoHookeanMaterial.c',...
+dependencies{6} = {'../../Core/Tools.c', 'MaterialModels/NeoHookeanMaterial.c',...
                    'MaterialModels/LinearElasticMaterial.c', 'MaterialModels/SEMMTMaterial.c', ...
                    'MaterialModels/StVenantKirchhoffMaterial.c',...
                    'MaterialModels/RaghavanVorpMaterial.c'};
-source_files{7} = {'RB_library/RBF_interpolation/','RBF_evaluate_Fast.c'};
+source_files{7} = {'RB_library/Tools/RBF_interpolation/','RBF_evaluate_Fast.c'};
 dependencies{7} = {};
+source_files{8} = {'FEM_library/Models/ADR/','ADR_SUPGassembler_C_omp.c'};
+dependencies{8} = {'../../Core/Tools.c'};
 
 %Mexify = 0;               
 if nargin < 2 || isempty( sources )

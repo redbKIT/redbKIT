@@ -128,46 +128,26 @@ classdef AS_Preconditioner_Serial < Preconditioner & handle
                     
                     if ~obj.M_reuse || (obj.M_reuse && ~obj.M_isBuilt)
                         
-                        A_DD = Composite(obj.M_options.num_subdomains);
-                        for ii = 1:numel(A_DD)
-                            A_DD{ii}   = A(obj.M_Restrictions{ii},obj.M_Restrictions{ii});
+                        A_DD = cell(obj.M_options.num_subdomains,1);
+                        for ii = 1 : length(A_DD) 
+                            A_DD{ii}             = A(obj.M_Restrictions{ii},obj.M_Restrictions{ii});
                         end
                         
                         reordering_alg = obj.M_options.mumps_reordering;
-                        spmd(0,numel(A_DD))
-                            mumps_ID            = initmumps;
-                            mumps_ID.SYM        = 0;
-                            mumps_ID            = dmumps(mumps_ID);
-                            mumps_ID.JOB        = 4;
-                            mumps_ID.ICNTL(1:4) = -1; % no output
-                            mumps_ID.ICNTL(7)   = reordering_alg;
-                            mumps_ID            = dmumps(mumps_ID, A_DD);
+                        mumps_ID       = cell(obj.M_options.num_subdomains,1);
+                        for i = 1 : length(A_DD) 
+                            mumps_ID{i}            = initmumps;
+                            mumps_ID{i}.SYM        = 0;
+                            mumps_ID{i}            = dmumps(mumps_ID{i});
+                            mumps_ID{i}.JOB        = 4;
+                            mumps_ID{i}.ICNTL(1:4) = -1; % no output
+                            mumps_ID{i}.ICNTL(7)   = reordering_alg;
+                            mumps_ID{i}            = dmumps(mumps_ID{i}, A_DD{i});
                         end
                         obj.M_A_DD     = A_DD;
-                        obj.M_mumps_ID = mumps_ID;
-                        clear mumps_ID;
-
-                        % coarse level
-                        if obj.M_twoLevel
-                            if strcmp(obj.M_options.coarse_level, 'SmoothedAggregation')
-                                D       = spdiags( spdiags(A, 0), 0, size(A,1), size(A,1));
-                                R_coarse = obj.M_Restrictions{end}';
-                                
-                                for i = 1 : obj.M_options.coarse_smoother_dumping
-                                    R_coarse = R_coarse - obj.M_options.coarse_smoother_dumping * ( D \ ( A*R_coarse ) );
-                                end
-                                
-                                R_coarse       = R_coarse';
-                            else
-                                R_coarse = obj.M_Restrictions{end};
-                            end
-                            
-                            obj.M_A_coarse = R_coarse * (A * R_coarse');
-                            obj.M_R_coarse = R_coarse;
-                            
-                        end
-                            
+                        obj.M_mumps_ID = mumps_ID;    
                         obj.M_isBuilt  = true;
+                        clear mumps_ID;
                     end
                     
             end
@@ -235,8 +215,6 @@ classdef AS_Preconditioner_Serial < Preconditioner & handle
                     %end
                     
                 case 'MUMPS'
-                    A_DD     = obj.M_A_DD;
-                    mumps_ID = obj.M_mumps_ID;
                     Restrictions = obj.M_Restrictions;
                     
                     % coarse level
@@ -248,22 +226,20 @@ classdef AS_Preconditioner_Serial < Preconditioner & handle
                         z     = 0 *r;
                     end
                     
-                    spmd(0,obj.M_options.num_subdomains)
-                        zi = 0*r;
+                    for i =  1 : obj.M_options.num_subdomains
+                        zi{i} = 0*r;
                         
-                        mumps_ID.JOB    = 3;
-                        mumps_ID.RHS    = r(Restrictions{labindex});
-                        mumps_ID        = dmumps(mumps_ID, A_DD);
+                        obj.M_mumps_ID{i}.JOB    = 3;
+                        obj.M_mumps_ID{i}.RHS    = r(Restrictions{i});
+                        obj.M_mumps_ID{i}        = dmumps(obj.M_mumps_ID{i}, obj.M_A_DD{i});
                         
-                        zi(Restrictions{labindex}) = mumps_ID.SOL;
+                        zi{i}(Restrictions{i}) = obj.M_mumps_ID{i}.SOL;
                     end
                     
                     for i = 1 : obj.M_options.num_subdomains
                         z = z + zi{i};
                     end
-                    
-                    clear mumps_ID;
-                    
+                                        
             end
             
         end
@@ -276,9 +252,9 @@ classdef AS_Preconditioner_Serial < Preconditioner & handle
                 case 'MUMPS'
                     mumps_ID = obj.M_mumps_ID;
                     num_local = length(obj.M_Restrictions);
-                    spmd(0,num_local)
-                        mumps_ID.JOB    = -2;
-                        mumps_ID        = dmumps(mumps_ID);
+                    for i = 1 : length( mumps_ID )
+                        mumps_ID{i}.JOB    = -2;
+                        mumps_ID{i}        = dmumps(mumps_ID{i});
                     end
                     
                 otherwise

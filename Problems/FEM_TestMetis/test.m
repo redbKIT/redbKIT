@@ -33,5 +33,9 @@ map = metis_to_matlab(A, n_subdomains, 1);
 time_p = toc(time_p);
 fprintf(' done in %f s\n', time_p);
 
+% To generate vtk of the decomposition uncomment the following two lines
+% [~,~,~] = mkdir('Figures');
+% geometric_domain_decomposition(vertices, elements, dim, n_subdomains, 1, 1, ['Figures/Subs',num2str(n_subdomains)], elements);
+
 
 end

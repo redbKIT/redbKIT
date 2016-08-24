@@ -1,4 +1,4 @@
-function [u, FE_SPACE, MESH, DATA] = CSMt_Solver(dim, elements, vertices, boundaries, fem, data_file, param, vtk_filename, sol_history)
+function [u, FE_SPACE, MESH, DATA] = CSMt_Solver(dim, elements, vertices, boundaries, fem, data_file, param, vtk_filename, sol_history, Training_Options)
 %CSMT_SOLVER Dynamic Structural Finite Element Solver
 
 %   This file is part of redbKIT.
@@ -23,6 +23,12 @@ end
 
 if nargin < 9 || isempty(sol_history)
     sol_history = false;
+end
+
+if nargin < 10 || isempty( Training_Options )
+    export_h5 = false;
+else
+    export_h5    = true;
 end
 
 %% Read problem parameters and BCs from data_file
@@ -70,11 +76,12 @@ for k = 1 : FE_SPACE.numComponents
             du0 = [du0; DATA.du0{k}( MESH.nodes(1,:), MESH.nodes(2,:), MESH.nodes(3,:), t0, param )'];
     end
 end
-d2u0 = 0*du0;
-u = u0;
-CSM_export_solution(MESH.dim, u0, MESH.vertices, MESH.elements, MESH.numNodes, vtk_filename, 0);
 
-TimeAdvance.Initialize( u0, du0, d2u0 );
+u = u0;
+if ~isempty(vtk_filename)
+    CSM_export_solution(MESH.dim, u0, MESH.vertices, MESH.elements, MESH.numNodes, vtk_filename, 0);
+end
+
 Coef_Mass = TimeAdvance.MassCoefficient( );
 
 fprintf('\n **** PROBLEM''S SIZE INFO ****\n');
@@ -84,6 +91,11 @@ fprintf(' * Number of Nodes     = %d \n',MESH.numNodes);
 fprintf(' * Number of Dofs      = %d \n',length(MESH.internal_dof));
 fprintf(' * Number of timesteps =  %d\n', (tf-t0)/dt);
 fprintf('-------------------------------------------\n');
+
+if export_h5
+    DispSnap_h5  = HDF5_DenseMultiCVector(Training_Options.h5_filename, Training_Options.h5_section, length(MESH.internal_dof));
+    DispSnap_h5.append( u0(MESH.internal_dof) );
+end
 
 %% Generate Domain Decomposition (if required)
 PreconFactory = PreconditionerFactory( );
@@ -104,22 +116,26 @@ M    =  M * DATA.Density;
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s', t_assembly);
 
-LinSolver = LinearSolver( DATA.LinearSolver );
-
-% Assemble matrix and right-hand side
+%% Initial Acceleration
 fprintf('\n -- Assembling external Forces at t0... ');
 t_assembly = tic;
-F_ext_old      = SolidModel.compute_volumetric_forces(t0);
-%CSM_Assembler('external_forces', MESH, DATA, FE_SPACE, [], t0);%M*(-9.81*ones(size(M,1),1));%
+F_ext_0  = SolidModel.compute_volumetric_forces(t0);
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s\n', t_assembly);
 
 fprintf('\n -- Assembling internal Forces at t0... ');
 t_assembly = tic;
-F_in_old  =  SolidModel.compute_internal_forces( u0 );
-%CSM_Assembler('internal_forces', MESH, DATA, FE_SPACE, u0);
+F_in_0   =  SolidModel.compute_internal_forces( u0 );
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s\n', t_assembly)
+
+d2u0 = M \ (F_ext_0 - F_in_0);
+
+TimeAdvance.Initialize( u0, du0, d2u0 );
+
+LinSolver = LinearSolver( DATA.LinearSolver );
+
+U_n = u0;
 
 %% Time Loop
 while ( t < tf )
@@ -149,28 +165,21 @@ while ( t < tf )
     % Assemble matrix and right-hand side
     fprintf('\n -- Assembling external Forces... ');
     t_assembly = tic;
-    F_ext      = SolidModel.compute_volumetric_forces( t );
-    %CSM_Assembler('external_forces', MESH, DATA, FE_SPACE, [], t);
+    F_ext      = SolidModel.compute_volumetric_forces( (1 - TimeAdvance.M_alpha_f) * t + TimeAdvance.M_alpha_f * (t-dt) );
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);
     
     fprintf('\n -- Assembling internal Forces ... ');
     t_assembly = tic;
-    %[F_in, dF_in]  =  CSM_Assembler('internal_forces', MESH, DATA, FE_SPACE, U_k);
-    F_in      = SolidModel.compute_internal_forces( U_k );
+    F_in      = SolidModel.compute_internal_forces( (1 - TimeAdvance.M_alpha_f) * U_k + TimeAdvance.M_alpha_f * U_n );
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);
     
-    Residual  = Coef_Mass * M * U_k +  ...
-                  (1 - TimeAdvance.M_alpha_f) * F_in  + TimeAdvance.M_alpha_f * F_in_old ...
-                - (1 - TimeAdvance.M_alpha_f) * F_ext + TimeAdvance.M_alpha_f * F_ext_old ...
-                - M * Csi;
-            
+    Residual  = Coef_Mass * M * U_k + F_in - F_ext - M * Csi;
             
     fprintf('\n -- Assembling Jacobian matrix... ');
     t_assembly = tic;
-    %[F_in, dF_in]  =  CSM_Assembler('internal_forces', MESH, DATA, FE_SPACE, U_k);
-    dF_in     = SolidModel.compute_jacobian( U_k );
+    dF_in     = SolidModel.compute_jacobian( (1 - TimeAdvance.M_alpha_f) * U_k + TimeAdvance.M_alpha_f * U_n );
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);        
             
@@ -196,6 +205,10 @@ while ( t < tf )
         dU(MESH.internal_dof) = LinSolver.Solve( A, b );
         fprintf('\n        time to solve the linear system in %3.3f s \n', LinSolver.GetSolveTime());
         
+        if export_h5
+            DispSnap_h5.append( dU(MESH.internal_dof) );
+        end
+        
         % update solution
         U_k        = U_k + dU;
         incrNorm   = norm(dU)/norm(U_k);
@@ -203,16 +216,12 @@ while ( t < tf )
         % Assemble matrix and right-hand side
         fprintf('\n   -- Assembling internal forces... ');
         t_assembly = tic;
-        %[F_in, dF_in]  =  CSM_Assembler('internal_forces', MESH, DATA, FE_SPACE, full(U_k));
-        F_in      = SolidModel.compute_internal_forces( full ( U_k ) );
-        dF_in     = SolidModel.compute_jacobian( full ( U_k ) );
+        F_in      = SolidModel.compute_internal_forces( (1 - TimeAdvance.M_alpha_f) * U_k + TimeAdvance.M_alpha_f * U_n );
+        dF_in     = SolidModel.compute_jacobian( (1 - TimeAdvance.M_alpha_f) * U_k + TimeAdvance.M_alpha_f * U_n );
         t_assembly = toc(t_assembly);
         fprintf('done in %3.3f s\n', t_assembly);
         
-        Residual  = Coef_Mass * M * U_k +  ...
-                  (1 - TimeAdvance.M_alpha_f) * F_in  + TimeAdvance.M_alpha_f * F_in_old ...
-                - (1 - TimeAdvance.M_alpha_f) * F_ext + TimeAdvance.M_alpha_f * F_ext_old ...
-                - M * Csi;
+        Residual  = Coef_Mass * M * U_k + F_in - F_ext - M * Csi;
             
         Jacobian  = Coef_Mass * M + (1 - TimeAdvance.M_alpha_f) * dF_in;
         
@@ -235,16 +244,31 @@ while ( t < tf )
     else
         u = U_k;
     end
-    
+        
     %% Export to VTK
     if ~isempty(vtk_filename)
         CSM_export_solution(MESH.dim, U_k, MESH.vertices, MESH.elements, MESH.numNodes, vtk_filename, k_t);
     end
     
+    %% Compute Von Mises Stress
+    if DATA.Output.ComputeVonMisesStress
+        fprintf('\n   -- Compute Element Stresses... ');
+        t_assembly = tic;
+        [~, Sigma]  =  SolidModel.compute_stress(U_k);
+        t_assembly = toc(t_assembly);
+        fprintf('done in %3.3f s\n', t_assembly);
+        
+        if MESH.dim == 2
+            Sigma_VM = sqrt(  Sigma(:,1).^2 + Sigma(:,4).^2 - Sigma(:,1) .* Sigma(:,4) + 3 * Sigma(:,2).^2 );
+        elseif MESH.dim == 3
+            Sigma_VM = sqrt( 0.5 * ( (Sigma(:,1) - Sigma(:,5)).^2 + (Sigma(:,5) - Sigma(:,9)).^2 + (Sigma(:,9) - Sigma(:,1)).^2 + 6 * ( Sigma(:,2).^2 + Sigma(:,6).^2 + Sigma(:,7).^2 ) ) );
+        end
+        CSM_export_VonMisesStress(MESH.dim, Sigma_VM, MESH.vertices, MESH.elements, [vtk_filename, 'VMstress_'], k_t);
+    end
+    
     TimeAdvance.Update( U_k );
     
-    F_ext_old = F_ext;
-    F_in_old  = F_in;
+    U_n = U_k;
     
     iter_time = toc(iter_time);
     fprintf('\n-------------- Iteration time: %3.2f s -----------------',iter_time);

@@ -1,0 +1,22 @@
+Fast spinning top in a gravitational field
+
+This problem simulates the fast spinning of an aluminium top in a gravitational field.
+For the full description of the model see:
+
+   [1] Farhat, Avery, Chapman, Cortial (2014). Dimensional reduction of nonlinear
+       finite element dynamic models with finite rotations and energy-based mesh
+       sampling and weighting for computational efficiency. 
+       Int. J. Numer. Meth. Engng., 98:625–662.
+
+   [2] Farhat, Chapman, Avery (2015). Structure-preserving, stability, and accuracy properties of the
+       energy-conserving sampling and weighting method for the hyper reduction of nonlinear 
+       finite element dynamic models. Int. J. Numer. Meth. Engng., 102:1077–1110.
+
+       
+Instructions:
+
+1) Launch Solve.m to start the simulation 
+   (by default 5000 timesteps are solved, could take around 0.5-2 hours)
+
+2) The output of interest, e.g. the x- and z-displacement at some probes, can be obtained 
+   with Paraview by selecting the corresponding mesh node and using the "Plot Selection Over Time" filter.

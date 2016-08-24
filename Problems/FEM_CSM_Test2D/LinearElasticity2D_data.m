@@ -33,3 +33,6 @@ data.Young   = 70000;
 data.Poisson = 0.334;
 data.model   = 'CSM';
 data.Material_Model   = 'Linear';
+
+% OutPut Options
+data.Output.ComputeVonMisesStress = true;

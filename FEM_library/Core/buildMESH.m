@@ -1,10 +1,14 @@
-function [ MESH ] = buildMESH( dim, elements, vertices, boundaries, fem, quad_order, DATA, model, rings )
+function [ MESH ] = buildMESH( dim, elements, vertices, boundaries, fem, quad_order, DATA, ...
+    model, rings, reduced_elements, reduced_boundaries )
 %BUILDMESH generates MESH struct
 
 %   This file is part of redbKIT.
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch> 
 
+if nargin < 8
+    model = [];
+end
 %% Fill MESH data structure
 MESH.dim         = dim;
 MESH.fem         = fem;
@@ -12,6 +16,7 @@ MESH.vertices    = vertices;
 MESH.boundaries  = boundaries;
 MESH.elements    = elements;
 MESH.numVertices = size(vertices,2);
+MESH.quad_order  = quad_order;
 
 if nargin > 8
     MESH.rings    = rings;
@@ -34,8 +39,15 @@ else
     MESH.nodes = vertices;
 end
 
+if nargin > 9
+    MESH.elements = MESH.elements(:, reduced_elements);
+end
+    
+if nargin > 10    
+    MESH.boundaries = MESH.boundaries(:, reduced_boundaries);
+end
 
-%% Update Mesh data with BC information and geometrical maps
+%% Update Mesh data with geometrical maps
 [MESH.numElemDof,MESH.numBoundaryDof,MESH.numRingsDof]    = select(fem, dim);
 MESH.numNodes                = size(MESH.nodes,2);
 MESH.numElem                 = size(MESH.elements,2);
@@ -49,14 +61,8 @@ MESH.numElem                 = size(MESH.elements,2);
 % Evaluate P1 geometrical mapping basis functions in the quad points
 [MESH.chi]                  =  fem_basis(dim, 'P1', quad_nodes);
 
-if nargin >= 7 && ~isempty(DATA)
-    if nargin < 8
-        model = [];
-    end
-    % Update MESH with BC information
-    [MESH]         = BC_info(MESH, DATA, model);
-end
 
+%% Generate mesh normals
 if strcmp( model, 'CSM') || strcmp( model, 'CFD')
     fprintf('\n Generating mesh normals ... ')
     time_mesh = tic;
@@ -71,7 +77,12 @@ if strcmp( model, 'CSM') || strcmp( model, 'CFD')
     time_mesh = toc(time_mesh);
     fprintf('done in %f s\n', time_mesh)
 end
-    
+
+%% Update Mesh data with BC information
+if nargin >= 7 && ~isempty(DATA)
+    % Update MESH with BC information
+    [MESH]         = BC_info(MESH, DATA, model);
+end
 
 end
 

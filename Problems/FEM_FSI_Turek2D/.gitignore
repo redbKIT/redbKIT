@@ -1,0 +1,6 @@
+CSM/Figures/
+FSI/Figures/
+FSI/Results/
+mesh/Turek_mesh_Fluid.msh
+mesh/Turek_mesh_Solid.msh
+mesh/meshFS.msh

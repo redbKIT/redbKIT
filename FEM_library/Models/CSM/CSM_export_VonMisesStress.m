@@ -6,11 +6,11 @@ function CSM_export_VonMisesStress(dim, VM_Stress, vertices, elements, outputFil
 %   Author: Federico Negri <federico.negri at epfl.ch> 
 
 titleData = 'CSM_VMstress';
-if nargin < 7
+if nargin < 6
       iter = -1;
 end
 
-if nargin < 8
+if nargin < 7
       variableName = 'VonMisesStress';
 end
 

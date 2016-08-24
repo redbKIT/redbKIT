@@ -11,6 +11,7 @@
 #define INVJAC(i,j,k) invjac[i+(j+k*dim)*noe]
 #define GRADREFPHI(i,j,k) gradrefphi[i+(j+k*NumQuadPoints)*nln]
 
+#include "../../Core/Tools.h"
 #include "MaterialModels/LinearElasticMaterial.h"
 #include "MaterialModels/SEMMTMaterial.h"
 #include "MaterialModels/NeoHookeanMaterial.h"
@@ -37,6 +38,10 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     }
     
     char *Material_Model = mxArrayToString(prhs[1]);
+    double* dim_ptr = mxGetPr(prhs[0]);
+    int dim     = (int)(dim_ptr[0]);
+    /*mxFree(dim_ptr);*/
+
     
     if (strcmp(Material_Model, "Linear_forces")==0)
     {
@@ -46,6 +51,11 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     if (strcmp(Material_Model, "Linear_jacobian")==0)
     {
             LinearElasticMaterial_jacobian(plhs, prhs);
+    }
+    
+    if (strcmp(Material_Model, "Linear_stress")==0)
+    {
+            LinearElasticMaterial_stress(plhs, prhs);
     }
     
     if (strcmp(Material_Model, "SEMMT_forces")==0)
@@ -64,9 +74,23 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
             StVenantKirchhoffMaterial_forces(plhs, prhs);
     }
     
-    if (strcmp(Material_Model, "StVenantKirchhoff_jacobian")==0)
+    if (strcmp(Material_Model, "StVenantKirchhoff_jacobianSlow")==0)
     {
             StVenantKirchhoffMaterial_jacobian(plhs, prhs);
+    }
+    
+    if (strcmp(Material_Model, "StVenantKirchhoff_jacobian")==0)
+    {
+        if (dim == 2)
+        {
+            StVenantKirchhoffMaterial_jacobianFast2D(plhs, prhs);
+        }
+        
+        if (dim == 3)
+        {
+            StVenantKirchhoffMaterial_jacobianFast3D(plhs, prhs);
+        }
+        
     }
     
     if (strcmp(Material_Model, "StVenantKirchhoff_stress")==0)
@@ -80,6 +104,11 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     }
     
     if (strcmp(Material_Model, "NeoHookean_jacobian")==0)
+    {
+            NeoHookeanMaterial_jacobianFast(plhs, prhs);
+    }
+    
+    if (strcmp(Material_Model, "NeoHookean_jacobianSlow")==0)
     {
             NeoHookeanMaterial_jacobian(plhs, prhs);
     }
@@ -96,6 +125,11 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     
     if (strcmp(Material_Model, "RaghavanVorp_jacobian")==0)
     {
+            RaghavanVorpMaterial_jacobianFast(plhs, prhs);
+    }
+    
+    if (strcmp(Material_Model, "RaghavanVorp_jacobianSlow")==0)
+    {
             RaghavanVorpMaterial_jacobian(plhs, prhs);
     }
    
@@ -105,6 +139,7 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     }
     
     mxFree(Material_Model);
+
 }
 /*************************************************************************/
 

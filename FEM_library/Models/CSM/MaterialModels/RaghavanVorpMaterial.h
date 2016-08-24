@@ -7,8 +7,7 @@
 #include <math.h>
 #include "blas.h"
 #include <string.h>
-
-#include "Tools.h"
+#include "../../../Core/Tools.h"
 
 #define INVJAC(i,j,k) invjac[i+(j+k*dim)*noe]
 #define GRADREFPHI(i,j,k) gradrefphi[i+(j+k*NumQuadPoints)*nln]
@@ -20,6 +19,8 @@
 void RaghavanVorpMaterial_forces(mxArray* plhs[], const mxArray* prhs[]);
 
 void RaghavanVorpMaterial_jacobian(mxArray* plhs[], const mxArray* prhs[]);
+
+void RaghavanVorpMaterial_jacobianFast(mxArray* plhs[], const mxArray* prhs[]);
 
 void RaghavanVorpMaterial_stress(mxArray* plhs[], const mxArray* prhs[]);
 

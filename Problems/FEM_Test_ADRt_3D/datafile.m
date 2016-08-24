@@ -32,6 +32,8 @@ data.transport{3} = @(x,y,z,t,param)( 0 + 0.*x.*y);
 % reaction
 data.reaction = @(x,y,z,t,param)(0.025 + 0.*x.*y);
 
+%data.Stabilization = 'SUPG';
+
 % Initial condition
 data.u0       = @(x,y,z,t,param)(0.0 + 0.*x.*y);
 

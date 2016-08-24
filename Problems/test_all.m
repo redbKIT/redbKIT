@@ -323,6 +323,18 @@ catch err
 end
 cd(TestFolder)
 
+% Test
+cd RB_CSM_ShearCube/
+try
+    testname = 'RB_CSM_ShearCube';
+    test;
+    print_test_passed(fid,testname);
+    
+catch err
+    print_error_toFile(fid,err,testname);
+end
+cd(TestFolder)
+
 %% End Testing
 
 t = now;

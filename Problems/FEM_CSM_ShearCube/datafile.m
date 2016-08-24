@@ -36,3 +36,10 @@ data.Material_Model = 'StVenantKirchhoff';%'StVenantKirchhoff', 'Linear'
 data.Young   = 6.6*10^4;
 data.Poisson = 0.37;
 data.Density = 1;
+
+% Linear Solver
+data.LinearSolver.type              = 'backslash'; % MUMPS, backslash, gmres
+data.LinearSolver.mumps_reordering  = 7;
+
+% OutPut Options
+data.Output.ComputeVonMisesStress = true;

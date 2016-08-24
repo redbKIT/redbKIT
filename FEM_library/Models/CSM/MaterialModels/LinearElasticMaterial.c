@@ -369,7 +369,10 @@ void LinearElasticMaterial_stress(mxArray* plhs[], const mxArray* prhs[])
     int nln2    = nln*nln;
     
     plhs[0] = mxCreateDoubleMatrix(noe,dim*dim, mxREAL);
-    double* Sigma    = mxGetPr(plhs[0]);
+    plhs[1] = mxCreateDoubleMatrix(noe,dim*dim, mxREAL);
+    
+    double* P        = mxGetPr(plhs[0]);
+    double* Sigma    = mxGetPr(plhs[1]);
     
     int k,l;
     int q;
@@ -455,12 +458,13 @@ void LinearElasticMaterial_stress(mxArray* plhs[], const mxArray* prhs[])
         }
         
         double trace = Trace(dim, EPS);
-        
+        /* For linear elasticity, Cauchy and 1st PK stress tensor coincide */
         for (d1 = 0; d1 < dim; d1 = d1 + 1 )
         {
             for (d2 = 0; d2 < dim; d2 = d2 + 1 )
             {
                 Sigma[ie+(d1+d2*dim)*noe] = 2 * mu * EPS[d1][d2] + lambda * trace * Id[d1][d2];
+                P[ie+(d1+d2*dim)*noe]     = Sigma[ie+(d1+d2*dim)*noe];
             }
         }
         
