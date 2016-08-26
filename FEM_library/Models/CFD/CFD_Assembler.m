@@ -66,14 +66,14 @@ classdef CFD_Assembler < handle
                  obj.M_density = obj.M_DATA.density;
              else
                  warning('\nCFD_ASSEMBLER class: density not provided, set to 1 by default \n')
-                 obj.M_density = obj.M_DATA.density;
+                 obj.M_density = 1;
              end
              
              if isfield(obj.M_DATA, 'dynamic_viscosity')
                  obj.M_dynamic_viscosity = obj.M_DATA.dynamic_viscosity;
              else
                  warning('\nCFD_ASSEMBLER class: kinematic viscosity not provided\n set to 1 by default \n')
-                 obj.M_dynamic_viscosity = obj.M_DATA.dynamic_viscosity;
+                 obj.M_dynamic_viscosity = 1;
              end
              
         end
