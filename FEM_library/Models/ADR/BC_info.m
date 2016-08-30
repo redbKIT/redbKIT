@@ -387,6 +387,22 @@ switch model
             
         end
         
+        %% Find Resistance boundaries (if any)
+        type_resistance = DATA.flag_resistance;
+        if ~isempty(type_resistance)
+            % Find the Resistance dofs of the domain
+            nPrex       = length(type_resistance);
+            Resistance_side = [];
+            for kk = 1 : nPrex
+                this_Resistance_side = find(MESH.boundaries(bc_flag_row,:) == type_resistance(kk));
+                MESH.Resistance_side_Flag{kk} = unique(this_Resistance_side);
+                Resistance_side = [Resistance_side, this_Resistance_side];
+            end
+            MESH.Resistance_side = unique(Resistance_side);
+        else
+            MESH.Resistance_side = [];
+        end
+
         MESH.internal_dof  = [MESH.internal_dof; MESH.dim*MESH.numNodes+[1:MESH.numVertices]' ];
         
     otherwise

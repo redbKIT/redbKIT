@@ -19,6 +19,7 @@ for d = 1 : dim
     DATA.flag_pressure{d}    = [];
     DATA.flag_ring{d}        = [];
 end
+DATA.flag_resistance  = [];
 
 switch dim
     

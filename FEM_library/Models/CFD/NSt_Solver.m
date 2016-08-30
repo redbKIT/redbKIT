@@ -198,7 +198,7 @@ while ( t < tf )
             % Apply boundary conditions
             fprintf('\n -- Apply boundary conditions ... ');
             t_assembly = tic;
-            [A, b, u_D]   =  CFD_ApplyBC(C_NS, F_NS, FE_SPACE_v, FE_SPACE_p, MESH, DATA, t);
+            [A, b, u_D]   =  CFD_ApplyBC(C_NS, F_NS, FE_SPACE_v, FE_SPACE_p, MESH, DATA, t, 0, u);
             t_assembly = toc(t_assembly);
             fprintf('done in %3.3f s\n', t_assembly);
             
@@ -228,7 +228,7 @@ while ( t < tf )
             U_k(MESH.Dirichlet_dof) = u_D;
             
             % Assemble matrix and right-hand side
-            fprintf('\n   -- Assembling Convective terms... ');
+            fprintf('\n -- Assembling Convective terms... ');
             t_assembly = tic;
             [C1, C2] = FluidModel.compute_convective_matrix( U_k );
             t_assembly = toc(t_assembly);
@@ -251,7 +251,7 @@ while ( t < tf )
             % Apply boundary conditions
             fprintf('\n -- Apply boundary conditions ... ');
             t_assembly = tic;
-            [A, b]   =  CFD_ApplyBC(Jacobian, -Residual, FE_SPACE_v, FE_SPACE_p, MESH, DATA, t, 1);
+            [A, b]   =  CFD_ApplyBC(Jacobian, -Residual, FE_SPACE_v, FE_SPACE_p, MESH, DATA, t, 1, u);
             t_assembly = toc(t_assembly);
             fprintf('done in %3.3f s\n', t_assembly);
             
@@ -296,7 +296,7 @@ while ( t < tf )
                 % Apply boundary conditions
                 fprintf('\n   -- Apply boundary conditions ... ');
                 t_assembly = tic;
-                [A, b]   =  CFD_ApplyBC(Jacobian, -Residual, FE_SPACE_v, FE_SPACE_p, MESH, DATA, t, 1);
+                [A, b]   =  CFD_ApplyBC(Jacobian, -Residual, FE_SPACE_v, FE_SPACE_p, MESH, DATA, t, 1, u);
                 t_assembly = toc(t_assembly);
                 fprintf('done in %3.3f s\n', t_assembly);
                 

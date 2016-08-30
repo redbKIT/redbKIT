@@ -1,4 +1,4 @@
-function [A_in, F_in, u_D] =  CFD_ApplyBC(A, F, FE_SPACE, FE_SPACE_p, MESH, DATA, t, zero_Dirichlet)
+function [A_in, F_in, u_D] =  CFD_ApplyBC(A, F, FE_SPACE, FE_SPACE_p, MESH, DATA, t, zero_Dirichlet, U_k)
 %CSM_APPLYBC apply boundary conditions for CSM problem in 2D/3D
 %
 %   [A_IN, F_IN, U_DIRICHLET] = CFD_ApplyBC(A, F, FE_SPACE, MESH, DATA) given an
@@ -36,6 +36,11 @@ end
 
 if nargin < 8
     zero_Dirichlet = 0;
+end
+
+
+if nargin < 9
+    U_k = zeros(FE_SPACE.numDof + FE_SPACE_p.numDof,1);
 end
 
 param = DATA.param;
@@ -255,6 +260,55 @@ switch MESH.dim
                     
                 end
             end
+        end
+        
+        %% Resistance condition
+        if ~isempty(MESH.Resistance_side)
+            
+            [quad_points, wi] = quadrature(MESH.dim-1, FE_SPACE.quad_order);
+            csi = quad_points(1,:);
+            eta = quad_points(2,:);
+            [phi]    =  fem_basis(MESH.dim, FE_SPACE.fem, [csi; eta; 0*eta], 1);
+            nbn      = MESH.numBoundaryDof;
+            
+            fprintf('\n');
+            for flag = 1 : length(DATA.flag_resistance)
+                
+                [FlowRate, Area]    = CFD_computeFlowRate(U_k, MESH, FE_SPACE, DATA.flag_resistance(flag));
+                fprintf('            Resistance BC flag %d: FlowRate = %2.4f, Area = %2.4f \n', DATA.flag_resistance(flag), FlowRate, Area);
+                nof         = length(MESH.Resistance_side_Flag{flag});
+                
+                Rrows       = zeros(nbn*nof,1);
+                Rcoef       = Rrows;
+                
+                pressure = FlowRate * DATA.OutFlow_Resistance(flag) + DATA.OutFlow_RefPressure(t);
+                
+                x    =  MESH.vertices(1,MESH.boundaries(1:3, MESH.Resistance_side_Flag{flag}));
+                y    =  MESH.vertices(2,MESH.boundaries(1:3, MESH.Resistance_side_Flag{flag}));
+                z    =  MESH.vertices(3,MESH.boundaries(1:3, MESH.Resistance_side_Flag{flag}));
+                
+                areav = cross(  [x(2:3:end)-x(1:3:end);  y(2:3:end)-y(1:3:end);  z(2:3:end)-z(1:3:end)], ...
+                    [x(3:3:end)-x(1:3:end);  y(3:3:end)-y(1:3:end);  z(3:3:end)-z(1:3:end)]);
+                
+                for k = 1 : MESH.dim
+                    
+                    for l = 1 : nof
+                        
+                        area   = 0.5*norm(areav(:,l));
+                        detjac = 2*area;
+                        
+                        face = MESH.Resistance_side_Flag{flag}(l);
+                        
+                        pressure_loc  = pressure * wi';
+                        
+                        Rrows(1+(l-1)*nbn:l*nbn)    = MESH.boundaries(1:nbn,face);
+                        Rcoef(1+(l-1)*nbn:l*nbn)    = - MESH.Normal_Faces(k,face)*detjac*phi*pressure_loc;
+                    end
+                    F = F + GlobalAssemble(Rrows+(k-1)*MESH.numNodes,1,Rcoef,FE_SPACE.numDof + FE_SPACE_p.numDof,1);
+                end
+                
+            end
+            
         end
         
         %% Dirichlet condition
