@@ -271,11 +271,11 @@ switch MESH.dim
             [phi]    =  fem_basis(MESH.dim, FE_SPACE.fem, [csi; eta; 0*eta], 1);
             nbn      = MESH.numBoundaryDof;
             
-            fprintf('\n');
+            %fprintf('\n');
             for flag = 1 : length(DATA.flag_resistance)
                 
                 [FlowRate, Area]    = CFD_computeFlowRate(U_k, MESH, FE_SPACE, DATA.flag_resistance(flag));
-                fprintf('            Resistance BC flag %d: FlowRate = %2.4f, Area = %2.4f \n', DATA.flag_resistance(flag), FlowRate, Area);
+                %fprintf('            Resistance BC flag %d: FlowRate = %2.4f, Area = %2.4f \n', DATA.flag_resistance(flag), FlowRate, Area);
                 nof         = length(MESH.Resistance_side_Flag{flag});
                 
                 Rrows       = zeros(nbn*nof,1);

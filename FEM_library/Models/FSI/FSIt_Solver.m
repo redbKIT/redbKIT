@@ -381,6 +381,32 @@ if compute_AerodynamicForces
     fprintf(fileDragLift, '\n%1.4e  %1.4e  %1.4e  %1.4e', t, AeroF_x(k_t+1), AeroF_y(k_t+1), AeroF_z(k_t+1));
 end
 
+%% PreProcessing for Boundary Flow Rates computations
+compute_FlowRates = 0 ;
+if isfield(DATA.Fluid, 'Output') && isfield(DATA.Fluid.Output, 'FlowRates')
+    if DATA.Fluid.Output.FlowRates.computeFlowRates == 1
+        compute_FlowRates = true;
+    end
+end
+
+if compute_FlowRates
+    
+    fileFlowRates = fopen(DATA.Fluid.Output.FlowRates.filename, 'w+');
+    fprintf(fileFlowRates, 'Time');
+    
+    for l = 1 : length(DATA.Fluid.Output.FlowRates.flag)
+        fprintf(fileFlowRates, '         Flag %d', DATA.Fluid.Output.FlowRates.flag(l) );
+    end
+    fprintf(fileFlowRates, '         Sum');
+    
+    fprintf(fileFlowRates, '\n%1.3e', t);
+    for l = 1 : length(DATA.Fluid.Output.FlowRates.flag)
+        FlowRate(l)  = CFD_computeFlowRate(u, MESH.Fluid, FE_SPACE_v, DATA.Fluid.Output.FlowRates.flag(l));
+        fprintf(fileFlowRates, '    %1.3e', FlowRate(l) );
+    end
+    fprintf(fileFlowRates, '    %1.3e', sum( FlowRate ) );
+    
+end
 
 %% Time Loop
 fprintf('\n **** Starting temporal loop ****\n');
@@ -679,7 +705,7 @@ while ( t < tf )
                 end
                 
                 % Apply Fluid boundary conditions
-                [dG_NS, G_NS]   =  CFD_ApplyBC(C_NS, -F_NS, FE_SPACE_v, FE_SPACE_p, MESH.Fluid, DATA.Fluid, t, 1);
+                [dG_NS, G_NS]   =  CFD_ApplyBC(C_NS, -F_NS, FE_SPACE_v, FE_SPACE_p, MESH.Fluid, DATA.Fluid, t, 1, u);
                 
                 fprintf('\n   -- Form monolithic system ... ');
                 t_assembly = tic;
@@ -832,10 +858,18 @@ while ( t < tf )
         fprintf(fileDragLift, '\n%1.4e  %1.4e  %1.4e  %1.4e', t, AeroF_x(k_t+1), AeroF_y(k_t+1), AeroF_z(k_t+1));
     end
 
+    if compute_FlowRates        
+        fprintf(fileFlowRates, '\n%1.3e', t);
+        for l = 1 : length(DATA.Fluid.Output.FlowRates.flag)
+            FlowRate(l)  = CFD_computeFlowRate(u, MESH.Fluid, FE_SPACE_v, DATA.Fluid.Output.FlowRates.flag(l));
+            fprintf(fileFlowRates, '    %1.3e', FlowRate(l) );
+        end
+        fprintf(fileFlowRates, '    %1.3e', sum( FlowRate ) );
+    end
+
     iter_time = toc(iter_time);
     fprintf('\nnorm(U^(n+1) - U^(n))/norm(U^(n)) = %2.3e -- Iteration time: %3.2f s \n',full(norm_n),iter_time);
     
-    %X(:,k_t+1) = [u; Displacement_np1];
     X = [u; Displacement_np1];
     
 end

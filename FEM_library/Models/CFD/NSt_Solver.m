@@ -151,6 +151,33 @@ if compute_AerodynamicForces
     fprintf(fileDragLift, '\n%1.4e  %1.4e  %1.4e  %1.4e', t, AeroF_x(k_t+1), AeroF_y(k_t+1), AeroF_z(k_t+1));
 end
 
+%% PreProcessing for Boundary Flow Rates computations
+compute_FlowRates = 0 ;
+if isfield(DATA, 'Output') && isfield(DATA.Output, 'FlowRates')
+    if DATA.Output.FlowRates.computeFlowRates == 1
+        compute_FlowRates = true;
+    end
+end
+
+if compute_FlowRates
+    
+    fileFlowRates = fopen(DATA.Output.FlowRates.filename, 'w+');
+    fprintf(fileFlowRates, 'Time');
+    
+    for l = 1 : length(DATA.Output.FlowRates.flag)
+        fprintf(fileFlowRates, '         Flag %d', DATA.Output.FlowRates.flag(l) );
+    end
+    fprintf(fileFlowRates, '         Sum');
+    
+    fprintf(fileFlowRates, '\n%1.3e', t);
+    for l = 1 : length(DATA.Output.FlowRates.flag)
+        FlowRate(l)  = CFD_computeFlowRate(u, MESH, FE_SPACE_v, DATA.Output.FlowRates.flag(l));
+        fprintf(fileFlowRates, '    %1.3e', FlowRate(l) );
+    end
+    fprintf(fileFlowRates, '    %1.3e', sum( FlowRate ) );
+    
+end
+
 %% Time Loop
 while ( t < tf )
     
@@ -348,9 +375,26 @@ while ( t < tf )
         fprintf(fileDragLift, '\n%1.4e  %1.4e  %1.4e  %1.4e', t, AeroF_x(k_t+1), AeroF_y(k_t+1), AeroF_z(k_t+1));
     end
     
+    if compute_FlowRates
+        fprintf(fileFlowRates, '\n%1.3e', t);
+        for l = 1 : length(DATA.Output.FlowRates.flag)
+            FlowRate(l)  = CFD_computeFlowRate(u, MESH, FE_SPACE_v, DATA.Output.FlowRates.flag(l));
+            fprintf(fileFlowRates, '    %1.3e', FlowRate(l) );
+        end
+        fprintf(fileFlowRates, '    %1.3e', sum( FlowRate ) );
+    end
+
     iter_time = toc(iter_time);
     fprintf('\n-------------- Iteration time: %3.2f s -----------------',iter_time);
     
+end
+
+if compute_AerodynamicForces
+    fclose(fileDragLift);
+end
+
+if compute_FlowRates
+    fclose(fileFlowRates);
 end
 
 fprintf('\n************************************************************************* \n');
