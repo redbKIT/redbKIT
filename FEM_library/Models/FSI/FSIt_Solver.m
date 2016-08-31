@@ -348,6 +348,9 @@ if strcmp( DATA.Solid.Material_Model, 'Linear' )
     A_s = SolidModel.compute_jacobian( zeros(FE_SPACE_s.numDof, 1) );
 end
 
+% Assemble Robin BC (if it's the case)
+A_robin = SolidModel.assemble_ElasticRobinBC();
+
 %% Initialize Linear Solver
 LinSolver  = LinearSolver( DATA.Fluid.LinearSolver );
 
@@ -654,8 +657,8 @@ while ( t < tf )
                 t_assembly = toc(t_assembly);
                 fprintf('done in %3.3f s\n', t_assembly);
                 
-                dG_STR    = Coef_MassS * M_s + dA;
-                G_S       = Coef_MassS * M_s * d_nk + GS - F_S;
+                dG_STR    = Coef_MassS * M_s + dA + A_robin;
+                G_S       = Coef_MassS * M_s * d_nk + GS + A_robin * d_nk - F_S;
                 
                 % Apply Solid boundary conditions
                 [dG_STR, G_S] = CSM_ApplyBC(dG_STR, -G_S, FE_SPACE_s, MESH.Solid, DATA.Solid, t, 1);
