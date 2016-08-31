@@ -228,7 +228,6 @@ for k = 1 : FE_SPACE_s.numComponents
     end
 end
 d2u0 = 0*du0;
-u    = u0;
 
 % export initial condition (if it's the case)
 if ~isempty(vtk_filename)
