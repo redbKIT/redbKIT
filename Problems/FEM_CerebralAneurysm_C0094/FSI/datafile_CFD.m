@@ -1,0 +1,86 @@
+%% PHYSICAL DATA
+
+% Inlet inward normal
+N1  = [0.3229 0.8899 0.3209];
+
+
+% Source term
+data.force{1} = @(x, y, z, t, param)(0.*x.*y);
+data.force{2} = @(x, y, z, t, param)(0.*x.*y);
+data.force{3} = @(x, y, z, t, param)(0.*x.*y);
+
+data.bcDir_t = @(t) Flow_Rate(0) * (t+0.1)/0.1 .*(t<0) + Flow_Rate( t / 0.8 )' .* (t>=0);
+
+% Dirichlet
+data.bcDir{1,5} = @(x, y, z, t, param)( data.bcDir_t(t)  * N1(1) * 1 + 0.*x.*y); 
+data.bcDir{2,5} = @(x, y, z, t, param)( data.bcDir_t(t)  * N1(2) * 1 + 0.*x.*y); 
+data.bcDir{3,5} = @(x, y, z, t, param)( data.bcDir_t(t)  * N1(3) * 1 + 0.*x.*y); 
+
+data.bcDir{1,200} = @(x, y, z, t, param)(0.*x.*y); 
+data.bcDir{2,200} = @(x, y, z, t, param)(0.*x.*y); 
+data.bcDir{3,200} = @(x, y, z, t, param)(0.*x.*y);
+
+% Neumann
+% data.bcNeu{1} = @(x, y, z, t, param)(0.*x.*y);
+% data.bcNeu{2} = @(x, y, z, t, param)(0.*x.*y);
+% data.bcNeu{3} = @(x, y, z, t, param)(0.*x.*y);
+
+% initial condition
+data.u0{1}    = @(x, y, z, t, param)(0.*x.*y);
+data.u0{2}    = @(x, y, z, t, param)(0.*x.*y);
+data.u0{3}    = @(x, y, z, t, param)(0.*x.*y);
+
+% flags
+data.flag_dirichlet{1} = [5];
+data.flag_FSinterface{1}  =  [200];
+data.flag_ring{1}         =  [1]; 
+data.flag_ALE_fixed{1}    =  [2:8];
+
+data.flag_dirichlet{2} = [5];
+data.flag_FSinterface{2}  =  [200];
+data.flag_ALE_fixed{2}    =  [2:8];
+data.flag_ring{2}         =  [1]; 
+
+data.flag_dirichlet{3} = [5];
+data.flag_FSinterface{3}  =  [200];
+data.flag_ALE_fixed{3}    =  [2:8];
+data.flag_ring{3}         =  [1]; 
+
+data.flag_resistance     = [2:4 6:8];
+data.OutFlow_Resistance  = [1 1 1 1 1 0.5]*37500;
+data.OutFlow_RefPressure = @(t) 0 * 80 * 1333;
+
+% Model parameters
+data.dynamic_viscosity   = 0.04;
+data.density             = 1.06;
+
+% Nonlinear solver
+data.NonlinearSolver.tol         = 1e-6; 
+data.NonlinearSolver.maxit       = 30;
+
+% Stabilization
+data.Stabilization = 'SUPG';
+
+% Linear solver
+data.LinearSolver.type           = 'MUMPS'; % MUMPS, backslash, gmres
+data.LinearSolver.mumps_reordering  = 7;
+
+% Preconditioner
+data.Preconditioner.type         = 'None'; % AdditiveSchwarz, None, ILU
+
+% time 
+data.time.BDF_order  = 2;
+data.time.t0         = -0.1;
+data.time.dt         = 0.0025;
+data.time.tf         = 1.6;
+data.time.nonlinearity  = 'implicit';
+
+%% Output options
+data.Output.FlowRates.computeFlowRates = 1;
+data.Output.FlowRates.flag             = [2:8 200];
+data.Output.FlowRates.filename         = 'Results/FlowRates_Coarse.txt';
+
+% % Normal Pressure
+% for flag = 3 : 12
+%     data.bcPrex{flag}   = @(x, y, z, t, param)( WindkesselModel( data.time.dt, t, flag, 0 ) + 0*x.*y.*z);
+% end

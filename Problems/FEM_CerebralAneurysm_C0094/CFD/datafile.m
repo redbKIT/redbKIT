@@ -57,3 +57,8 @@ data.time.t0         = 0;
 data.time.dt         = 0.005;
 data.time.tf         = 1;
 data.time.nonlinearity  = 'implicit';
+
+%% Output options
+data.Output.FlowRates.computeFlowRates = 1;
+data.Output.FlowRates.flag             = [2:8 200];
+data.Output.FlowRates.filename         = 'Results/FlowRates_Coarse.txt';

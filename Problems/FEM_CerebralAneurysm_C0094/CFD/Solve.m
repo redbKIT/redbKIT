@@ -9,6 +9,7 @@ clear all
 dim      =  3;
 
 [~,~,~] = mkdir('Figures');
+[~,~,~] = mkdir('Results');
 
 % load mesh
 %[vertices, boundaries, elements] = msh_to_Mmesh('../mesh/FluidBL', dim);
