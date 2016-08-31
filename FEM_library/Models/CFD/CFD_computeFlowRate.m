@@ -1,4 +1,4 @@
-function [Q, Area] = CFD_computeFlowRate(u_n, MESH, FE_SPACE_v, boundary_flag)
+function [Q, Area, P_average] = CFD_computeFlowRate(u_n, MESH, FE_SPACE_v, FE_SPACE_p, boundary_flag)
 
 %   This file is part of redbKIT.
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
@@ -12,8 +12,10 @@ for j = 1 : nflags
 end
 face_list = unique(face_list);
 
-Q     = 0;
-Area  = 0;
+Q         = 0;
+Area      = 0;
+P_average = 0;
+
 
 switch MESH.dim
     
@@ -22,7 +24,8 @@ switch MESH.dim
         [quad_points, wi] = quadrature(MESH.dim-1, 5);
         csi = quad_points(1,:);
         eta = quad_points(2,:);
-        [phi]          =  fem_basis(MESH.dim, FE_SPACE_v.fem, [csi; eta; 0*eta], 1);
+        phi            =  fem_basis(MESH.dim, FE_SPACE_v.fem, [csi; eta; 0*eta], 1);
+        phi_p          =  fem_basis(MESH.dim, FE_SPACE_p.fem, [csi; eta; 0*eta], 1);
 
         nqn = length(wi);
         
@@ -48,10 +51,12 @@ switch MESH.dim
                 uhq = (u_n(dofs)'*phi);
                 vhq = (u_n(dofs+FE_SPACE_v.numDofScalar)'*phi);
                 whq = (u_n(dofs+2*FE_SPACE_v.numDofScalar)'*phi);
+                phq = (u_n(dofs+3*FE_SPACE_v.numDofScalar)'*phi_p);
                 
                 for q = 1 : nqn
                     Q    = Q + ( uhq(q)*MESH.Normal_Faces(1,face) + vhq(q)*MESH.Normal_Faces(2,face) + whq(q)*MESH.Normal_Faces(3,face)) * wi(q) * detjac;
                     Area = Area + wi(q) * detjac;
+                    P_average = P_average +  phq(q) * wi(q) * detjac;
                 end
                 
             end
@@ -60,6 +65,8 @@ switch MESH.dim
         
     case 2
         
+        warning('Average pressure computation only available in 3D');
+
         [csi,wi]         =  xwgl(FE_SPACE_v.quad_order, 0, 1);
         [phi]          =  fem_basis(MESH.dim, FE_SPACE_v.fem, [csi; 0*csi], 1);
                 
@@ -92,5 +99,7 @@ switch MESH.dim
             
         end
 end
+
+P_average = P_average / Area;
 
 end

@@ -274,14 +274,15 @@ switch MESH.dim
             %fprintf('\n');
             for flag = 1 : length(DATA.flag_resistance)
                 
-                [FlowRate, Area]    = CFD_computeFlowRate(U_k, MESH, FE_SPACE, DATA.flag_resistance(flag));
-                %fprintf('            Resistance BC flag %d: FlowRate = %2.4f, Area = %2.4f \n', DATA.flag_resistance(flag), FlowRate, Area);
+                [FlowRate, Area, P_average]    = CFD_computeFlowRate(U_k, MESH, FE_SPACE, FE_SPACE_p, DATA.flag_resistance(flag));
                 nof         = length(MESH.Resistance_side_Flag{flag});
                 
                 Rrows       = zeros(nbn*nof,1);
                 Rcoef       = Rrows;
                 
-                pressure = FlowRate * DATA.OutFlow_Resistance(flag) + DATA.OutFlow_RefPressure(t);
+                pressure = DATA.time.dt / (DATA.time.dt + DATA.OutFlow_Resistance(flag) * DATA.OutFlow_Capacity(flag)) ...
+                                 * ( FlowRate * DATA.OutFlow_Resistance(flag) + P_average * DATA.OutFlow_Resistance(flag) * DATA.OutFlow_Capacity(flag) / DATA.time.dt ...
+                                     + DATA.OutFlow_RefPressure(t) );
                 
                 x    =  MESH.vertices(1,MESH.boundaries(1:3, MESH.Resistance_side_Flag{flag}));
                 y    =  MESH.vertices(2,MESH.boundaries(1:3, MESH.Resistance_side_Flag{flag}));
