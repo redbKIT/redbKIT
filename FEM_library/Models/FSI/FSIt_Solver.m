@@ -403,7 +403,7 @@ if compute_FlowRates
     
     fprintf(fileFlowRates, '\n%1.3e', t);
     for l = 1 : length(DATA.Fluid.Output.FlowRates.flag)
-        FlowRate(l)  = CFD_computeFlowRate(u, MESH.Fluid, FE_SPACE_v, DATA.Fluid.Output.FlowRates.flag(l));
+        FlowRate(l)  = CFD_computeFlowRate(u, MESH.Fluid, FE_SPACE_v, FE_SPACE_p, DATA.Fluid.Output.FlowRates.flag(l));
         fprintf(fileFlowRates, '    %1.3e', FlowRate(l) );
     end
     fprintf(fileFlowRates, '    %1.3e', sum( FlowRate ) );
@@ -863,7 +863,7 @@ while ( t < tf )
     if compute_FlowRates        
         fprintf(fileFlowRates, '\n%1.3e', t);
         for l = 1 : length(DATA.Fluid.Output.FlowRates.flag)
-            FlowRate(l)  = CFD_computeFlowRate(u, MESH.Fluid, FE_SPACE_v, DATA.Fluid.Output.FlowRates.flag(l));
+            FlowRate(l)  = CFD_computeFlowRate(u, MESH.Fluid, FE_SPACE_v, FE_SPACE_p, DATA.Fluid.Output.FlowRates.flag(l));
             fprintf(fileFlowRates, '    %1.3e', FlowRate(l) );
         end
         fprintf(fileFlowRates, '    %1.3e', sum( FlowRate ) );
