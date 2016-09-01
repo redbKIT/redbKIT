@@ -20,6 +20,10 @@ void LinearElasticMaterial_forces(mxArray* plhs[], const mxArray* prhs[]);
 
 void LinearElasticMaterial_jacobian(mxArray* plhs[], const mxArray* prhs[]);
 
+void LinearElasticMaterial_jacobianFast3D(mxArray* plhs[], const mxArray* prhs[]);
+
+void LinearElasticMaterial_jacobianFast2D(mxArray* plhs[], const mxArray* prhs[]);
+
 void LinearElasticMaterial_stress(mxArray* plhs[], const mxArray* prhs[]);
 
 #endif

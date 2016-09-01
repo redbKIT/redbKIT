@@ -40,17 +40,28 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     char *Material_Model = mxArrayToString(prhs[1]);
     double* dim_ptr = mxGetPr(prhs[0]);
     int dim     = (int)(dim_ptr[0]);
-    /*mxFree(dim_ptr);*/
-
     
     if (strcmp(Material_Model, "Linear_forces")==0)
     {
             LinearElasticMaterial_forces(plhs, prhs);
     }
     
-    if (strcmp(Material_Model, "Linear_jacobian")==0)
+    if (strcmp(Material_Model, "Linear_jacobianSlow")==0)
     {
             LinearElasticMaterial_jacobian(plhs, prhs);
+    }
+    
+    if (strcmp(Material_Model, "Linear_jacobian")==0)
+    {
+        if (dim == 2)
+        {
+            LinearElasticMaterial_jacobianFast2D(plhs, prhs);
+        }
+        
+        if (dim == 3)
+        {
+            LinearElasticMaterial_jacobianFast3D(plhs, prhs);
+        }
     }
     
     if (strcmp(Material_Model, "Linear_stress")==0)
