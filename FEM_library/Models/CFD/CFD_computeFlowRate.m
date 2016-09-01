@@ -46,12 +46,13 @@ switch MESH.dim
                 area   = 0.5*norm(areav(:,l));
                 detjac = 2*area;
                 
-                dofs    = MESH.boundaries(1:MESH.numBoundaryDof,face);
+                dofs      = MESH.boundaries(1:MESH.numBoundaryDof,face);
+                dofs_p    = MESH.boundaries(1:3,face);
                 
                 uhq = (u_n(dofs)'*phi);
                 vhq = (u_n(dofs+FE_SPACE_v.numDofScalar)'*phi);
                 whq = (u_n(dofs+2*FE_SPACE_v.numDofScalar)'*phi);
-                phq = (u_n(dofs+3*FE_SPACE_v.numDofScalar)'*phi_p);
+                phq = (u_n(dofs_p+3*FE_SPACE_v.numDofScalar)'*phi_p);
                 
                 for q = 1 : nqn
                     Q    = Q + ( uhq(q)*MESH.Normal_Faces(1,face) + vhq(q)*MESH.Normal_Faces(2,face) + whq(q)*MESH.Normal_Faces(3,face)) * wi(q) * detjac;

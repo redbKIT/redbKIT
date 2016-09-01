@@ -348,6 +348,7 @@ switch MESH.dim
                         
                     end
                 end
+                v_D(MESH.ringDofs{k}+(k-1)*FE_SPACE.numDofScalar) = 0; % set zero velocity on rings
             end
             u_D = v_D(MESH.Dirichlet_dof);% [Q, Area] = CFD_computeFlowRate(v_D, MESH, FE_SPACE, 1);    
         end

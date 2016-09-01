@@ -209,6 +209,7 @@ if ~isempty(vtk_filename)
 end
 
 TimeAdvanceF.Initialize( v0 );
+TimeAdvanceF.Append( v0 );
 
 %% Initalize Solid Time Advance
 TimeAdvanceS = Newmark_TimeAdvance( DATA.Solid.time.beta, DATA.Solid.time.gamma, dt );
@@ -658,7 +659,7 @@ while ( t < tf )
                 
                 dG_STR    = Coef_MassS * M_s + dA + A_robin;
                 G_S       = Coef_MassS * M_s * d_nk + GS + A_robin * d_nk - F_S;
-                
+
                 % Apply Solid boundary conditions
                 [dG_STR, G_S] = CSM_ApplyBC(dG_STR, -G_S, FE_SPACE_s, MESH.Solid, DATA.Solid, t, 1);
                 
