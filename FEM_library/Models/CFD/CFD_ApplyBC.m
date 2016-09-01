@@ -276,6 +276,7 @@ switch MESH.dim
                 
                 [FlowRate, Area, P_average]    = CFD_computeFlowRate(U_k, MESH, FE_SPACE, FE_SPACE_p, DATA.flag_resistance(flag));
                 nof         = length(MESH.Resistance_side_Flag{flag});
+                %fprintf('\n Flag %d, Area  = %2.6f', DATA.flag_resistance(flag), Area);
                 
                 Rrows       = zeros(nbn*nof,1);
                 Rcoef       = Rrows;

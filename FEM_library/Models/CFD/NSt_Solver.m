@@ -82,6 +82,9 @@ if ~isempty(vtk_filename)
 end
 
 BDFhandler.Initialize( v0 );
+for bd = 2 : BDF_order
+    BDFhandler.Append( v0 );
+end
 
 fprintf('\n **** PROBLEM''S SIZE INFO ****\n');
 fprintf(' * Number of Vertices  = %d \n',MESH.numVertices);
@@ -171,7 +174,7 @@ if compute_FlowRates
     
     fprintf(fileFlowRates, '\n%1.3e', t);
     for l = 1 : length(DATA.Output.FlowRates.flag)
-        FlowRate(l)  = CFD_computeFlowRate(u, MESH, FE_SPACE_v, DATA.Output.FlowRates.flag(l));
+        FlowRate(l)  = CFD_computeFlowRate(u, MESH, FE_SPACE_v, FE_SPACE_p, DATA.Output.FlowRates.flag(l));
         fprintf(fileFlowRates, '    %1.3e', FlowRate(l) );
     end
     fprintf(fileFlowRates, '    %1.3e', sum( FlowRate ) );
@@ -378,7 +381,7 @@ while ( t < tf )
     if compute_FlowRates
         fprintf(fileFlowRates, '\n%1.3e', t);
         for l = 1 : length(DATA.Output.FlowRates.flag)
-            FlowRate(l)  = CFD_computeFlowRate(u, MESH, FE_SPACE_v, DATA.Output.FlowRates.flag(l));
+            FlowRate(l)  = CFD_computeFlowRate(u, MESH, FE_SPACE_v, FE_SPACE_p, DATA.Output.FlowRates.flag(l));
             fprintf(fileFlowRates, '    %1.3e', FlowRate(l) );
         end
         fprintf(fileFlowRates, '    %1.3e', sum( FlowRate ) );

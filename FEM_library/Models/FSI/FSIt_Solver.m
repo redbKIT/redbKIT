@@ -209,7 +209,9 @@ if ~isempty(vtk_filename)
 end
 
 TimeAdvanceF.Initialize( v0 );
-TimeAdvanceF.Append( v0 );
+for bd = 2 : BDF_orderF
+    TimeAdvanceF.Append( v0 );
+end
 
 %% Initalize Solid Time Advance
 TimeAdvanceS = Newmark_TimeAdvance( DATA.Solid.time.beta, DATA.Solid.time.gamma, dt );
@@ -247,6 +249,9 @@ d_Fn         = zeros(MESH.Fluid.numNodes*dim, 1);
 % only used in the fully implicit case
 TimeAdvanceG = BDF_TimeAdvance( BDF_orderF );
 TimeAdvanceG.Initialize( d_Fn );
+for bd = 2 : BDF_orderF
+    TimeAdvanceG.Append( d_Fn );
+end
 
 
 %% Generate Domain Decomposition (if required)
