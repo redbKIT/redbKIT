@@ -514,7 +514,7 @@ classdef CSM_Assembler < handle
                     areav = cross(  [x(2:3:end)-x(1:3:end);  y(2:3:end)-y(1:3:end);  z(2:3:end)-z(1:3:end)], ...
                         [x(3:3:end)-x(1:3:end);  y(3:3:end)-y(1:3:end);  z(3:3:end)-z(1:3:end)]);
                     
-                    MASS_loc = phi*phi';
+                    MASS_loc = (phi.*repmat(wi,nbn,1))*phi';
                     MASS_loc = MASS_loc(:);
                     for l = 1 : nof
                         
