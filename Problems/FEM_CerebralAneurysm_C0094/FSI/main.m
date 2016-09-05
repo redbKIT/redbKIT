@@ -11,11 +11,11 @@ clc
 dim      =  3;
 
 %% Load meshes
-[mshS.vertices, mshS.boundaries, mshS.elements, mshS.rings] = msh_to_Mmesh('../mesh/SolidCoarse', dim);
-[mshF.vertices, mshF.boundaries, mshF.elements, mshF.rings] = msh_to_Mmesh('../mesh/FluidCoarse', dim);
+[mshS.vertices, mshS.boundaries, mshS.elements, mshS.rings] = msh_to_Mmesh('../mesh/SolidVeryCoarse', dim);
+[mshF.vertices, mshF.boundaries, mshF.elements, mshF.rings] = msh_to_Mmesh('../mesh/FluidVeryCoarse', dim);
 
 mshS.vertices = 0.1 * mshS.vertices;
 mshF.vertices = 0.1 * mshF.vertices;
 
 %% Solve
-[U, MESH, DATA] = FSIt_Solver(dim, mshF, mshS, {'P1','P1'}, 'P1', 'datafile_CFD', 'datafile_CSM', [], 'Figures/C0094_Coarse');
+[U, MESH, DATA] = FSIt_Solver(dim, mshF, mshS, {'P1','P1'}, 'P1', 'datafile_CFD', 'datafile_CSM', [], 'Figures/C0094_VeryCoarse_');

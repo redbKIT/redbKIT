@@ -16,7 +16,7 @@ data.bcNeu{2} = @(x, y, z, t, param)(0.*x.*y.*z);
 data.bcNeu{3} = @(x, y, z, t, param)(0 + 0.*x.*y.*z);
 
 % Normal Pressure
-data.bcPrex{210}   = @(x, y, z, t, param)(-3*1333 + 0*x.*y.*z);%dyn/cm^2 intracranial pressure produced by the cerebral spinal fluid
+data.bcPrex{210}   = @(x, y, z, t, param)(-0*3*1333 + 0*x.*y.*z);%dyn/cm^2 intracranial pressure produced by the cerebral spinal fluid
 
 % BC flag
 data.flag_dirichlet{1} = [1];
@@ -49,8 +49,8 @@ data.du0{3} = @(x, y, z, t, param)(0.*x.*y);
 
 % material parameters
 data.Material_Model = 'NeoHookean';%'StVenantKirchhoff', 'Linear','NeoHookean','RaghavanVorp'
-data.Young   = 1.6 * 10^7;%dyn/cm^2
-data.Poisson = 0.4;
+data.Young   = 10^7;%dyn/cm^2
+data.Poisson = 0.45;
 data.Density = 1.05;
 data.ElasticCoefRobin = 10^4;%dyn/cm^2
 
