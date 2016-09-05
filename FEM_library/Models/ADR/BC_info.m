@@ -402,6 +402,22 @@ switch model
         else
             MESH.Resistance_side = [];
         end
+        
+        %% Find Absorbing boundaries (if any)
+        type_absorbing = DATA.flag_absorbing;
+        if ~isempty(type_absorbing)
+            % Find the Resistance dofs of the domain
+            nPrex       = length(type_absorbing);
+            Absorbing_side = [];
+            for kk = 1 : nPrex
+                this_Absorbing_side = find(MESH.boundaries(bc_flag_row,:) == type_absorbing(kk));
+                MESH.Absorbing_side_Flag{kk} = unique(this_Absorbing_side);
+                Absorbing_side = [Absorbing_side, this_Absorbing_side];
+            end
+            MESH.Absorbing_side = unique(Absorbing_side);
+        else
+            MESH.Absorbing_side = [];
+        end
 
         MESH.internal_dof  = [MESH.internal_dof; MESH.dim*MESH.numNodes+[1:MESH.numVertices]' ];
         

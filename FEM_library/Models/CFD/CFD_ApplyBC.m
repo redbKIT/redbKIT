@@ -313,6 +313,57 @@ switch MESH.dim
             
         end
         
+        %% Absorbing condition
+        if ~isempty(MESH.Absorbing_side)
+            
+            [quad_points, wi] = quadrature(MESH.dim-1, FE_SPACE.quad_order);
+            csi = quad_points(1,:);
+            eta = quad_points(2,:);
+            [phi]    =  fem_basis(MESH.dim, FE_SPACE.fem, [csi; eta; 0*eta], 1);
+            nbn      =  MESH.numBoundaryDof;
+            
+            %fprintf('\n');
+            for flag = 1 : length(DATA.flag_absorbing)
+                
+                [FlowRate, Area]    = CFD_computeFlowRate(U_k, MESH, FE_SPACE, FE_SPACE_p, DATA.flag_absorbing(flag));
+                nof         = length(MESH.Absorbing_side_Flag{flag});
+                %fprintf('\n Flag %d, Area  = %2.6f', DATA.flag_absorbing(flag), Area);
+                
+                Rrows       = zeros(nbn*nof,1);
+                Rcoef       = Rrows;
+                
+                Radius   = sqrt(Area / pi);
+                beta     = DATA.OutFlow_WallThicknessPercentage * Radius * DATA.OutFlow_Young / (1 - DATA.OutFlow_Poisson^2) * pi / Area;
+                pressure = ( sqrt(DATA.density) / (2*sqrt(2)) * FlowRate / Area + sqrt( beta * sqrt(Area) ) )^2  - beta * sqrt(Area) + DATA.OutFlow_RefPressure(t);
+                
+                x    =  MESH.vertices(1,MESH.boundaries(1:3, MESH.Absorbing_side_Flag{flag}));
+                y    =  MESH.vertices(2,MESH.boundaries(1:3, MESH.Absorbing_side_Flag{flag}));
+                z    =  MESH.vertices(3,MESH.boundaries(1:3, MESH.Absorbing_side_Flag{flag}));
+                
+                areav = cross(  [x(2:3:end)-x(1:3:end);  y(2:3:end)-y(1:3:end);  z(2:3:end)-z(1:3:end)], ...
+                    [x(3:3:end)-x(1:3:end);  y(3:3:end)-y(1:3:end);  z(3:3:end)-z(1:3:end)]);
+                
+                for k = 1 : MESH.dim
+                    
+                    for l = 1 : nof
+                        
+                        area   = 0.5*norm(areav(:,l));
+                        detjac = 2*area;
+                        
+                        face = MESH.Absorbing_side_Flag{flag}(l);
+                        
+                        pressure_loc  = pressure * wi';
+                        
+                        Rrows(1+(l-1)*nbn:l*nbn)    = MESH.boundaries(1:nbn,face);
+                        Rcoef(1+(l-1)*nbn:l*nbn)    = - MESH.Normal_Faces(k,face)*detjac*phi*pressure_loc;
+                    end
+                    F = F + GlobalAssemble(Rrows+(k-1)*MESH.numNodes,1,Rcoef,FE_SPACE.numDof + FE_SPACE_p.numDof,1);
+                end
+                
+            end
+            
+        end
+        
         %% Dirichlet condition
         if size(DATA.bcDir,1) == 1
             

@@ -20,6 +20,7 @@ for d = 1 : dim
     DATA.flag_ring{d}        = [];
 end
 DATA.flag_resistance  = [];
+DATA.flag_absorbing   = [];
 
 switch dim
     
