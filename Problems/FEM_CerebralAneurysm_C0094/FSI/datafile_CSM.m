@@ -1,4 +1,6 @@
-%DATAFILE for linear elasticity problem
+%   This file is part of redbKIT.
+%   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
+%   Author: Federico Negri <federico.negri@epfl.ch>
 
 % Source term
 data.force{1} = @(x, y, z, t, param)(0.*x.*y.*z);
