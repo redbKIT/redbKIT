@@ -1,4 +1,4 @@
-function [normalf] = ComputeSurfaceNormals3D(boundaries, vertices, elements)
+function [normalf, FaceToElem_list] = ComputeSurfaceNormals3D(boundaries, vertices, elements)
 %ComputeSurfaceNormals3D computes normal vectors on the boundary vertices 
 %of a P1 TET mesh
 %
@@ -7,7 +7,16 @@ function [normalf] = ComputeSurfaceNormals3D(boundaries, vertices, elements)
 %   This file is part of redbKIT.
 %   Author: Federico Negri <federico.negri at epfl.ch>
 
-normalf  = faceNormal(vertices', boundaries', elements');
+if nargout == 1
+    
+    normalf  = faceNormal(vertices', boundaries', elements');
+    
+elseif nargout == 2
+    
+    [normalf, FaceToElem_list]  = faceNormal(vertices', boundaries', elements');
+    
+end
+
 normalf  = normalf';
 
 end
@@ -76,6 +85,17 @@ fprintf(message);
 %     end
 % end
 
+%% compute FaceToElem_list
+if nargout > 1
+    faces    = faces';
+    elements = elements';
+    elements_row = [elements(1,:) elements(2,:) elements(3,:) elements(4,:)];
+    
+    id_e = zeros(size(faces,2),1);
+    parfor i = 1 : size(faces, 2)
+        id_e(i)        = FaceToElement(faces(:,i), elements, elements_row);
+    end
+end
     
 end
 
