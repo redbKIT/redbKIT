@@ -322,7 +322,7 @@ switch MESH.dim
             [phi]    =  fem_basis(MESH.dim, FE_SPACE.fem, [csi; eta; 0*eta], 1);
             nbn      =  MESH.numBoundaryDof;
             
-            fprintf('\n');
+            %fprintf('\n');
             for flag = 1 : length(DATA.flag_absorbing)
                 
                 [FlowRate, Area]    = CFD_computeFlowRate(U_k, MESH, FE_SPACE, FE_SPACE_p, DATA.flag_absorbing(flag));
@@ -335,8 +335,7 @@ switch MESH.dim
                 beta     = sqrt( pi ) * DATA.OutFlow_WallThicknessPercentage * Radius * DATA.OutFlow_Young / (1 - DATA.OutFlow_Poisson^2);
                 pressure = sqrt(DATA.density * beta) / sqrt(2) / Area^(5/4) * FlowRate + DATA.OutFlow_RefPressure(t);
                 % pressure = ( sqrt(DATA.density) / (2*sqrt(2)) * FlowRate / Area + sqrt( beta * sqrt(Area) ) )^2  - beta * sqrt(Area) + DATA.OutFlow_RefPressure(t);
-                
-                fprintf('\n Flag %d, beta = %2.6f, Equivalent Resistance  = %2.6f',  DATA.flag_absorbing(flag), beta,  sqrt(DATA.density * beta) / sqrt(2) / Area^(5/4) ) ;
+                %fprintf('\n Flag %d, beta = %2.6f, Equivalent Resistance  = %2.6f',  DATA.flag_absorbing(flag), beta,  sqrt(DATA.density * beta) / sqrt(2) / Area^(5/4) ) ;
 
                 x    =  MESH.vertices(1,MESH.boundaries(1:3, MESH.Absorbing_side_Flag{flag}));
                 y    =  MESH.vertices(2,MESH.boundaries(1:3, MESH.Absorbing_side_Flag{flag}));
