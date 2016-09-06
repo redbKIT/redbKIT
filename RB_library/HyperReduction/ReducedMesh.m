@@ -70,7 +70,12 @@ classdef ReducedMesh < handle
             tmp        = reshape(tmp, obj.M_numInternalDoFs, obj.M_numInternalDoFs);
 
             [row, col] = find(tmp);
-            obj.M_DoFsList = [obj.M_DoFsList obj.M_MESH.internal_dof(unique([row; col]))'];
+            
+            if size(obj.M_MESH.internal_dof, 1) > 1
+                obj.M_DoFsList = [obj.M_DoFsList obj.M_MESH.internal_dof(unique([row; col]))'];
+            else
+                obj.M_DoFsList = [obj.M_DoFsList obj.M_MESH.internal_dof(unique([row; col]))];
+            end
             
         end
         
