@@ -135,7 +135,7 @@ switch model
             type_Robin     = DATA.flag_robin{d};
             type_clamp_points = DATA.flag_clamp_points{d};
             
-            if isempty(type_Dirichlet) && isempty(type_Neumann) && isempty(type_Pressure) && isempty(type_Robin)
+            if isempty(type_Dirichlet) && isempty(type_Neumann) && isempty(type_Pressure) && isempty(type_Robin) && isempty(type_clamp_points) 
                 error(['No boundary conditions are imposed on component ', num2str(d)]);
             end
             
