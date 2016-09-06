@@ -1,0 +1,25 @@
+2D Scattering problem on a deformable object
+
+For the full description of the problem see:
+
+   [1] A. Manzoni, F. Negri. Automatic reduction of PDEs defined on domains
+       with variable shape. Mathicse Report Nr. 19.2016. 
+       Available at 
+       http://mathicse.epfl.ch/files/content/sites/mathicse/files/Mathicse%20reports%202016/19.2016_AM-FN.pdf
+
+       
+Instructions:
+
+(1) In the mesh subfolder we already provide the gmsh script to generate the mesh.
+    Type in a terminal:
+
+    $ gmsh obstacle.geo -2 -o obstacle_Coarse.msh
+
+(2) Navigate into the "MeshMotion" folder and launch the script Reduced_SEMMT.m
+    to generate the reduced-order model for the mesh motion problem.
+
+(3) Add the "MeshMotion" folder to the path
+
+(4) Navigate into the "Scattering" folder and launch the script reduce_SCATTERING.m
+    to generate the reduced-order model for the scattering problem.
+    The mesh motion is performed by means of the ROM built in (2).
