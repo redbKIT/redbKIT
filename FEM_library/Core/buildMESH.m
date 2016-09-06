@@ -43,9 +43,12 @@ if nargin > 9
     MESH.elements = MESH.elements(:, reduced_elements);
 end
     
-if nargin > 10    
-    MESH.boundaries = MESH.boundaries(:, reduced_boundaries);
-end
+% I cannot just restict boundaries to the reduced ones, otherwise essential
+% Dofs and internal numbering are not correct.
+%
+% if nargin > 10    
+%     MESH.boundaries = MESH.boundaries(:, reduced_boundaries);
+% end
 
 %% Update Mesh data with geometrical maps
 [MESH.numElemDof,MESH.numBoundaryDof,MESH.numRingsDof]    = select(fem, dim);
@@ -68,11 +71,11 @@ if strcmp( model, 'CSM') || strcmp( model, 'CFD')
     time_mesh = tic;
     switch dim
         case 2
-            [MESH.Normal_Faces] = ComputeSurfaceNormals2D(MESH.boundaries(1:2,:),MESH.vertices(1:2,:),MESH.elements(1:3,:));
+            [MESH.Normal_Faces] = ComputeSurfaceNormals2D(MESH.boundaries(1:2,:),MESH.vertices(1:2,:),elements(1:3,:));
             
         case 3
             [MESH.Normal_Faces] = ...
-                ComputeSurfaceNormals3D(MESH.boundaries(1:3,:),MESH.vertices(1:3,:), MESH.elements(1:4,:));
+                ComputeSurfaceNormals3D(MESH.boundaries(1:3,:),MESH.vertices(1:3,:), elements(1:4,:));
     end
     time_mesh = toc(time_mesh);
     fprintf('done in %f s\n', time_mesh)

@@ -70,7 +70,7 @@ classdef ReducedMesh < handle
             tmp        = reshape(tmp, obj.M_numInternalDoFs, obj.M_numInternalDoFs);
 
             [row, col] = find(tmp);
-            obj.M_DoFsList = [obj.M_DoFsList unique([row; col])'];
+            obj.M_DoFsList = [obj.M_DoFsList obj.M_MESH.internal_dof(unique([row; col]))'];
             
         end
         
@@ -107,9 +107,12 @@ classdef ReducedMesh < handle
             obj.M_ReducedElements = unique(Red_elem);
             
             % Find Boundary Elements
+            Attached_nodes      = obj.M_MESH.elements(1:obj.M_MESH.numElemDof,obj.M_ReducedElements);
+            Attached_nodes      = unique(Attached_nodes(:));
+
             Red_boundary = [];
-            for i = 1 : length(obj.M_NodesList)
-                Red_boundary  = [Red_boundary obj.M_node_to_boundary{obj.M_NodesList(i)}];
+            for i = 1 : length(Attached_nodes)
+                Red_boundary  = [Red_boundary obj.M_node_to_boundary{Attached_nodes(i)}];
             end
             obj.M_ReducedBoundaries = unique(Red_boundary);
                                     
