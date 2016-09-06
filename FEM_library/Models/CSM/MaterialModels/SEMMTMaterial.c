@@ -170,6 +170,289 @@ void SEMMTMaterial_forces(mxArray* plhs[], const mxArray* prhs[])
     }
         
 }
+
+
+/*************************************************************************/
+void SEMMTMaterial_jacobianFast3D(mxArray* plhs[], const mxArray* prhs[])
+{
+    
+    double* dim_ptr = mxGetPr(prhs[0]);
+    int dim     = (int)(dim_ptr[0]);
+    int noe     = mxGetN(prhs[4]);
+    double* nln_ptr = mxGetPr(prhs[5]);
+    int nln     = (int)(nln_ptr[0]);
+    int numRowsElements  = mxGetM(prhs[4]);
+    int nln2    = nln*nln;
+    
+    plhs[0] = mxCreateDoubleMatrix(nln2*noe*dim*dim,1, mxREAL);
+    plhs[1] = mxCreateDoubleMatrix(nln2*noe*dim*dim,1, mxREAL);
+    plhs[2] = mxCreateDoubleMatrix(nln2*noe*dim*dim,1, mxREAL);
+    
+    double* myArows    = mxGetPr(plhs[0]);
+    double* myAcols    = mxGetPr(plhs[1]);
+    double* myAcoef    = mxGetPr(plhs[2]);
+    
+    int k,l;
+    int q;
+    int NumQuadPoints     = mxGetN(prhs[6]);
+    int NumNodes          = (int)(mxGetM(prhs[3]) / dim);
+    
+    double* U_h   = mxGetPr(prhs[3]);
+    double* w   = mxGetPr(prhs[6]);
+    double* invjac = mxGetPr(prhs[7]);
+    double* detjac = mxGetPr(prhs[8]);
+    double* phi = mxGetPr(prhs[9]);
+    double* gradrefphi = mxGetPr(prhs[10]);
+    
+    double* elements  = mxGetPr(prhs[4]);
+    
+    int d1,d2;
+    
+    double* material_param = mxGetPr(prhs[2]);
+    double Young = material_param[0];
+    double Poisson = material_param[1];
+    double Stiffening_power = material_param[2];
+
+    double mu = Young / (2 + 2 * Poisson);
+    double lambda =  Young * Poisson /( (1+Poisson) * (1-2*Poisson) );
+    
+    double detjac_ref = detjac[0];
+    
+    /* Assembly: loop over the elements */
+    int ie;
+    
+#pragma omp parallel for shared(invjac,detjac,elements,myAcols,myArows,myAcoef,U_h) private(ie,k,l,q,d1,d2) firstprivate(phi,gradrefphi,w,numRowsElements,nln2,nln,NumNodes,mu,lambda,detjac_ref,Stiffening_power)
+    
+    for (ie = 0; ie < noe; ie = ie + 1 )
+    {
+        double gradphi[NumQuadPoints][dim][nln];
+        
+        for (q = 0; q < NumQuadPoints; q = q + 1 )
+        {
+            /* Compute Gradient of Basis functions*/
+            for (k = 0; k < nln; k = k + 1 )
+            {
+                for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+                {
+                    gradphi[q][d1][k] = 0;
+                    for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+                    {
+                        gradphi[q][d1][k] = gradphi[q][d1][k] + INVJAC(ie,d1,d2)*GRADREFPHI(k,q,d2);
+                    }
+                }
+            }
+        }
+        
+        int iii = 0;
+        int a, b, i_c, j_c;
+        
+        double aloc[nln][dim][nln][dim];
+        /* loop over test functions --> a */
+        for (a = 0; a < nln; a = a + 1 )
+        {
+            /* loop over test components --> i_c */
+            for (i_c = 0; i_c < 3; i_c = i_c + 1 )
+            {
+                /* loop over trial functions --> b */
+                for (b = 0; b < nln; b = b + 1 )
+                {
+                    /* loop over trial components --> j_c */
+                    for (j_c = 0; j_c < 3; j_c = j_c + 1 )
+                    {
+                        aloc[a][i_c][b][j_c]  = 0.0;
+                    }
+                }
+            }
+        }
+        for (q = 0; q < NumQuadPoints; q = q + 1 )
+        {
+            /* loop over test functions --> a */
+            for (a = 0; a < nln; a = a + 1 )
+            {
+                /* loop over trial functions --> b */
+                for (b = 0; b < nln; b = b + 1 )
+                {
+                    
+                    aloc[a][0][b][0] += ( gradphi[q][0][a]*(lambda*gradphi[q][0][b] + 2.0*mu*gradphi[q][0][b]) + mu*gradphi[q][1][b]*gradphi[q][1][a] + mu*gradphi[q][2][b]*gradphi[q][2][a] ) * w[q];
+                    
+                    aloc[a][0][b][1] += ( lambda*gradphi[q][1][b]*gradphi[q][0][a] + mu*gradphi[q][0][b]*gradphi[q][1][a] ) * w[q];
+                    
+                    aloc[a][0][b][2] += ( lambda*gradphi[q][2][b]*gradphi[q][0][a] + mu*gradphi[q][0][b]*gradphi[q][2][a] ) * w[q];
+                    
+                    aloc[a][1][b][0] += ( lambda*gradphi[q][0][b]*gradphi[q][1][a] + mu*gradphi[q][1][b]*gradphi[q][0][a] ) * w[q];
+                    
+                    aloc[a][1][b][1] += ( gradphi[q][1][a]*(lambda*gradphi[q][1][b] + 2.0*mu*gradphi[q][1][b]) + mu*gradphi[q][0][b]*gradphi[q][0][a] + mu*gradphi[q][2][b]*gradphi[q][2][a] ) * w[q];
+                    
+                    aloc[a][1][b][2] += ( lambda*gradphi[q][2][b]*gradphi[q][1][a] + mu*gradphi[q][1][b]*gradphi[q][2][a] ) * w[q];
+                    
+                    aloc[a][2][b][0] += ( lambda*gradphi[q][0][b]*gradphi[q][2][a] + mu*gradphi[q][2][b]*gradphi[q][0][a] ) * w[q];
+                    
+                    aloc[a][2][b][1] += ( lambda*gradphi[q][1][b]*gradphi[q][2][a] + mu*gradphi[q][2][b]*gradphi[q][1][a] ) * w[q];
+                    
+                    aloc[a][2][b][2] += ( gradphi[q][2][a]*(lambda*gradphi[q][2][b] + 2.0*mu*gradphi[q][2][b]) + mu*gradphi[q][0][b]*gradphi[q][0][a] + mu*gradphi[q][1][b]*gradphi[q][1][a] ) * w[q];
+
+                }
+            }
+        }
+
+        double modified_detJ = detjac[ie] * pow( detjac_ref / detjac[ie], Stiffening_power );
+        for (a = 0; a < nln; a = a + 1 )
+        {
+            /* loop over test components --> i_c */
+            for (i_c = 0; i_c < 3; i_c = i_c + 1 )
+            {
+                /* loop over trial functions --> b */
+                for (b = 0; b < nln; b = b + 1 )
+                {
+                    /* loop over trial components --> j_c */
+                    for (j_c = 0; j_c < 3; j_c = j_c + 1 )
+                    {
+                        myArows[ie*nln2*9+iii] = elements[a+ie*numRowsElements] + i_c * NumNodes;
+                        myAcols[ie*nln2*9+iii] = elements[b+ie*numRowsElements] + j_c * NumNodes;
+                        myAcoef[ie*nln2*9+iii] = aloc[a][i_c][b][j_c]*modified_detJ;
+                        iii = iii + 1;
+                    }
+                }
+            }
+        }
+    }
+    
+}
+/*************************************************************************/
+void SEMMTMaterial_jacobianFast2D(mxArray* plhs[], const mxArray* prhs[])
+{
+    
+    double* dim_ptr = mxGetPr(prhs[0]);
+    int dim     = (int)(dim_ptr[0]);
+    int noe     = mxGetN(prhs[4]);
+    double* nln_ptr = mxGetPr(prhs[5]);
+    int nln     = (int)(nln_ptr[0]);
+    int numRowsElements  = mxGetM(prhs[4]);
+    int nln2    = nln*nln;
+    
+    plhs[0] = mxCreateDoubleMatrix(nln2*noe*dim*dim,1, mxREAL);
+    plhs[1] = mxCreateDoubleMatrix(nln2*noe*dim*dim,1, mxREAL);
+    plhs[2] = mxCreateDoubleMatrix(nln2*noe*dim*dim,1, mxREAL);
+    
+    double* myArows    = mxGetPr(plhs[0]);
+    double* myAcols    = mxGetPr(plhs[1]);
+    double* myAcoef    = mxGetPr(plhs[2]);
+    
+    int k,l;
+    int q;
+    int NumQuadPoints     = mxGetN(prhs[6]);
+    int NumNodes          = (int)(mxGetM(prhs[3]) / dim);
+    
+    double* U_h   = mxGetPr(prhs[3]);
+    double* w   = mxGetPr(prhs[6]);
+    double* invjac = mxGetPr(prhs[7]);
+    double* detjac = mxGetPr(prhs[8]);
+    double* phi = mxGetPr(prhs[9]);
+    double* gradrefphi = mxGetPr(prhs[10]);
+    
+    double* elements  = mxGetPr(prhs[4]);
+    
+    int d1,d2;
+    
+    double* material_param = mxGetPr(prhs[2]);
+    double Young = material_param[0];
+    double Poisson = material_param[1];
+    double Stiffening_power = material_param[2];
+    double mu = Young / (2 + 2 * Poisson);
+    double lambda =  Young * Poisson /( (1+Poisson) * (1-2*Poisson) );
+    
+    double detjac_ref = detjac[0];
+
+    /* Assembly: loop over the elements */
+    int ie;
+    
+#pragma omp parallel for shared(invjac,detjac,elements,myAcols,myArows,myAcoef,U_h) private(ie,k,l,q,d1,d2) firstprivate(phi,gradrefphi,w,numRowsElements,nln2,nln,NumNodes,mu,lambda,detjac_ref,Stiffening_power)
+    
+    for (ie = 0; ie < noe; ie = ie + 1 )
+    {
+        double gradphi[NumQuadPoints][dim][nln];
+        
+        for (q = 0; q < NumQuadPoints; q = q + 1 )
+        {
+            /* Compute Gradient of Basis functions*/
+            for (k = 0; k < nln; k = k + 1 )
+            {
+                for (d1 = 0; d1 < dim; d1 = d1 + 1 )
+                {
+                    gradphi[q][d1][k] = 0;
+                    for (d2 = 0; d2 < dim; d2 = d2 + 1 )
+                    {
+                        gradphi[q][d1][k] = gradphi[q][d1][k] + INVJAC(ie,d1,d2)*GRADREFPHI(k,q,d2);
+                    }
+                }
+            }
+        }
+        
+        int iii = 0;
+        int a, b, i_c, j_c;
+        
+        double aloc[nln][dim][nln][dim];
+        /* loop over test functions --> a */
+        for (a = 0; a < nln; a = a + 1 )
+        {
+            /* loop over test components --> i_c */
+            for (i_c = 0; i_c < 2; i_c = i_c + 1 )
+            {
+                /* loop over trial functions --> b */
+                for (b = 0; b < nln; b = b + 1 )
+                {
+                    /* loop over trial components --> j_c */
+                    for (j_c = 0; j_c < 2; j_c = j_c + 1 )
+                    {
+                        aloc[a][i_c][b][j_c]  = 0.0;
+                    }
+                }
+            }
+        }
+        for (q = 0; q < NumQuadPoints; q = q + 1 )
+        {
+            /* loop over test functions --> a */
+            for (a = 0; a < nln; a = a + 1 )
+            {
+                /* loop over trial functions --> b */
+                for (b = 0; b < nln; b = b + 1 )
+                {
+                    
+                    aloc[a][0][b][0] += ( gradphi[q][0][a]*(lambda*gradphi[q][0][b] + 2.0*mu*gradphi[q][0][b]) + mu*gradphi[q][1][b]*gradphi[q][1][a] ) * w[q];
+                    
+                    aloc[a][0][b][1] += ( lambda*gradphi[q][1][b]*gradphi[q][0][a] + mu*gradphi[q][0][b]*gradphi[q][1][a] ) * w[q];
+                    
+                    aloc[a][1][b][0] += ( lambda*gradphi[q][0][b]*gradphi[q][1][a] + mu*gradphi[q][1][b]*gradphi[q][0][a] ) * w[q];
+                    
+                    aloc[a][1][b][1] += ( gradphi[q][1][a]*(lambda*gradphi[q][1][b] + 2.0*mu*gradphi[q][1][b]) + mu*gradphi[q][0][b]*gradphi[q][0][a] ) * w[q];
+                }
+            }
+        }
+        
+        double modified_detJ = detjac[ie] * pow( detjac_ref / detjac[ie], Stiffening_power );
+        for (a = 0; a < nln; a = a + 1 )
+        {
+            /* loop over test components --> i_c */
+            for (i_c = 0; i_c < 2; i_c = i_c + 1 )
+            {
+                /* loop over trial functions --> b */
+                for (b = 0; b < nln; b = b + 1 )
+                {
+                    /* loop over trial components --> j_c */
+                    for (j_c = 0; j_c < 2; j_c = j_c + 1 )
+                    {
+                        myArows[ie*nln2*4+iii] = elements[a+ie*numRowsElements] + i_c * NumNodes;
+                        myAcols[ie*nln2*4+iii] = elements[b+ie*numRowsElements] + j_c * NumNodes;
+                        myAcoef[ie*nln2*4+iii] = aloc[a][i_c][b][j_c]*modified_detJ;
+                        iii = iii + 1;
+                    }
+                }
+            }
+        }
+    }
+    
+}
+
 /*************************************************************************/
 void SEMMTMaterial_jacobian(mxArray* plhs[], const mxArray* prhs[])
 {

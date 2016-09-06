@@ -21,4 +21,9 @@ void SEMMTMaterial_forces(mxArray* plhs[], const mxArray* prhs[]);
 
 void SEMMTMaterial_jacobian(mxArray* plhs[], const mxArray* prhs[]);
 
+void SEMMTMaterial_jacobianFast3D(mxArray* plhs[], const mxArray* prhs[]);
+
+void SEMMTMaterial_jacobianFast2D(mxArray* plhs[], const mxArray* prhs[]);
+
+
 #endif

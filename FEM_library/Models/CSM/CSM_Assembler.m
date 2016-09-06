@@ -472,6 +472,10 @@ classdef CSM_Assembler < handle
         %==========================================================================
         %% Compute internal forces Jacobian
         function [dF_in] = compute_jacobian(obj, U_h)
+            
+            if nargin < 2 || isempty(U_h)
+                U_h = zeros(obj.M_MESH.dim*obj.M_MESH.numNodes,1);
+            end
 
             % C_OMP assembly, returns matrices in sparse vector format
             [rowdG, coldG, coefdG] = ...

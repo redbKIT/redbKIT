@@ -74,9 +74,22 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
             SEMMTMaterial_forces(plhs, prhs);
     }
     
-    if (strcmp(Material_Model, "SEMMT_jacobian")==0)
+    if (strcmp(Material_Model, "SEMMT_jacobianSlow")==0)
     {
             SEMMTMaterial_jacobian(plhs, prhs);
+    }
+    
+    if (strcmp(Material_Model, "SEMMT_jacobian")==0)
+    {
+        if (dim == 2)
+        {
+            SEMMTMaterial_jacobianFast2D(plhs, prhs);
+        }
+        
+        if (dim == 3)
+        {
+            SEMMTMaterial_jacobianFast3D(plhs, prhs);
+        }
     }
     
     
