@@ -336,7 +336,8 @@ while ( t < tf )
                 k = k + 1;
                 
             end
-            
+            fprintf('\n -- Norm(U_np1 - U_n) / Norm( U_n ) = %1.2e \n', norm(U_k - u) / norm(u));
+
     end
     u = U_k;
     
@@ -398,6 +399,32 @@ end
 
 if compute_FlowRates
     fclose(fileFlowRates);
+end
+
+%% Compute and save Fluid Load on the boundary (for prestressing in FSI simulations)
+export_FluidLoad = 0 ;
+if isfield(DATA, 'Output') && isfield(DATA.Output, 'ExportFinalLoad')
+    if DATA.Output.ExportFinalLoad.computeLoad == 1
+        export_FluidLoad = true;
+    end
+end
+
+if export_FluidLoad
+    dofs_load    = [];
+    
+    for j = 1 : length(DATA.Output.ExportFinalLoad.flag)
+        load_side         = find(MESH.boundaries(MESH.bc_flag_row,:) == DATA.Output.ExportFinalLoad.flag(j));
+        load_side         = unique(load_side);
+        load_dof          = MESH.boundaries(1:MESH.numBoundaryDof,load_side);
+        dofs_load         = [dofs_load; load_dof(:)];
+    end
+    dofs_load = unique(dofs_load);
+    
+    if strcmp(DATA.time.nonlinearity,'implicit')
+        F_NS = Residual;
+    end
+    FluidLoad = F_NS;%(dofs_load);
+    save(DATA.Output.ExportFinalLoad.filename, 'FluidLoad');
 end
 
 fprintf('\n************************************************************************* \n');
