@@ -31,11 +31,13 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     
     /* Check for proper number of arguments. */
     
+    /*
     if(nrhs!=11) {
         mexErrMsgTxt("11 inputs are required.");
-    } else if(nlhs>5) {
+    } else if(nlhs>6) {
         mexErrMsgTxt("Too many output arguments.");
     }
+    */
     
     char *Material_Model = mxArrayToString(prhs[1]);
     double* dim_ptr = mxGetPr(prhs[0]);
@@ -140,6 +142,11 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     if (strcmp(Material_Model, "NeoHookean_stress")==0)
     {
             NeoHookeanMaterial_stress(plhs, prhs);
+    }
+    
+    if (strcmp(Material_Model, "NeoHookean_prestress")==0)
+    {
+            NeoHookeanMaterial_prestress(plhs, prhs);
     }
     
     if (strcmp(Material_Model, "RaghavanVorp_forces")==0)

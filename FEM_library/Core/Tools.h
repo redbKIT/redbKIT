@@ -44,6 +44,9 @@ void MatrixInvT(int dim, double A[dim][dim], double invAT[dim][dim] );
 void MatrixInvT3(int dim, double A[dim][dim], double invAT[dim][dim] );
 
 
+void MatrixInv3(int dim, double A[dim][dim], double invA[dim][dim] );
+
+
 void MatrixProduct(int dim, double X[dim][dim], double Y[dim][dim], double result[dim][dim] );
 
 

@@ -488,6 +488,29 @@ classdef CSM_Assembler < handle
         end
         
         %==========================================================================
+        %% Compute Prestress vector and jacobian
+        function [R_P, J_P, S_np1] = compute_prestress(obj, U_h, S_0)
+            
+            if nargin < 2 || isempty(U_h)
+                U_h = zeros(obj.M_MESH.dim*obj.M_MESH.numNodes,1);
+            end
+            
+            if nargin < 3 || isempty(S_0)
+                S_0 = zeros(obj.M_MESH.numElem*length(obj.M_FE_SPACE.quad_weights)*obj.M_MESH.dim*obj.M_MESH.dim, 1);
+            end
+
+            % C_OMP assembly, returns matrices in sparse vector format
+            [rowdG, coldG, coefdG, rowG, coefG, S_np1] = ...
+                CSM_assembler_C_omp(obj.M_MESH.dim, [obj.M_MaterialModel,'_prestress'], obj.M_MaterialParam, full( U_h ), ...
+                obj.M_MESH.elements, obj.M_FE_SPACE.numElemDof, ...
+                obj.M_FE_SPACE.quad_weights, obj.M_MESH.invjac, obj.M_MESH.jac, obj.M_FE_SPACE.phi, obj.M_FE_SPACE.dphi_ref, S_0);
+            
+            % Build sparse matrix and vector
+            R_P   = GlobalAssemble(rowG, 1, coefG, obj.M_MESH.numNodes*obj.M_MESH.dim, 1);
+            J_P   = GlobalAssemble(rowdG, coldG, coefdG, obj.M_MESH.numNodes*obj.M_MESH.dim, obj.M_MESH.numNodes*obj.M_MESH.dim);
+        end
+        
+        %==========================================================================
         %% Assemble Robin Condition: Pn + K d = 0 on \Gamma_Robin, with K = ElasticCoefRobin
         function [A] = assemble_ElasticRobinBC(obj)
             
