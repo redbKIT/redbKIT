@@ -183,7 +183,6 @@ fprintf(' * Number of timesteps =  %d\n', (tf-t0)/dt);
 fprintf('-------------------------------------------\n');
 
 X_n  = zeros(length(MESH.Fluid.II) + length(MESH.Fluid.Gamma) + length(MESH.Solid.II),1);
-X_nk = X_n;
 k_t  = 0;
 
 %% Initalize Fluid Time Advance
@@ -200,7 +199,9 @@ for k = 1 : FE_SPACE_v.numComponents
             v0  = [v0; DATA.Fluid.u0{k}(  MESH.Fluid.nodes(1,:), MESH.Fluid.nodes(2,:), MESH.Fluid.nodes(3,:), t0, param )'];
     end
 end
-u = [v0; zeros(FE_SPACE_p.numDof,1)];
+
+u = [v0; load_ICfluid(MESH.Fluid.nodes(1,:), MESH.dim+1)'];%zeros(FE_SPACE_p.numDof,1)];
+X_n(1:length(MESH.Fluid.internal_dof)) = u(MESH.Fluid.internal_dof);
 
 % export initial condition (if it's the case)
 if ~isempty(vtk_filename)
@@ -415,6 +416,27 @@ if compute_FlowRates
     fprintf(fileFlowRates, '    %1.3e', sum( FlowRate ) );
     
 end
+
+%% Load Prestress data
+use_Prestress = false ;
+if isfield(DATA.Solid, 'Prestress')
+    if DATA.Solid.Prestress == true
+        use_Prestress = true;
+    end
+end
+
+if use_Prestress
+
+	load R_P R_P;
+	load J_P J_P;
+    fprintf('\n\n -- Prestress loaded -- \n');
+
+else
+	R_P = zeros(FE_SPACE_s.numDof,1);
+	J_P = sparse(FE_SPACE_s.numDof,FE_SPACE_s.numDof);
+end
+
+X_nk = X_n;
 
 %% Time Loop
 fprintf('\n **** Starting temporal loop ****\n');
@@ -662,8 +684,8 @@ while ( t < tf )
                 t_assembly = toc(t_assembly);
                 fprintf('done in %3.3f s\n', t_assembly);
                 
-                dG_STR    = Coef_MassS * M_s + dA + A_robin;
-                G_S       = Coef_MassS * M_s * d_nk + GS + A_robin * d_nk - F_S;
+                dG_STR    = Coef_MassS * M_s + dA + A_robin + J_P;
+                G_S       = Coef_MassS * M_s * d_nk + GS + A_robin * d_nk + R_P + J_P * d_nk - F_S;
 
                 % Apply Solid boundary conditions
                 [dG_STR, G_S] = CSM_ApplyBC(dG_STR, -G_S, FE_SPACE_s, MESH.Solid, DATA.Solid, t, 1);
