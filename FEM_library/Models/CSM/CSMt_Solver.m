@@ -116,6 +116,9 @@ M    =  M * DATA.Density;
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s', t_assembly);
 
+% Assemble Robin BC (if it's the case)
+A_robin = SolidModel.assemble_ElasticRobinBC();
+
 %% Initial Acceleration
 fprintf('\n -- Assembling external Forces at t0... ');
 t_assembly = tic;
@@ -125,7 +128,7 @@ fprintf('done in %3.3f s\n', t_assembly);
 
 fprintf('\n -- Assembling internal Forces at t0... ');
 t_assembly = tic;
-F_in_0   =  SolidModel.compute_internal_forces( u0 );
+F_in_0   =  SolidModel.compute_internal_forces( u0 ) + A_robin * u0;
 t_assembly = toc(t_assembly);
 fprintf('done in %3.3f s\n', t_assembly)
 
@@ -175,7 +178,8 @@ while ( t < tf )
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);
     
-    Residual  = Coef_Mass * M * U_k + F_in - F_ext - M * Csi;
+    Residual  = Coef_Mass * M * U_k + F_in - F_ext - M * Csi ...
+                + A_robin * ((1 - TimeAdvance.M_alpha_f) * U_k + TimeAdvance.M_alpha_f * U_n);
             
     fprintf('\n -- Assembling Jacobian matrix... ');
     t_assembly = tic;
@@ -183,7 +187,7 @@ while ( t < tf )
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);        
             
-    Jacobian  = Coef_Mass * M + (1 - TimeAdvance.M_alpha_f) * dF_in;
+    Jacobian  = Coef_Mass * M + (1 - TimeAdvance.M_alpha_f) * dF_in + A_robin * (1 - TimeAdvance.M_alpha_f);
     
     % Apply boundary conditions
     fprintf('\n -- Apply boundary conditions ... ');
@@ -221,10 +225,11 @@ while ( t < tf )
         t_assembly = toc(t_assembly);
         fprintf('done in %3.3f s\n', t_assembly);
         
-        Residual  = Coef_Mass * M * U_k + F_in - F_ext - M * Csi;
+        Residual  = Coef_Mass * M * U_k + F_in - F_ext - M * Csi ...
+                    + A_robin * ((1 - TimeAdvance.M_alpha_f) * U_k + TimeAdvance.M_alpha_f * U_n);
             
-        Jacobian  = Coef_Mass * M + (1 - TimeAdvance.M_alpha_f) * dF_in;
-        
+        Jacobian  = Coef_Mass * M + (1 - TimeAdvance.M_alpha_f) * dF_in + A_robin * (1 - TimeAdvance.M_alpha_f);
+
         % Apply boundary conditions
         fprintf('\n   -- Apply boundary conditions ... ');
         t_assembly = tic;
