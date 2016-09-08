@@ -175,7 +175,8 @@ while ( t < tf )
     
     fprintf('\n=========================================================================')
     fprintf('\n==========  t0 = %2.4f  t = %2.4f  tf = %2.4f\n', t0, t, tf );
-
+    fprintf('\n==========  Load percentage = %2.3f\n', DATA.Solid.LoadTimeProfile(t) * 100 );
+    
     % Newton Method
     tol        = DATA.Solid.NonLinearSolver.tol;
     resRelNorm = tol + 1;
