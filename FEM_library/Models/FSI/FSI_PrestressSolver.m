@@ -308,6 +308,11 @@ while ( t < tf )
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);
     
+    if ( abs( DATA.Solid.LoadTimeProfile(t) - 1.0 ) < 1e-4 )
+        U_n = 0*U_n;
+        u   = 0*u;
+    end
+    
     iter_time = toc(iter_time);
     fprintf('\n-------------- Iteration time: %3.2f s -----------------',iter_time);
     
