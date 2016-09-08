@@ -302,7 +302,11 @@ while ( t < tf )
     
     U_n = U_k;
     
+    fprintf('\n   -- Update Prestress ... ');
+    t_assembly = tic;
     [R_P, J_P, S_np1] = SolidModel.compute_prestress(U_n, S_np1);
+    t_assembly = toc(t_assembly);
+    fprintf('done in %3.3f s\n', t_assembly);
     
     iter_time = toc(iter_time);
     fprintf('\n-------------- Iteration time: %3.2f s -----------------',iter_time);
