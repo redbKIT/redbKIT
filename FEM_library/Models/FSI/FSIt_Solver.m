@@ -200,7 +200,19 @@ for k = 1 : FE_SPACE_v.numComponents
     end
 end
 
-u = [v0; load_ICfluid(MESH.Fluid.nodes(1,:), MESH.dim+1)'];%zeros(FE_SPACE_p.numDof,1)];
+if isfield(DATA.Fluid, 'p0')
+    switch dim
+        case 2
+            p0  = DATA.Fluid.p0(  MESH.Fluid.nodes(1,:), MESH.Fluid.nodes(2,:), t0, param )';
+            
+        case 3
+            p0  = DATA.Fluid.p0(  MESH.Fluid.nodes(1,:), MESH.Fluid.nodes(2,:), MESH.Fluid.nodes(3,:), t0, param )';
+    end
+else
+    p0 = zeros(FE_SPACE_p.numDof,1);
+end
+
+u = [v0; p0];
 X_n(1:length(MESH.Fluid.internal_dof)) = u(MESH.Fluid.internal_dof);
 
 % export initial condition (if it's the case)
