@@ -141,20 +141,8 @@ fprintf('done in %3.3f s', t_assembly);
 % Assemble Robin BC (if it's the case)
 A_robin = SolidModel.assemble_ElasticRobinBC();
 
-%% Initial Acceleration
-fprintf('\n -- Assembling external Forces at t0... ');
-t_assembly = tic;
-F_ext_0  = SolidModel.compute_volumetric_forces(t0);
-t_assembly = toc(t_assembly);
-fprintf('done in %3.3f s\n', t_assembly);
-
-fprintf('\n -- Assembling internal Forces at t0... ');
-t_assembly = tic;
-F_in_0   =  SolidModel.compute_internal_forces( u0 ) + A_robin * u0;
-t_assembly = toc(t_assembly);
-fprintf('done in %3.3f s\n', t_assembly)
-
-d2u0 = M \ (F_ext_0 - F_in_0);
+%% Zero Initial Acceleration
+d2u0 = 0 * u0;
 
 TimeAdvance.Initialize( u0, du0, d2u0 );
 
