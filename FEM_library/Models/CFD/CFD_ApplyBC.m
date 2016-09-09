@@ -270,13 +270,21 @@ switch MESH.dim
             eta = quad_points(2,:);
             [phi]    =  fem_basis(MESH.dim, FE_SPACE.fem, [csi; eta; 0*eta], 1);
             nbn      = MESH.numBoundaryDof;
-            
+                        
             %fprintf('\n');
             for flag = 1 : length(DATA.flag_resistance)
                 
                 [FlowRate, Area, P_average]    = CFD_computeFlowRate(U_k, MESH, FE_SPACE, FE_SPACE_p, DATA.flag_resistance(flag));
                 nof         = length(MESH.Resistance_side_Flag{flag});
                 %fprintf('\n Flag %d, Area  = %2.6f', DATA.flag_resistance(flag), Area);
+                
+                if isfield(DATA, 'OutFlow_ComputeApproximateResistance')
+                    if DATA.OutFlow_ComputeApproximateResistance == true
+                        Radius   = sqrt( Area / pi);
+                        beta     = sqrt( pi ) * DATA.OutFlow_WallThicknessPercentage * Radius * DATA.OutFlow_Young / (1 - DATA.OutFlow_Poisson^2);
+                        DATA.OutFlow_Resistance(flag) = sqrt(DATA.density * beta) / sqrt(2) / Area^(5/4);
+                    end
+                end
                 
                 Rrows       = zeros(nbn*nof,1);
                 Rcoef       = Rrows;
