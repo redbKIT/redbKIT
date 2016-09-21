@@ -1,4 +1,13 @@
 function [R_P, J_P] = FSI_PrestressSolver(dim, meshFluid, meshSolid, fem_F, fem, data_file_F, data_file_S, param, vtk_filename)
+%FSI_PRESTRESSSOLVER given a fluid load on the FS interface, solves modified 
+%nonlinear elastodynamics equations to find the corresponding prestress
+%tensor, following the procedure detailed in:
+%
+%   Hsu, M. C., & Bazilevs, Y. (2011). Blood vessel tissue prestress modeling
+%   for vascular fluid?structure interaction simulation. Finite Elements in 
+%   Analysis and Design, 47(6), 593-599.
+
+%
 %   This file is part of redbKIT.
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch>
@@ -150,7 +159,7 @@ LinSolver = LinearSolver( DATA.Solid.LinearSolver );
 
 U_n = u0;
 
-
+%% Initialize Prestress
 [R_P, J_P, S_np1] = SolidModel.compute_prestress(U_n, []);
 
 %% Time Loop
@@ -234,8 +243,8 @@ while ( t < tf )
         % Assemble matrix and right-hand side
         fprintf('\n   -- Assembling internal forces... ');
         t_assembly = tic;
-        F_in      = SolidModel.compute_internal_forces( (1 - TimeAdvance.M_alpha_f) * U_k + TimeAdvance.M_alpha_f * U_n );
-        dF_in     = SolidModel.compute_jacobian( (1 - TimeAdvance.M_alpha_f) * U_k + TimeAdvance.M_alpha_f * U_n );
+        F_in       = SolidModel.compute_internal_forces( (1 - TimeAdvance.M_alpha_f) * U_k + TimeAdvance.M_alpha_f * U_n );
+        dF_in      = SolidModel.compute_jacobian( (1 - TimeAdvance.M_alpha_f) * U_k + TimeAdvance.M_alpha_f * U_n );
         t_assembly = toc(t_assembly);
         fprintf('done in %3.3f s\n', t_assembly);
         
@@ -284,22 +293,17 @@ while ( t < tf )
         CSM_export_VonMisesStress(MESH.Solid.dim, Sigma_VM, MESH.Solid.vertices, MESH.Solid.elements, [vtk_filename, 'VMstress_'], k_t);
     end
     
-    %U_k = 0*U_k;
     u   = U_k;
     TimeAdvance.Update( U_k );
     
     U_n = U_k;
     
+    % Update Prestress
     fprintf('\n   -- Update Prestress ... ');
     t_assembly = tic;
     [R_P, J_P, S_np1] = SolidModel.compute_prestress(U_n, S_np1);
     t_assembly = toc(t_assembly);
     fprintf('done in %3.3f s\n', t_assembly);
-    
-    if ( abs( DATA.Solid.LoadTimeProfile(t) - 1.0 ) < 1e-4 )
-        U_n = 0*U_n;
-        u   = 0*u;
-    end
     
     iter_time = toc(iter_time);
     fprintf('\n-------------- Iteration time: %3.2f s -----------------',iter_time);
