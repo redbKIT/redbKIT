@@ -500,15 +500,19 @@ In particular:</p>
 
 <ul>
   <li>a reasonably recent version of Matlab (some examples require the mesh generation functions provided by the Matlab Partial Differential Equation Toolbox)</li>
-  <li>a supported C compiler, see e.g. http://www.mathworks.com/support/compilers/R2016a/index.html?s_tid=gn_loc_drop
- (gcc on Unix and gcc/clang on Mac OS X work smoothly)</li>
+  <li><a href="http://www.mathworks.com/support/compilers/R2016a/index.html?s_tid=gn_loc_drop">a supported C compiler</a>:
+    <ul>
+      <li>Linux: gcc works smoothly and provides support for OpenMP.</li>
+      <li>Mac OS X: install Xcode command line tools which provides clang compiler (without OpenMP support). For Xcode 7.0 or higher, follow <a href="https://www.mathworks.com/matlabcentral/answers/246507-why-can-t-mex-find-a-supported-compiler-in-matlab-r2015b-after-i-upgraded-to-xcode-7-0#answer_194526">these instructions</a> if Matlab can’t find a supported compiler.</li>
+      <li>Windows 64-bit: consider installing the MinGW-w64 compiler <a href="https://www.mathworks.com/matlabcentral/fileexchange/52848-matlab-support-for-the-mingw-w64-c-c++-compiler-from-tdm-gcc">following these instructions</a> (supported by MATLAB R2015b and beyond).</li>
+    </ul>
+  </li>
 </ul>
 
 <p>If you want to speed-up matrix assembly via multithreading, you also need:</p>
 
 <ul>
-  <li>a C compiler with OpenMP support, see e.g. http://www.mathworks.com/support/compilers/R2016a/index.html?s_tid=gn_loc_drop
- (gcc is tested for both Unix and Mac OS X)</li>
+  <li><a href="https://www.mathworks.com/matlabcentral/answers/237411-can-i-make-use-of-openmp-in-my-matlab-mex-files">a C compiler with OpenMP support</a>: gcc is tested for both Unix and Mac OS X. To install the GNU compilers on Mac OS X follow <a href="https://wiki.helsinki.fi/display/HUGG/GNU+compiler+install+on+Mac+OS+X">these instructions</a>; see also <a href="http://ch.mathworks.com/matlabcentral/newsreader/view_thread/334250">here</a>.</li>
 </ul>
 
 <p>If you want to speed-up Matlab built-in “sparse” command by installing the FAST package, you also need:</p>
@@ -521,8 +525,8 @@ In particular:</p>
 <p>If you want to use parallel Additive Schwarz preconditioners, you also need:</p>
 
 <ul>
-  <li>MATLAB Parallel Computing Toolbox</li>
-  <li>CMake</li>
+  <li><a href="https://www.mathworks.com/products/parallel-computing/">MATLAB Parallel Computing Toolbox</a></li>
+  <li><a href="https://cmake.org/">CMake</a></li>
 </ul>
 
 <h3 id="basic-installation">Basic Installation</h3>
@@ -589,7 +593,7 @@ Then type</p>
       <div id="subfooter">
         <nav class="row">
           <section id="subfooter-left" class="small-12 medium-6 columns credits">
-            <p>Created by <a href="http://cmcs.epfl.ch/people/negri">Federico Negri</a> with <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> based on <a href="http://phlow.github.io/feeling-responsive/">Feeling Responsive</a>.</p>
+            <p><a href="http://cmcs.epfl.ch/people/negri">&copy;Federico Negri</a>. Created with <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> based on <a href="http://phlow.github.io/feeling-responsive/">Feeling Responsive</a>.</p>
           </section>
 
           <section id="subfooter-right" class="small-12 medium-6 columns">

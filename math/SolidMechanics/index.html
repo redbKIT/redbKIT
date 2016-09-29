@@ -536,7 +536,7 @@
 \label{eq:CSM_Motion}</script>
 </blockquote>
 
-<p>where $\mathbf{f}$ is an external force, $\rho$ is the density of the body and $\PP = \PP(\FF)$ is the first Piola-Kirchhoff stress tensor. Note that the first Piola-Kirchhoff stress tensor is related to the Cauchy stress tensor $\bm{\sigma}$ by the following formula: $\PP = J \bm{\sigma} \FF^T$.</p>
+<p>where $\mathbf{f}$ is an external force, $\rho$ is the density of the body and $\PP = \PP(\FF)$ is the first Piola-Kirchhoff stress tensor. Note that the first Piola-Kirchhoff stress tensor is related to the Cauchy stress tensor $\bm{\sigma}$ by the following formula: $\PP = J \bm{\sigma} \FF^{-T}$.</p>
 
 <p>The relation between the stress and the deformation tensor is the so-called constitutive law, peculiar to each specific material. Equation \eqref{eq:CSM_Motion} is referred to as governing equation of nonlinear elastodynamics.</p>
 
@@ -696,7 +696,7 @@ At the algebraic level, we obtain the following nonlinear system of equations to
 
 <script type="math/tex; mode=display">\JJ(\bmw)  = \frac{\partial \FFi}{\partial \bd} \left( \bmw \right).</script>
 
-<p>The assembly of the Jacobian matrix $\JJ$ and the residual vector $\mathbf{R}$ is performed by the <code class="highlighter-rouge">CSM_Assembler</code> class. Once the system has been assembled, Dirichlet boundary conditions should be imposed; a detailed description of this step can be found <a href="/math/essentialbc/">here</a>.</p>
+<p>The assembly of the Jacobian matrix $\JJ$ and the residual vector $\mathbf{R}$ is performed by the <code class="highlighter-rouge">CSM_Assembler</code> class. Once the system has been assembled, Dirichlet boundary conditions should be imposed; a detailed description of this step can be found <a href="http://redbkit.github.io/redbKIT/math/essentialbc/">here</a>.</p>
 
 <h2 id="dynamics">Dynamics</h2>
 
@@ -919,7 +919,7 @@ $$
       <div id="subfooter">
         <nav class="row">
           <section id="subfooter-left" class="small-12 medium-6 columns credits">
-            <p>Created by <a href="http://cmcs.epfl.ch/people/negri">Federico Negri</a> with <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> based on <a href="http://phlow.github.io/feeling-responsive/">Feeling Responsive</a>.</p>
+            <p><a href="http://cmcs.epfl.ch/people/negri">&copy;Federico Negri</a>. Created with <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> based on <a href="http://phlow.github.io/feeling-responsive/">Feeling Responsive</a>.</p>
           </section>
 
           <section id="subfooter-right" class="small-12 medium-6 columns">

@@ -567,6 +567,19 @@
   <li><img src="http://redbkit.github.io/redbKIT/images//simulations/MeshMotion_3.png" alt="" /></li>
 </ul>
 
+<p><code class="highlighter-rouge">FEM_CSM_Spinning</code> this problem simulates the fast spinning of an aluminium top in a gravitational field. For a detailed description of the model see <a href="http://onlinelibrary.wiley.com/doi/10.1002/nme.4668/abstract">(Farhat et al, 2014)</a></p>
+
+<ul class="small-block-grid-2">
+  <li><div align="center">
+	<video width="350" align="left" autoplay="" loop="">
+	<source src="http://redbkit.github.io/redbKIT/images//simulations/VideoSpinning.mp4" type="video/mp4" />
+	&lt;/source&gt; 
+	Your browser does not support the video tag.
+	</video>
+  </div></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/Spinning_Mesh.png" alt="" /></li>
+</ul>
+
 <h3 id="fem-fsi-fluid-structure-interaction">FEM-FSI: Fluid-Structure Interaction</h3>
 
 <p><code class="highlighter-rouge">FEM_FSI_Turek2D</code> numerical benchmarking of fluid-structure interaction between an elastic object and laminar incompressible flow. For a detailed description of this problem see the <a href="http://www.featflow.de/en/benchmarks/cfdbenchmarking/fsi_benchmark.html">FeatFlow website</a>.</p>
@@ -647,10 +660,20 @@
 </ul>
 
 <h3 id="rb---mdeim">RB - MDEIM</h3>
-<p><code class="highlighter-rouge">RB_AcousticHorn_NonAffine</code> RB approximation of the (nonaffine) Helmholtz equations modeling the propagation of a pressure wave into an acoustic horn. The geometry of the horn is parametrized with a Radial Basis Functions mapping. System approximation is performed via the <em>Matrix Discrete Empirical Interpolation</em> method, as detailed in <a href="http://www.sciencedirect.com/science/article/pii/S0021999115006543">[NMA15]</a></p>
+<p><code class="highlighter-rouge">RB_AcousticHorn_NonAffine</code> RB-MDEIM approximation of the (nonaffine) Helmholtz equations modeling the propagation of a pressure wave into an acoustic horn. The geometry of the horn is parametrized with a Radial Basis Functions mapping. System approximation is performed via the <em>Matrix Discrete Empirical Interpolation</em> method, as detailed in <a href="http://www.sciencedirect.com/science/article/pii/S0021999115006543">[NMA15]</a></p>
 
 <ul class="small-block-grid-1">
   <li><img src="http://redbkit.github.io/redbKIT/images//simulations/atlas3-crop.png" alt="" /></li>
+</ul>
+
+<p><code class="highlighter-rouge">RB_MeshMotion_Scattering</code> RB-MDEIM approximation of a 2D scattering problem on a deformable object. For a detailed description of the problem see <a href="http://mathicse.epfl.ch/files/content/sites/mathicse/files/Mathicse%20reports%202016/19.2016_AM-FN.pdf">(Manzoni, Negri, 2016)</a></p>
+
+<ul class="small-block-grid-5">
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/Scattering_Wave_K2-crop.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/Scattering_RB_0000.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/Scattering_RB_0001.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/Scattering_RB_0002.png" alt="" /></li>
+  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/Scattering_RB_0003.png" alt="" /></li>
 </ul>
 
 		</article>
@@ -670,7 +693,7 @@
       <div id="subfooter">
         <nav class="row">
           <section id="subfooter-left" class="small-12 medium-6 columns credits">
-            <p>Created by <a href="http://cmcs.epfl.ch/people/negri">Federico Negri</a> with <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> based on <a href="http://phlow.github.io/feeling-responsive/">Feeling Responsive</a>.</p>
+            <p><a href="http://cmcs.epfl.ch/people/negri">&copy;Federico Negri</a>. Created with <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> based on <a href="http://phlow.github.io/feeling-responsive/">Feeling Responsive</a>.</p>
           </section>
 
           <section id="subfooter-right" class="small-12 medium-6 columns">

@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Advection Diffusion Reaction Solvers</title>
+	<title>Vascular fluid–structure interaction: tissue prestress</title>
 	<link rel="stylesheet" type="text/css" href="http://redbkit.github.io/redbKIT/assets/css/styles_feeling_responsive.css">
 	<script src="http://redbkit.github.io/redbKIT/assets/js/modernizr.min.js"></script>
 
@@ -31,9 +31,9 @@
 
 
 	<!-- Facebook Open Graph -->
-	<meta property="og:title" content="Advection Diffusion Reaction Solvers">
+	<meta property="og:title" content="Vascular fluid–structure interaction: tissue prestress">
 	<meta property="og:description" content="»redbKIT:« a MATLAB library for reduced-order modeling of parametrized PDEs">
-	<meta property="og:url" content="http://redbkit.github.io/redbKIT/math/ADR/">
+	<meta property="og:url" content="http://redbkit.github.io/redbKIT/math/FSIprestress/">
 	<meta property="og:locale" content="en_EN">
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="redbKIT">
@@ -268,7 +268,7 @@
 			
                       
 		      
-			<li class="has-dropdown active">
+			<li class="has-dropdown">
                 <a href="http://redbkit.github.io/redbKIT/math/ADR/">Advection diffusion reaction</a>
 
                   <ul class="dropdown">
@@ -432,45 +432,117 @@
 		<article>
 			<header>
 				
-				<h1>Advection Diffusion Reaction Solvers</h1>
+				<h1>Vascular fluid–structure interaction: tissue prestress</h1>
 			</header>
 
 			
 
-			<div class="row">
-<div class="medium-9 columns">
+			<p><script type="math/tex">\newcommand{\bm}[1]{\boldsymbol{\mathbf{#1}}}
+\newcommand{\bvec}[1]{\mathbf{#1}}
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\bd}{\mathbf{d}}
+\newcommand{\bv}{\dot{\mathbf{d}}}
+\newcommand{\ba}{\ddot{\mathbf{d}}}
+\newcommand{\bmw}{\mathbf{w}}
+\newcommand{\bmv}{\mathbf{v}}
+\newcommand{\Nh}{N_h}
+\newcommand{\bU}{\mathbf{U}}
+\newcommand{\bp}{\bvec{p}}
+\newcommand{\VV}{\mathbf{V}}
+\newcommand{\WW}{\mathbf{W}}
+\newcommand{\QQ}{\mathbf{Q}}
+\renewcommand{\AA}{\mathbf{A}}
+\newcommand{\BB}{\mathbf{B}}
+\newcommand{\CC}{\mathbf{B}}
+\newcommand{\EE}{\mathbf{E}}
+\newcommand{\FF}{\mathbf{F}}
+\newcommand{\FFi}{\mathbf{f}^i}
+\newcommand{\FFe}{\mathbf{f}^e}
+\newcommand{\GG}{\mathbf{G}}
+\newcommand{\CC}{\mathbf{C}}
+\newcommand{\MM}{\mathbf{M}}
+\newcommand{\XX}{\mathbf{X}}
+\newcommand{\KK}{\mathbf{K}}
+\newcommand{\UU}{\mathbf{U}}
+\newcommand{\II}{\mathbf{I}}
+\renewcommand{\SS}{\mathbf{S}}
+\newcommand{\HH}{\mathbf{H}}
+\newcommand{\DD}{\mathbf{D}}
+\newcommand{\NN}{\mathbf{N}}
+\newcommand{\bmg}{\mathbf{g}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\JJ}{\mathbf{J}}
+\newcommand{\RR}{\mathbf{R}}
+\newcommand{\PP}{\mathbf{P}}</script></p>
 <div>
-      <p>We provide here a brief summary of the models, and corresponding finite element approximations, available in the <code class="highlighter-rouge">ADR</code> (Advection Diffusion Reaction) module of the <code class="highlighter-rouge">FEM_Library</code>.</p>
-
-      <p>In particular:</p>
-
-      <ul>
-        <li>
-          <p>Steady and unsteady linear advection-diffusion-reaction equations and their finite element approximation are introduced  <a href="http://redbkit.github.io/redbKIT/math/AdvDiffReact/">here</a></p>
-        </li>
-        <li>
-          <p>An example of datafile and main file for the setup of a simulation using either the <code class="highlighter-rouge">Elliptic_Solver</code> (for steady problems) or the <code class="highlighter-rouge">ADRt_Solver</code> (for unsteady problems) are provided <a href="http://redbkit.github.io/redbKIT/math/AdvDiffReactEx/">here</a></p>
-        </li>
-      </ul>
-    </div>
-
-<ul class="small-block-grid-2">
-  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/Elliptic_Solver_Dep.png" alt="" /></li>
-  <li><img src="http://redbkit.github.io/redbKIT/images//simulations/ADRt_Solver_Dep.png" alt="" /></li>
-</ul> 
-
-</div>
-
-
-<div class="medium-3 columns">
-
-<ul class="side-nav">
-        	<li><a href="http://redbkit.github.io/redbKIT/math/AdvDiffReact/">Equations</a></li>
-       	        <li><a href="http://redbkit.github.io/redbKIT/math/AdvDiffReactEx/">Simulation Setup</a></li>
+  <!-- -->
+<ul id="markdown-toc">
+  <li><a href="#blood-vessel-tissue-prestress-modeling-for-vascular-fluidstructure-interaction-simulation" id="markdown-toc-blood-vessel-tissue-prestress-modeling-for-vascular-fluidstructure-interaction-simulation">Blood vessel tissue prestress modeling for vascular fluid–structure interaction simulation</a></li>
+  <li><a href="#references" id="markdown-toc-references">References</a></li>
 </ul>
 
-</div><!-- /.medium-4.columns -->
 </div>
+
+<h2 id="blood-vessel-tissue-prestress-modeling-for-vascular-fluidstructure-interaction-simulation">Blood vessel tissue prestress modeling for vascular fluid–structure interaction simulation</h2>
+
+<p>In vascular FSI analysis, patient-specific geometries of blood vessels are obtained from medical imaging data.
+When imaged, the blood vessels are in a state of mechanical stress that puts them in equilibrium with loading coming from the blood flow (i.e. blood pressure and viscous
+traction). As a result, when modeling blood vessel tissue, a patient specific geometry configuration coming from imaging data may not be used as a stress-free configuration.</p>
+
+<p>We follow the approach proposed by (Hsu and Bazilevs, 2011). To this end</p>
+
+<p>The weak formulation of reads: for all $t \in (0,T]$, find $\bd = \bd(t) \in V_D$ such that</p>
+
+<script type="math/tex; mode=display">\begin{multline}  
+\left( \rho \frac{\partial^2 \bd}{\partial t^2} , \bmw \right)_{\Omega^S}  + \left( \FF \SS , \nabla \bmw \right)_{\Omega^S}  =  \int_{\Omega^S} \mathbf{f} \cdot \bmw \, d\Omega + \int_{\Gamma_N} \mathbf{h} \cdot \bmw \, d\Gamma \qquad \forall \bmw \in V.
+\label{eq:CSM_DynamicWeak}
+\end{multline}</script>
+
+<p>where $\PP = \FF \SS$. Modified version</p>
+
+<script type="math/tex; mode=display">\begin{multline}  
+\left( \rho \frac{\partial^2 \bd}{\partial t^2} , \bmw \right)_{\Omega^S}  + \left( \FF (\SS + \SS_0) , \nabla \bmw \right)_{\Omega^S}  =  \int_{\Omega} \mathbf{f} \cdot \bmw \, d\Omega + \int_{\Gamma_N} \mathbf{h} \cdot \bmw \, d\Gamma \qquad \forall \bmw \in V.
+\label{eq:CSM_DynamicWeak2}
+\end{multline}</script>
+
+<p>Equilibrium</p>
+
+<script type="math/tex; mode=display">\begin{equation}
+ \left( \SS_0 , \nabla \bmw \right)_{\Omega^S}  +  \left( \widetilde{\mathbf{h}} , \bmw \right)_{\Gamma} = 0\qquad \forall \bmw \in V.
+\end{equation}</script>
+
+<script type="math/tex; mode=display">\begin{multline}  
+\left( \rho \frac{\partial^2 \bd}{\partial t^2} , \bmw \right)_{\Omega^S}  + \left( \FF (\SS + \SS_0) , \nabla \bmw \right)_{\Omega^S}  +  \left( \widetilde{\mathbf{h}} , \bmw \right)_{\Gamma} = 0 \qquad \forall \bmw \in V.
+\label{eq:CSM_DynamicWeak3}
+\end{multline}</script>
+
+<p>where $\Omega^S$ is the blood vessel reference configuration coming form imaging data, $\Gamma$ is the fluid-structure interface in the reference configuration and $\widetilde{\mathbf{h}}$ is the fluid traction vector. This latter can be obtained, e.g., from a separate rigig-wall blood flow simulation on the reference domain with steady inflow and resistance outflow boundary conditions:</p>
+
+<script type="math/tex; mode=display">\bm{\sigma}\mathbf{n} = R Q + p_0 \qquad \text{on } \Gamma_{out}</script>
+
+<p>where $R$ is the resistance coefficient, $Q = \int_{\Gamma_{out}} \mathbf{v} \cdot \mathbf{n} \, d\Gamma$ is the flow rate, and $p_0$ is a reference pressure (usually about 80 mmHg).</p>
+
+<p>Procedure:</p>
+
+<p>1- Run a CFD simulation with steady inflow until convergence to a steady solution</p>
+
+<p>2- Compute traction vector $\widetilde{\mathbf{h}}$ on the FS interface $\Gamma$</p>
+
+<p>3- Run a “modified CSM” simulation to find the prestress tensor $\SS_0$ which equilabrates the fluid traction load</p>
+
+<p>4- Compute and save the residual and Jacobian contributes given by the prestress term in the solid equations, namely</p>
+
+<script type="math/tex; mode=display">(\RR_P)_i = \int_{\Omega^S} \SS_0 : \nabla \bm{\varphi}_i\,d\Omega</script>
+
+<script type="math/tex; mode=display">(\JJ_P)_{ij} = \int_{\Omega^S} \nabla \bm{\varphi}_j\SS_0 : \nabla \bm{\varphi}_i\,d\Omega</script>
+
+<p>5 - Run  the FSI simulation with prestresss contribute in the structural equations</p>
+
+<h1 id="references">References</h1>
+
+<ul>
+  <li>M.C. Hsu, and Y. Bazilevs. Blood vessel tissue prestress modeling for vascular fluid–structure interaction simulation. Finite Elements in Analysis and Design, 47(6), 593-599, 2011.</li>
+</ul>
 
 		</article>
 	</div><!-- /.medium-12.columns -->
