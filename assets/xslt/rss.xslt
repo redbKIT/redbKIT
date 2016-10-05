@@ -143,6 +143,20 @@
             
             
               <li class="divider"></li>
+              <li><a href="http://redbkit.github.io/redbKIT/search/">Search</a></li>
+
+            
+            
+          
+        
+
+              
+
+          
+          
+            
+            
+              <li class="divider"></li>
               <li><a href="http://redbkit.github.io/redbKIT/contact/">Contact</a></li>
 
             
@@ -346,6 +360,11 @@
 
                       <li><a href="http://redbkit.github.io/redbKIT/math/FSIEx/">Simulation Setup</a></li>
 			
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/FSIprestress/">Tissue prestress</a></li>
+			
 </ul>
  </li>
 		                          
@@ -367,6 +386,12 @@
               </li>
               <li class="divider"></li>
             
+          
+        
+
+              
+
+          
           
         
 

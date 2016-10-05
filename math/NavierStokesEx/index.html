@@ -161,6 +161,20 @@
             
             
               <li class="divider"></li>
+              <li><a href="http://redbkit.github.io/redbKIT/search/">Search</a></li>
+
+            
+            
+          
+        
+
+              
+
+          
+          
+            
+            
+              <li class="divider"></li>
               <li><a href="http://redbkit.github.io/redbKIT/contact/">Contact</a></li>
 
             
@@ -364,6 +378,11 @@
 
                       <li><a href="http://redbkit.github.io/redbKIT/math/FSIEx/">Simulation Setup</a></li>
 			
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/FSIprestress/">Tissue prestress</a></li>
+			
 </ul>
  </li>
 		                          
@@ -385,6 +404,12 @@
               </li>
               <li class="divider"></li>
             
+          
+        
+
+              
+
+          
           
         
 
@@ -568,11 +593,65 @@
 <p>Set output options. In this case we require to compute and export to a txt file the aerodynamic forces (i.e. drag and lift coefficients) computed on the boundary with flag 6</p>
 
 <div class="language-matlab highlighter-rouge"><pre class="highlight"><code><span class="c1">%% Output options</span>
-<span class="c1">% data.options.Output.computeWSS      = 0;</span>
 <span class="n">data</span><span class="o">.</span><span class="n">Output</span><span class="o">.</span><span class="n">DragLift</span><span class="o">.</span><span class="n">computeDragLift</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
 <span class="n">data</span><span class="o">.</span><span class="n">Output</span><span class="o">.</span><span class="n">DragLift</span><span class="o">.</span><span class="nb">factor</span>          <span class="o">=</span> <span class="mi">2</span><span class="p">/(</span><span class="mf">0.1</span><span class="o">*</span><span class="mi">1</span><span class="o">^</span><span class="mi">2</span><span class="o">*</span><span class="mf">0.41</span><span class="p">);</span>
 <span class="n">data</span><span class="o">.</span><span class="n">Output</span><span class="o">.</span><span class="n">DragLift</span><span class="o">.</span><span class="n">flag</span>            <span class="o">=</span> <span class="mi">6</span><span class="p">;</span>
 <span class="n">data</span><span class="o">.</span><span class="n">Output</span><span class="o">.</span><span class="n">DragLift</span><span class="o">.</span><span class="n">filename</span>        <span class="o">=</span> <span class="s1">'Results/AerodynamicForces_Re100.txt'</span><span class="p">;</span>
+</code></pre>
+</div>
+
+<p>It also possible to export to a txt file the flow rate computed on selected boundaries (e.g. those with flag 2,3,4,5,6,7,200 as below)</p>
+
+<div class="language-matlab highlighter-rouge"><pre class="highlight"><code><span class="c1">%% Output options</span>
+<span class="n">data</span><span class="o">.</span><span class="n">Output</span><span class="o">.</span><span class="n">FlowRates</span><span class="o">.</span><span class="n">computeFlowRates</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="n">data</span><span class="o">.</span><span class="n">Output</span><span class="o">.</span><span class="n">FlowRates</span><span class="o">.</span><span class="n">flag</span>             <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">7</span> <span class="mi">200</span><span class="p">];</span>
+<span class="n">data</span><span class="o">.</span><span class="n">Output</span><span class="o">.</span><span class="n">FlowRates</span><span class="o">.</span><span class="n">filename</span>         <span class="o">=</span> <span class="s1">'Results/FlowRates.txt'</span><span class="p">;</span>
+</code></pre>
+</div>
+
+<h2 id="resistance-boundary-conditions">Resistance boundary conditions</h2>
+
+<p>A family of <a href="http://link.springer.com/article/10.1007%2Fs10439-008-9527-7">RC type outflow boundary conditions</a> for cardiovascular simulations are available. Please note that they are supported only in 3D in combination  with the implicit solver. They are formulated as follows:</p>
+
+<script type="math/tex; mode=display">\begin{equation} \label{eq:RC_BC}
+p + RC \frac{dp}{dt} = RQ + p_0 \qquad \text{on } \Gamma_o
+\end{equation}</script>
+
+<p>where $p$ is the average pressure on the outflow boundary $\Gamma_o$, $R$ is the resistance, $C$ is the capacitance, $Q = \int_{\Gamma_o} \mathbf{v} \cdot \mathbf{n} \,d\Gamma$ is the flow rate, and $p_0$ sets the physiological values of intramural blood pressure. From the algorithmic standpoint, equation \eqref{eq:RC_BC} is discretized in time using a semi-implicit approach:</p>
+
+<script type="math/tex; mode=display">\begin{equation} 
+p^{n+1} + RC \frac{p^{n+1} - p^n}{\Delta t} = RQ^n + p_0 \qquad \text{on } \Gamma_o,
+\end{equation}</script>
+
+<p>As a result, this condition is imposed by setting $\boldsymbol{\sigma}^{n+1}\mathbf{n} = -p^{n+1}\mathbf{n}$ on $\Gamma_o$, with</p>
+
+<script type="math/tex; mode=display">\begin{equation} \label{eq:RC_BC3}
+p^{n+1} =  \frac{\Delta t}{\Delta t + RC} \left( Q^n R + p^n \frac{R C}{\Delta t} + p_0 \right).
+\end{equation}</script>
+
+<p>If $C=0$, \eqref{eq:RC_BC3} reduces to the following (explicit) resistance BC</p>
+
+<script type="math/tex; mode=display">p^{n+1} =  Q^n R + p_0.</script>
+
+<p>In the datafile, this condition can be imposed by setting the following fields:</p>
+
+<div class="language-matlab highlighter-rouge"><pre class="highlight"><code><span class="n">data</span><span class="o">.</span><span class="n">flag_resistance</span>     <span class="o">=</span> <span class="p">[</span><span class="mi">2</span> <span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">];</span>
+<span class="n">data</span><span class="o">.</span><span class="n">OutFlow_Resistance</span>  <span class="o">=</span> <span class="p">[</span><span class="mf">178.39</span> <span class="mf">1120.66</span> <span class="mf">1008.25</span> <span class="mf">1311.84</span> <span class="mf">674.94</span><span class="p">];</span>
+<span class="n">data</span><span class="o">.</span><span class="n">OutFlow_RefPressure</span> <span class="o">=</span> <span class="o">@</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="mi">80</span> <span class="o">*</span> <span class="mi">1333</span><span class="p">;</span><span class="c1">% corresponds to 80 mmHg</span>
+<span class="n">data</span><span class="o">.</span><span class="n">OutFlow_Capacity</span>    <span class="o">=</span> <span class="p">[</span><span class="mf">7.817</span> <span class="mf">1.234</span> <span class="mf">1.373</span> <span class="mf">1.050</span> <span class="mf">2.037</span><span class="p">]</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">;</span>
+</code></pre>
+</div>
+
+<p>In Fluid-Structure Interaction simulations, if the values of the resistance coefficients are not available, they can be estimated using a  <a href="http://www.cimec.org.ar/ojs/index.php/mc/article/viewFile/3424/3341">first order Taylor approximation of the formula for absorbing BCs</a>:</p>
+
+<script type="math/tex; mode=display">R \approx \frac{\sqrt{\rho \beta}}{\sqrt{2}A_f^{5/4}} \quad \text{with} \quad \beta = \frac{\sqrt{\pi} h_s R_f E}{1-\nu^2},</script>
+
+<p>where $E$ and $\nu$ are the arterial wall Young modulus and Poisson coefficient, respectively, $A_f$ is the area of the fluid outflow section, $R_f$ its radius, and $h_s$ is such that the wall thickness equals $h_s R_f$. In the datafile, it is sufficient to set the following fields:</p>
+
+<div class="language-matlab highlighter-rouge"><pre class="highlight"><code><span class="n">data</span><span class="o">.</span><span class="n">OutFlow_ComputeApproximateResistance</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+<span class="n">data</span><span class="o">.</span><span class="n">OutFlow_Poisson</span>                      <span class="o">=</span> <span class="mf">0.45</span><span class="p">;</span>
+<span class="n">data</span><span class="o">.</span><span class="n">OutFlow_Young</span>                        <span class="o">=</span> <span class="mf">1e+07</span><span class="p">;</span>
+<span class="n">data</span><span class="o">.</span><span class="n">OutFlow_WallThicknessPercentage</span>      <span class="o">=</span> <span class="mf">0.12</span><span class="p">;</span><span class="c1">% wall thickness is 12% of the lumen radius</span>
 </code></pre>
 </div>
 

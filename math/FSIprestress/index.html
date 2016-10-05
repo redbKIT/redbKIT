@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Vascular fluid–structure interaction: tissue prestress</title>
+	<title>Vascular FSI: tissue prestress</title>
 	<link rel="stylesheet" type="text/css" href="http://redbkit.github.io/redbKIT/assets/css/styles_feeling_responsive.css">
 	<script src="http://redbkit.github.io/redbKIT/assets/js/modernizr.min.js"></script>
 
@@ -31,7 +31,7 @@
 
 
 	<!-- Facebook Open Graph -->
-	<meta property="og:title" content="Vascular fluid–structure interaction: tissue prestress">
+	<meta property="og:title" content="Vascular FSI: tissue prestress">
 	<meta property="og:description" content="»redbKIT:« a MATLAB library for reduced-order modeling of parametrized PDEs">
 	<meta property="og:url" content="http://redbkit.github.io/redbKIT/math/FSIprestress/">
 	<meta property="og:locale" content="en_EN">
@@ -151,6 +151,20 @@
               
 
           
+          
+        
+
+              
+
+          
+          
+            
+            
+              <li class="divider"></li>
+              <li><a href="http://redbkit.github.io/redbKIT/search/">Search</a></li>
+
+            
+            
           
         
 
@@ -364,6 +378,11 @@
 
                       <li><a href="http://redbkit.github.io/redbKIT/math/FSIEx/">Simulation Setup</a></li>
 			
+
+                      
+
+                      <li><a href="http://redbkit.github.io/redbKIT/math/FSIprestress/">Tissue prestress</a></li>
+			
 </ul>
  </li>
 		                          
@@ -385,6 +404,12 @@
               </li>
               <li class="divider"></li>
             
+          
+        
+
+              
+
+          
           
         
 
@@ -432,7 +457,7 @@
 		<article>
 			<header>
 				
-				<h1>Vascular fluid–structure interaction: tissue prestress</h1>
+				<h1>Vascular FSI: tissue prestress</h1>
 			</header>
 
 			
@@ -477,71 +502,179 @@
 <div>
   <!-- -->
 <ul id="markdown-toc">
-  <li><a href="#blood-vessel-tissue-prestress-modeling-for-vascular-fluidstructure-interaction-simulation" id="markdown-toc-blood-vessel-tissue-prestress-modeling-for-vascular-fluidstructure-interaction-simulation">Blood vessel tissue prestress modeling for vascular fluid–structure interaction simulation</a></li>
+  <li><a href="#blood-vessel-tissue-prestress" id="markdown-toc-blood-vessel-tissue-prestress">Blood vessel tissue prestress</a></li>
+  <li><a href="#workflow" id="markdown-toc-workflow">Workflow</a>    <ul>
+      <li><a href="#step-1--cfd-simulation-with-steady-inflow" id="markdown-toc-step-1--cfd-simulation-with-steady-inflow">Step 1:  CFD simulation with steady inflow</a></li>
+      <li><a href="#step-2-find-the-prestress-tensor-ss0" id="markdown-toc-step-2-find-the-prestress-tensor-ss0">Step 2: find the prestress tensor $\SS_0$</a></li>
+      <li><a href="#step-3-run-the-fsi-simulation" id="markdown-toc-step-3-run-the-fsi-simulation">Step 3: run the FSI simulation</a></li>
+    </ul>
+  </li>
   <li><a href="#references" id="markdown-toc-references">References</a></li>
 </ul>
 
 </div>
 
-<h2 id="blood-vessel-tissue-prestress-modeling-for-vascular-fluidstructure-interaction-simulation">Blood vessel tissue prestress modeling for vascular fluid–structure interaction simulation</h2>
+<h2 id="blood-vessel-tissue-prestress">Blood vessel tissue prestress</h2>
 
-<p>In vascular FSI analysis, patient-specific geometries of blood vessels are obtained from medical imaging data.
-When imaged, the blood vessels are in a state of mechanical stress that puts them in equilibrium with loading coming from the blood flow (i.e. blood pressure and viscous
-traction). As a result, when modeling blood vessel tissue, a patient specific geometry configuration coming from imaging data may not be used as a stress-free configuration.</p>
+<p>In cardiovascular FSI simulations patient-specific geometries of blood vessels are
+ usually reconstructed from in vivo medical imaging such as CT scans. When imaged, the blood vessels are in a state of mechanical stress that puts them in equilibrium with loading coming from the blood flow (i.e. blood pressure and viscous
+traction). As a result, when modeling blood vessel tissue, a patient specific geometry configuration coming from imaging data may not be used as a stress-free configuration. Taking the in
+vivo geometry as stress-free is especially not suitable for fluid-structure interaction simulations as this assumption will lead to non-physical large deformations under realistic loading.</p>
 
-<p>We follow the approach proposed by (Hsu and Bazilevs, 2011). To this end</p>
+<p>To overcome these shortcomings in simulation on patient-specific geometries, techniques that allow for the evaluation of a stress-state that corresponds to a given spatial configuration
+under known external loads are necessary. Here, we follow the approach proposed by <a href="http://www.sciencedirect.com/science/article/pii/S0168874X10002106">(Hsu and Bazilevs, 2011)</a>. To this end, let us recall the weak formulation of the <a href="http://redbkit.github.io/redbKIT/math/SolidMechanics/">nonlinear elastodynamics equations</a> modeling the solid material in FSI simulations: find $\bd = \bd(t) \in V_D$ such that</p>
 
-<p>The weak formulation of reads: for all $t \in (0,T]$, find $\bd = \bd(t) \in V_D$ such that</p>
-
-<script type="math/tex; mode=display">\begin{multline}  
-\left( \rho \frac{\partial^2 \bd}{\partial t^2} , \bmw \right)_{\Omega^S}  + \left( \FF \SS , \nabla \bmw \right)_{\Omega^S}  =  \int_{\Omega^S} \mathbf{f} \cdot \bmw \, d\Omega + \int_{\Gamma_N} \mathbf{h} \cdot \bmw \, d\Gamma \qquad \forall \bmw \in V.
+<script type="math/tex; mode=display">\begin{equation}  
+\left( \rho \frac{\partial^2 \bd}{\partial t^2} , \bmw \right)_{\Omega^S}  + \left( \FF \SS , \nabla \bmw \right)_{\Omega^S}  =  \int_{\Omega^S} \mathbf{f} \cdot \bmw \, d\Omega + \int_{\Gamma_N} \mathbf{h} \cdot \bmw \, d\Gamma \qquad \forall \bmw \in V,
 \label{eq:CSM_DynamicWeak}
-\end{multline}</script>
-
-<p>where $\PP = \FF \SS$. Modified version</p>
-
-<script type="math/tex; mode=display">\begin{multline}  
-\left( \rho \frac{\partial^2 \bd}{\partial t^2} , \bmw \right)_{\Omega^S}  + \left( \FF (\SS + \SS_0) , \nabla \bmw \right)_{\Omega^S}  =  \int_{\Omega} \mathbf{f} \cdot \bmw \, d\Omega + \int_{\Gamma_N} \mathbf{h} \cdot \bmw \, d\Gamma \qquad \forall \bmw \in V.
-\label{eq:CSM_DynamicWeak2}
-\end{multline}</script>
-
-<p>Equilibrium</p>
-
-<script type="math/tex; mode=display">\begin{equation}
- \left( \SS_0 , \nabla \bmw \right)_{\Omega^S}  +  \left( \widetilde{\mathbf{h}} , \bmw \right)_{\Gamma} = 0\qquad \forall \bmw \in V.
 \end{equation}</script>
 
-<script type="math/tex; mode=display">\begin{multline}  
-\left( \rho \frac{\partial^2 \bd}{\partial t^2} , \bmw \right)_{\Omega^S}  + \left( \FF (\SS + \SS_0) , \nabla \bmw \right)_{\Omega^S}  +  \left( \widetilde{\mathbf{h}} , \bmw \right)_{\Gamma} = 0 \qquad \forall \bmw \in V.
-\label{eq:CSM_DynamicWeak3}
-\end{multline}</script>
+<p>where $\Omega^S$ is the solid domain in the reference configuration, $\SS$ is the second Piola–Kirchhoff stress tensor and $\PP = \FF \SS$ is the first Piola–Kirchhoff stress tensor. To account for the prestress state, the variational formulation \eqref{eq:CSM_DynamicWeak} is modified as follows: find $\bd = \bd(t) \in V_D$ such that</p>
 
-<p>where $\Omega^S$ is the blood vessel reference configuration coming form imaging data, $\Gamma$ is the fluid-structure interface in the reference configuration and $\widetilde{\mathbf{h}}$ is the fluid traction vector. This latter can be obtained, e.g., from a separate rigig-wall blood flow simulation on the reference domain with steady inflow and resistance outflow boundary conditions:</p>
+<blockquote>
+  <script type="math/tex; mode=display">\begin{equation}  
+\left( \rho \frac{\partial^2 \bd}{\partial t^2} , \bmw \right)_{\Omega^S}  + \left( \FF (\SS + \SS_0) , \nabla \bmw \right)_{\Omega^S}  =  \int_{\Omega} \mathbf{f} \cdot \bmw \, d\Omega + \int_{\Gamma_N} \mathbf{h} \cdot \bmw \, d\Gamma \qquad \forall \bmw \in V,
+\label{eq:CSM_DynamicWeak2}
+\end{equation}</script>
+</blockquote>
 
-<script type="math/tex; mode=display">\bm{\sigma}\mathbf{n} = R Q + p_0 \qquad \text{on } \Gamma_{out}</script>
+<p>where $\SS_0$  is an a priori specified prestress tensor. This latter is designed such that in the absence of displacement the blood vessel is in equilibrium with the blood flow forces. This condition leads to the following variational problem, obtained by setting $\bd = \mathbf{0}$ in \eqref{eq:CSM_DynamicWeak2}: find $\SS_0$ such that</p>
 
-<p>where $R$ is the resistance coefficient, $Q = \int_{\Gamma_{out}} \mathbf{v} \cdot \mathbf{n} \, d\Gamma$ is the flow rate, and $p_0$ is a reference pressure (usually about 80 mmHg).</p>
+<script type="math/tex; mode=display">\begin{equation}
+ \left( \SS_0 , \nabla \bmw \right)_{\Omega^S}  +  \left( \widetilde{\mathbf{h}} , \bmw \right)_{\Gamma} = 0\qquad \forall \bmw \in V,
+\end{equation}</script>
 
-<p>Procedure:</p>
+<p>where $\Gamma$ is the fluid-structure interface in the reference configuration and $\widetilde{\mathbf{h}}$ is the fluid traction vector. This latter can be obtained, e.g., from a separate rigig-wall blood flow simulation on the reference domain with steady inflow and <a href="http://redbkit.github.io/redbKIT/math/NavierStokesEx/">resistance outflow boundary conditions</a>.</p>
 
-<p>1- Run a CFD simulation with steady inflow until convergence to a steady solution</p>
+<p>We obtain a particular solution for the state of prestress $\SS_0$ following the iterative procedure detailed in <a href="http://www.sciencedirect.com/science/article/pii/S0168874X10002106">(Hsu and Bazilevs, 2011)</a>, which is implemented in the <code class="highlighter-rouge">FSI_PrestressSolver</code> function.</p>
 
-<p>2- Compute traction vector $\widetilde{\mathbf{h}}$ on the FS interface $\Gamma$</p>
+<p>A the albegraic level, the prestress term in the structural equations yields the following additional contribute to the solid residual vector:</p>
 
-<p>3- Run a “modified CSM” simulation to find the prestress tensor $\SS_0$ which equilabrates the fluid traction load</p>
+<script type="math/tex; mode=display">\int_{\Omega^S} \FF \SS_0 : \nabla \bm{\varphi}_i\,d\Omega = \int_{\Omega^S} \SS_0 : \nabla \bm{\varphi}_i\,d\Omega + \int_{\Omega^S} (\nabla \bd \, \SS_0) : \nabla \bm{\varphi}_i\,d\Omega.</script>
 
-<p>4- Compute and save the residual and Jacobian contributes given by the prestress term in the solid equations, namely</p>
+<p>In particular, the residual vector and the Jacobian matrix become</p>
 
-<script type="math/tex; mode=display">(\RR_P)_i = \int_{\Omega^S} \SS_0 : \nabla \bm{\varphi}_i\,d\Omega</script>
+<blockquote>
+  <script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+\RR^S(\bd_{n+1}^k)  &= \frac{1}{\beta \Delta t^2} \MM \bd_{n+1}^k + \FFi (\bd_{n+1}^k) + \RR_P + \JJ_P \bd_{n+1}^k - \FFe_{n+1} - \MM \bm{\xi}_{n},\\[4pt]
+\JJ^S(\bd_{n+1}^k)  &= \frac{1}{\beta \Delta t^2} \MM + \frac{\partial \FFi}{\partial \bd} \left( {\bd_{n+1}^{k}} \right) + \JJ_P,
+\end{aligned} %]]></script>
+</blockquote>
 
-<script type="math/tex; mode=display">(\JJ_P)_{ij} = \int_{\Omega^S} \nabla \bm{\varphi}_j\SS_0 : \nabla \bm{\varphi}_i\,d\Omega</script>
+<p>where</p>
 
-<p>5 - Run  the FSI simulation with prestresss contribute in the structural equations</p>
+<blockquote>
+  <script type="math/tex; mode=display">(\RR_P)_i = \int_{\Omega^S} \SS_0 : \nabla \bm{\varphi}_i\,d\Omega, \qquad 
+  (\JJ_P)_{ij} = \int_{\Omega^S} \nabla \bm{\varphi}_j\SS_0 : \nabla \bm{\varphi}_i\,d\Omega.</script>
+</blockquote>
 
-<h1 id="references">References</h1>
+<p>Note that the vector $\RR_P$ and the matrix $\JJ_P$ do not depend on the unknown displacement. Therefore, they can be assembled once and for all at the beginning of the FSI simulation.</p>
+
+<h2 id="workflow">Workflow</h2>
+
+<p>The entire procedure for the simulation of an FSI problem with prestress consists of three main steps which are detailed below.</p>
+
+<div class="alert-box alert "><p>Warning: for the time being, the <strong>FSI_PrestressSolver</strong> only supports the <strong>NeoHookean</strong> material model.</p>
+</div>
+
+<h3 id="step-1--cfd-simulation-with-steady-inflow">Step 1:  CFD simulation with steady inflow</h3>
+
+<p>Run a rigid-wall blood flow simulation on the reference domain with steady inflow until convergence to a steady solution</p>
+
+<div class="language-matlab highlighter-rouge"><pre class="highlight"><code><span class="c1">%% Load F mesh</span>
+<span class="p">[</span><span class="n">vertices</span><span class="p">,</span> <span class="n">boundaries</span><span class="p">,</span> <span class="n">elements</span><span class="p">]</span> <span class="o">=</span> <span class="n">msh_to_Mmesh</span><span class="p">(</span><span class="s1">'../mesh/FluidVeryCoarse'</span><span class="p">,</span> <span class="n">dim</span><span class="p">);</span>
+
+<span class="c1">%% Solve Fluid</span>
+<span class="p">[</span><span class="n">U0_Fluid</span><span class="p">,</span> <span class="n">MESH</span><span class="p">,</span> <span class="n">DATA</span><span class="p">]</span> <span class="o">=</span> <span class="n">NSt_Solver</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">elements</span><span class="p">,</span> <span class="n">vertices</span><span class="p">,</span> <span class="n">boundaries</span><span class="p">,</span> <span class="p">{</span><span class="s1">'P1'</span><span class="p">,</span><span class="s1">'P1'</span><span class="p">},</span> <span class="s1">'datafile_CFD_Steady'</span><span class="p">,</span> <span class="p">[],</span> <span class="s1">'Figures/PreStressFluid_'</span><span class="p">);</span>
+
+<span class="nb">save</span> <span class="n">U0_Fluid</span> <span class="n">U0_Fluid</span><span class="p">;</span>
+</code></pre>
+</div>
+
+<p>In the datafile <code class="highlighter-rouge">datafile_CFD_Steady</code> we use the following inflow profile (short ramp to a constant value equal to the flowrate at $t_0 = 0$)</p>
+
+<div class="language-matlab highlighter-rouge"><pre class="highlight"><code><span class="n">Q_0</span> <span class="o">=</span> <span class="n">Flow_Rate</span><span class="p">(</span> <span class="mi">0</span> <span class="p">);</span>
+<span class="n">data</span><span class="o">.</span><span class="n">bcDir_t</span> <span class="o">=</span> <span class="o">@</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="n">Q_0</span> <span class="p">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="nb">cos</span><span class="p">(</span><span class="nb">pi</span><span class="p">/</span><span class="mf">0.1</span><span class="o">*</span><span class="n">t</span><span class="p">)</span> <span class="p">)</span> <span class="o">.*</span> <span class="p">(</span><span class="n">t</span><span class="o">&lt;</span><span class="mf">0.1</span><span class="p">)</span> <span class="o">+</span>  <span class="n">Q_0</span> <span class="o">.*</span> <span class="p">(</span><span class="n">t</span><span class="o">&gt;=</span><span class="mf">0.1</span><span class="p">);</span>
+
+<span class="n">data</span><span class="o">.</span><span class="n">bcDir</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">}</span> <span class="o">=</span> <span class="o">@</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">param</span><span class="p">)(</span> <span class="n">data</span><span class="o">.</span><span class="n">bcDir_t</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>  <span class="o">*</span> <span class="n">N1</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1</span> <span class="o">+</span> <span class="mf">0.</span><span class="o">*</span><span class="n">x</span><span class="o">.*</span><span class="n">y</span><span class="p">);</span> 
+<span class="n">data</span><span class="o">.</span><span class="n">bcDir</span><span class="p">{</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">}</span> <span class="o">=</span> <span class="o">@</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">param</span><span class="p">)(</span> <span class="n">data</span><span class="o">.</span><span class="n">bcDir_t</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>  <span class="o">*</span> <span class="n">N1</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1</span> <span class="o">+</span> <span class="mf">0.</span><span class="o">*</span><span class="n">x</span><span class="o">.*</span><span class="n">y</span><span class="p">);</span> 
+<span class="n">data</span><span class="o">.</span><span class="n">bcDir</span><span class="p">{</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">}</span> <span class="o">=</span> <span class="o">@</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">param</span><span class="p">)(</span> <span class="n">data</span><span class="o">.</span><span class="n">bcDir_t</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>  <span class="o">*</span> <span class="n">N1</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1</span> <span class="o">+</span> <span class="mf">0.</span><span class="o">*</span><span class="n">x</span><span class="o">.*</span><span class="n">y</span><span class="p">);</span> 
+</code></pre>
+</div>
+
+<p>Moreover, we set the <code class="highlighter-rouge">ExportFinalLoad</code> field in the datafile in order to compute the traction vector $\widetilde{\mathbf{h}}$ on the FS interface $\Gamma$</p>
+
+<div class="language-matlab highlighter-rouge"><pre class="highlight"><code><span class="n">data</span><span class="o">.</span><span class="n">Output</span><span class="o">.</span><span class="n">ExportFinalLoad</span><span class="o">.</span><span class="n">computeLoad</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+<span class="n">data</span><span class="o">.</span><span class="n">Output</span><span class="o">.</span><span class="n">ExportFinalLoad</span><span class="o">.</span><span class="n">flag</span>        <span class="o">=</span> <span class="mi">200</span><span class="p">;</span>
+<span class="n">data</span><span class="o">.</span><span class="n">Output</span><span class="o">.</span><span class="n">ExportFinalLoad</span><span class="o">.</span><span class="n">filename</span>    <span class="o">=</span> <span class="s1">'PrestressFluidLoad.mat'</span><span class="p">;</span>
+</code></pre>
+</div>
+
+<h3 id="step-2-find-the-prestress-tensor-ss0">Step 2: find the prestress tensor $\SS_0$</h3>
+
+<p>Launch the <code class="highlighter-rouge">FSI_PrestressSolver</code> to find the prestress tensor $\SS_0$ which equilabrates the fluid traction load</p>
+
+<div class="language-matlab highlighter-rouge"><pre class="highlight"><code><span class="p">[</span><span class="n">mshS</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="n">mshS</span><span class="o">.</span><span class="n">boundaries</span><span class="p">,</span> <span class="n">mshS</span><span class="o">.</span><span class="n">elements</span><span class="p">,</span> <span class="n">mshS</span><span class="o">.</span><span class="n">rings</span><span class="p">]</span> <span class="o">=</span> <span class="n">msh_to_Mmesh</span><span class="p">(</span><span class="s1">'../mesh/SolidVeryCoarse'</span><span class="p">,</span> <span class="n">dim</span><span class="p">);</span>
+<span class="p">[</span><span class="n">mshF</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="n">mshF</span><span class="o">.</span><span class="n">boundaries</span><span class="p">,</span> <span class="n">mshF</span><span class="o">.</span><span class="n">elements</span><span class="p">,</span> <span class="n">mshF</span><span class="o">.</span><span class="n">rings</span><span class="p">]</span> <span class="o">=</span> <span class="n">msh_to_Mmesh</span><span class="p">(</span><span class="s1">'../mesh/FluidVeryCoarse'</span><span class="p">,</span> <span class="n">dim</span><span class="p">);</span>
+
+<span class="p">[</span><span class="n">R_P</span><span class="p">,</span> <span class="n">J_P</span><span class="p">]</span> <span class="o">=</span> <span class="n">FSI_PrestressSolver</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">mshF</span><span class="p">,</span> <span class="n">mshS</span><span class="p">,</span> <span class="p">{</span><span class="s1">'P1'</span><span class="p">,</span><span class="s1">'P1'</span><span class="p">},</span> <span class="s1">'P1'</span><span class="p">,</span> <span class="s1">'datafile_CFD'</span><span class="p">,</span> <span class="s1">'datafile_CSM_Prestress'</span><span class="p">,</span> <span class="p">[],</span> <span class="s1">'Figures/PreStressSolid_'</span><span class="p">);</span>
+</code></pre>
+</div>
+
+<p>Save the residual and Jacobian contributes given by the prestress term in the solid equations, namely $\RR_P$ and $\JJ_P$.</p>
+
+<div class="language-matlab highlighter-rouge"><pre class="highlight"><code><span class="nb">save</span> <span class="n">R_P</span> <span class="n">R_P</span><span class="p">;</span>
+<span class="nb">save</span> <span class="n">J_P</span> <span class="n">J_P</span><span class="p">;</span>
+</code></pre>
+</div>
+
+<h3 id="step-3-run-the-fsi-simulation">Step 3: run the FSI simulation</h3>
+
+<p>Run  the FSI simulation with prestresss contribute in the structural equations</p>
+
+<div class="language-matlab highlighter-rouge"><pre class="highlight"><code><span class="c1">%% Solve FSI</span>
+<span class="n">FSIt_Solver</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">mshF</span><span class="p">,</span> <span class="n">mshS</span><span class="p">,</span> <span class="p">{</span><span class="s1">'P1'</span><span class="p">,</span><span class="s1">'P1'</span><span class="p">},</span> <span class="s1">'P1'</span><span class="p">,</span> <span class="s1">'datafile_CFD'</span><span class="p">,</span> <span class="s1">'datafile_CSM'</span><span class="p">,</span> <span class="p">[],</span> <span class="s1">'Figures/FSIsol_'</span><span class="p">);</span>
+</code></pre>
+</div>
+
+<p>To this end, the <code class="highlighter-rouge">Prestress</code> flag should be set to true in the CSM datafile</p>
+
+<div class="language-matlab highlighter-rouge"><pre class="highlight"><code><span class="n">data</span><span class="o">.</span><span class="n">Prestress</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+</code></pre>
+</div>
+
+<p>Moreover, initial condition for the fluid velocity and pressure should be loaded from file. To this end, set in the CFD datafile</p>
+
+<div class="language-matlab highlighter-rouge"><pre class="highlight"><code><span class="c1">% initial condition</span>
+<span class="n">data</span><span class="o">.</span><span class="n">u0</span><span class="p">{</span><span class="mi">1</span><span class="p">}</span>    <span class="o">=</span> <span class="o">@</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">param</span><span class="p">)(</span><span class="n">load_ICfluid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">));</span>
+<span class="n">data</span><span class="o">.</span><span class="n">u0</span><span class="p">{</span><span class="mi">2</span><span class="p">}</span>    <span class="o">=</span> <span class="o">@</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">param</span><span class="p">)(</span><span class="n">load_ICfluid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">));</span>
+<span class="n">data</span><span class="o">.</span><span class="n">u0</span><span class="p">{</span><span class="mi">3</span><span class="p">}</span>    <span class="o">=</span> <span class="o">@</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">param</span><span class="p">)(</span><span class="n">load_ICfluid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">3</span><span class="p">));</span>
+<span class="n">data</span><span class="o">.</span><span class="n">p0</span>       <span class="o">=</span> <span class="o">@</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">param</span><span class="p">)(</span><span class="n">load_ICfluid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">4</span><span class="p">));</span>
+</code></pre>
+</div>
+
+<p>where</p>
+
+<div class="language-matlab highlighter-rouge"><pre class="highlight"><code><span class="k">function</span> <span class="n">v</span> <span class="o">=</span> <span class="n">load_ICfluid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+
+<span class="nb">load</span> <span class="n">U0_Fluid</span> <span class="n">U0_Fluid</span><span class="p">;</span>
+<span class="n">numNodes</span> <span class="o">=</span> <span class="nb">length</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="n">d</span> <span class="o">&lt;</span> <span class="mi">4</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">U0_Fluid</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="p">(</span><span class="n">d</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">numNodes</span><span class="p">:</span><span class="n">numNodes</span><span class="o">*</span><span class="n">d</span><span class="p">)</span><span class="o">'</span><span class="p">;</span>
+<span class="k">else</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">U0_Fluid</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="p">(</span><span class="n">d</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">numNodes</span><span class="p">:</span><span class="k">end</span><span class="p">)</span><span class="o">'</span><span class="p">;</span>
+<span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<h2 id="references">References</h2>
 
 <ul>
   <li>M.C. Hsu, and Y. Bazilevs. Blood vessel tissue prestress modeling for vascular fluid–structure interaction simulation. Finite Elements in Analysis and Design, 47(6), 593-599, 2011.</li>
+  <li>Y. Bazilevs, K. Takizawa, and T. E. Tezduyar. Computational fluid-structure interaction: methods and applications. John Wiley &amp; Sons, 2013.</li>
 </ul>
 
 		</article>
