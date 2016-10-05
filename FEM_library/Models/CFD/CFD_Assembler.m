@@ -10,7 +10,8 @@
 %    compute_mass_pressure             - assemble pressure mass matrix
 %    compute_SUPG_semiimplicit         - assemble SUPG stabilization for semi-implicit scheme
 %    compute_SUPG_implicit             - assemble SUPG stabilization for implicit scheme
-%
+%    compute_SUPG_implicit_ALE         - assemble SUPG stabilization for implicit scheme in ALE formulation 
+
 % CFD_ASSEMBLER properties:
 %    M_MESH                - struct containing MESH data
 %    M_DATA                - struct containing DATA information
@@ -18,7 +19,7 @@
 %    M_FE_SPACE_p          - struct containing Finite Element space data
 %    M_totSize             - size of the entire system (vel + pressure)
 %    M_density             - density value
-%    M_dynamic_viscosity - kinematic viscosity value
+%    M_dynamic_viscosity   - dynamic viscosity value
 
 %   This file is part of redbKIT.
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
@@ -330,6 +331,30 @@ classdef CFD_Assembler < handle
                 U_k, v_n, ... %13 14
                 obj.M_density, obj.M_dynamic_viscosity, dt, alpha_BDF,... %15 16 17 18
                 obj.M_FE_SPACE_p.dphi_ref, convective_velocity, obj.M_gravity); % 19, 20, 21
+            
+            % Build sparse matrix
+            dG_SUPG   = GlobalAssemble(rowA, colA, coefA, obj.M_totSize, obj.M_totSize);
+            G_SUPG    = GlobalAssemble(rowF, 1,    coefF, obj.M_totSize, 1);
+
+        end
+        
+        %==========================================================================
+        %% compute_SUPG_implicit
+        function [dG_SUPG, G_SUPG] = compute_SUPG_implicitSteady(obj, U_k)
+
+            if ~strcmp(obj.M_FE_SPACE_v.fem, 'P1') || ~strcmp(obj.M_FE_SPACE_p.fem, 'P1')
+                error('SUPG stabilization only available for P1-P1 finite elements')
+            end
+
+            [rowA, colA, coefA, rowF, coefF] = ...
+                CFD_assembler_C_omp('SUPG_ImplicitSteady', obj.M_MESH.dim, ... %0 1
+                obj.M_MESH.elements,  obj.M_MESH.jac, obj.M_MESH.invjac, ... %2 3 4
+                obj.M_FE_SPACE_v.quad_weights, obj.M_FE_SPACE_v.phi, obj.M_FE_SPACE_v.dphi_ref, ... %5 6 7
+                obj.M_FE_SPACE_v.numElemDof, obj.M_FE_SPACE_p.numElemDof, ... %8 9
+                obj.M_FE_SPACE_v.numDof, obj.M_FE_SPACE_p.numDof,  obj.M_FE_SPACE_p.phi, ... %10 11 12
+                U_k, ... %13
+                obj.M_density, obj.M_dynamic_viscosity,... %14 15
+                obj.M_FE_SPACE_p.dphi_ref); % 16
             
             % Build sparse matrix
             dG_SUPG   = GlobalAssemble(rowA, colA, coefA, obj.M_totSize, obj.M_totSize);

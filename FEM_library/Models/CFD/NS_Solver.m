@@ -31,6 +31,13 @@ else
 end
 t      = [];
 
+use_SUPG = false;
+if isfield(DATA, 'Stabilization')
+    if strcmp( DATA.Stabilization, 'SUPG' ) && strcmp(fem{1}, 'P1')
+        use_SUPG = true;
+    end
+end
+
 %% Set quad_order
 if dim == 2
     quad_order       = 4;
@@ -98,8 +105,19 @@ fprintf('done in %3.3f s\n', t_assembly);
 Residual = A_Stokes * U_k + C1 * U_k;
 Jacobian = A_Stokes + C1 + C2;
 
+if use_SUPG
+    fprintf('\n   -- Assembling SUPG Terms ... ');
+    t_assembly = tic;
+    [A_SUPG, F_SUPG] = FluidModel.compute_SUPG_implicitSteady( U_k );
+    t_assembly = toc(t_assembly);
+    fprintf('done in %3.3f s\n', t_assembly);
+    
+    Jacobian    = Jacobian + A_SUPG;
+    Residual    = Residual + F_SUPG;
+end
+
 % Apply boundary conditions
-fprintf('\n -- Apply boundary conditions ... ');
+fprintf('\n   -- Apply boundary conditions ... ');
 t_assembly = tic;
 [A, b]   =  CFD_ApplyBC(Jacobian, -Residual, FE_SPACE_v, FE_SPACE_p, MESH, DATA, [], 1);
 t_assembly = toc(t_assembly);
@@ -132,6 +150,17 @@ while (k <= maxIter && incrNorm > tol && resRelNorm > tol)
     
     Residual = A_Stokes * U_k + C1 * U_k;
     Jacobian = A_Stokes + C1 + C2;
+    
+    if use_SUPG
+        fprintf('\n   -- Assembling SUPG Terms ... ');
+        t_assembly = tic;
+        [A_SUPG, F_SUPG] = FluidModel.compute_SUPG_implicitSteady( U_k );
+        t_assembly = toc(t_assembly);
+        fprintf('done in %3.3f s\n', t_assembly);
+        
+        Jacobian    = Jacobian + A_SUPG;
+        Residual    = Residual + F_SUPG;
+    end
     
     % Apply boundary conditions
     fprintf('\n   -- Apply boundary conditions ... ');
