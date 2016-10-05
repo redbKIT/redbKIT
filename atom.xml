@@ -4,7 +4,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 	<id>http://redbkit.github.io/redbKIT/</id>
 	<title>redbKIT</title>
-	<updated>2016-10-05T16:11:26+02:00</updated>
+	<updated>2016-10-05T16:16:59+02:00</updated>
 
 	<subtitle>»redbKIT:« a MATLAB library for reduced-order modeling of parametrized PDEs</subtitle>
 
