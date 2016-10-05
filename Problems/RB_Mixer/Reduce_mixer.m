@@ -13,9 +13,20 @@
 clear all
 clc
 
-%% Load Affine Full-Order Model
-load FOM FOM;
-FOM.u_D   = eval(FOM.u_D_str);
+dim = 3;
+
+%% Solve Steady Navier-Stokes equations using SUPG stabilized P1-P1 Finite Elements to compute the advection field
+femNS      = {'P1', 'P1'};
+[~,~,~]    = mkdir('Figures');
+[vertices, boundaries, elements] = msh_to_Mmesh( 'mesh/mixer_gmsh_3D_sym', dim);
+
+Advection_Field = NS_Solver(dim, elements, vertices, boundaries, femNS, 'mixerNS_data', [], 'Figures/AdvectionField');
+
+%% Set FE Space and load mesh 
+fem      =  'P1';
+
+%% Generate Affine Full-Order Model
+[ FOM ] = build_affineFOM( elements, vertices, boundaries, fem, 'mixerADR_data', Advection_Field );
 
 %% Build Approximation of the Stability Factor (by RBF interpolation)
 FOM.stabFactor.mu_interp_index   = [4];
