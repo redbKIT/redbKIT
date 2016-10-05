@@ -81,29 +81,12 @@ switch MESH.dim
         end
         
         %% Evaluation of coefficients in the quadrature nodes
-        mu  = DATA.diffusion(x,y,t,DATA.param);
-        si  = DATA.reaction(x,y,t,DATA.param);
+        mu  = EvalDataQuad(MESH, DATA.param, FE_SPACE, t, {x, y}, DATA.diffusion, index_subd);
+        si  = EvalDataQuad(MESH, DATA.param, FE_SPACE, t, {x, y}, DATA.reaction, index_subd);
+        f   = EvalDataQuad(MESH, DATA.param, FE_SPACE, t, {x, y}, DATA.force, index_subd);
         
-        switch class(DATA.force)
-            case {'function_handle','inline'}
-                f  = DATA.force(x,y,t,DATA.param);
-                
-            case 'double'
-                if size(DATA.force,1)>1 && size(DATA.force,2)>1
-                    f = DATA.force(index_subd,:);
-                    
-                elseif length(DATA.force)==MESH.numNodes
-                    
-                    f = zeros(MESH.numElem,FE_SPACE.numQuadNodes);
-                    for j = 1 : FE_SPACE.numElemDof
-                        i = MESH.elements(j,:);
-                        f = f + DATA.force(i)*FE_SPACE.phi(j,:);
-                    end
-                end
-        end
-        
-        bx  = DATA.transport{1}(x,y,t,DATA.param);
-        by  = DATA.transport{2}(x,y,t,DATA.param);
+        bx  = EvalDataQuad(MESH, DATA.param, FE_SPACE, t, {x, y}, DATA.transport{1}, index_subd);
+        by  = EvalDataQuad(MESH, DATA.param, FE_SPACE, t, {x, y}, DATA.transport{2}, index_subd);
         
         b = [bx by];
         
@@ -121,30 +104,13 @@ switch MESH.dim
         end
         
         %% Evaluation of coefficients in the quadrature nodes
-        mu  = DATA.diffusion(x,y,z,t,DATA.param);
-        si  = DATA.reaction(x,y,z,t,DATA.param);
-        
-        switch class(DATA.force)
-            case {'function_handle','inline'}
-                f  = DATA.force(x,y,z,t,DATA.param);
-                
-            case 'double'
-                if size(DATA.force,1)>1 && size(DATA.force,2)>1
-                    f = DATA.force(index_subd,:);
-                    
-                elseif length(DATA.force)==MESH.numNodes
-                    
-                    f = zeros(MESH.numElem,FE_SPACE.numQuadNodes);
-                    for j = 1 : FE_SPACE.numElemDof
-                        i = MESH.elements(j,:);
-                        f = f + DATA.force(i)*FE_SPACE.phi(j,:);
-                    end
-                end
-        end
-        
-        bx  = DATA.transport{1}(x,y,z,t,DATA.param);
-        by  = DATA.transport{2}(x,y,z,t,DATA.param);
-        bz  = DATA.transport{3}(x,y,z,t,DATA.param);
+        mu  = EvalDataQuad(MESH, DATA.param, FE_SPACE, t, {x, y, z}, DATA.diffusion, index_subd);
+        si  = EvalDataQuad(MESH, DATA.param, FE_SPACE, t, {x, y, z}, DATA.reaction, index_subd);
+        f   = EvalDataQuad(MESH, DATA.param, FE_SPACE, t, {x, y, z}, DATA.force, index_subd);
+  
+        bx  = EvalDataQuad(MESH, DATA.param, FE_SPACE, t, {x, y, z}, DATA.transport{1}, index_subd);
+        by  = EvalDataQuad(MESH, DATA.param, FE_SPACE, t, {x, y, z}, DATA.transport{2}, index_subd);
+        bz  = EvalDataQuad(MESH, DATA.param, FE_SPACE, t, {x, y, z}, DATA.transport{3}, index_subd);
         
         b = [bx by bz];
 end
