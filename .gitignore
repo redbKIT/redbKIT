@@ -21,3 +21,6 @@ FEM_library/Tools/Fast/
 Problems/RB_CSM_Turek2D/Snapshots/
 Problems/RB_CSM_ShearCube/Snapshots/
 Problems/RB_AcousticHorn_Affine/Figures/
+dmumps.m
+initmumps.m
+zmumps.m
