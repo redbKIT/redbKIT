@@ -455,6 +455,7 @@
       <li><a href="#installation-with-openmp-enabled" id="markdown-toc-installation-with-openmp-enabled">Installation with OpenMP enabled</a></li>
       <li><a href="#install-metis-for-additive-schwarz-preconditioners" id="markdown-toc-install-metis-for-additive-schwarz-preconditioners">Install Metis for Additive Schwarz preconditioners</a></li>
       <li><a href="#install-fast-to-speed-up-matlab-sparse-command" id="markdown-toc-install-fast-to-speed-up-matlab-sparse-command">Install FAST to speed-up Matlab “sparse” command</a></li>
+      <li><a href="#install-mumps-parallel-sparse-linear-solver" id="markdown-toc-install-mumps-parallel-sparse-linear-solver">Install MUMPS (parallel sparse linear solver)</a></li>
     </ul>
   </li>
 </ul>
@@ -600,6 +601,22 @@ Then type</p>
 </div>
 
 <p>In both cases you will be required to accept <a href="http://user.it.uu.se/~stefane/freeware">FAST’s license</a>.</p>
+
+<h3 id="install-mumps-parallel-sparse-linear-solver">Install MUMPS (parallel sparse linear solver)</h3>
+
+<p>The <code class="highlighter-rouge">LinearSolver</code> class provides the possibility to use <a href="http://mumps.enseeiht.fr/">MUMPS (a
+MUltifrontal Massively Parallel sparse direct Solver)</a> as sparse linear solver. To this end, please follow these steps (only for Linux machines):</p>
+
+<p>1 - Open a terminal and navigate to the folder <code class="highlighter-rouge">redbKIT/FEM_library/LinearSolver/Mumps</code></p>
+
+<p>2 - Launch the install script</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ sh INSTALL.sh
+</code></pre>
+</div>
+
+<p>This script automatically download and install into a local folder <a href="http://glaros.dtc.umn.edu/gkhome/metis/metis/overview">Metis</a>, <a href="https://www.labri.fr/perso/pelegrin/scotch/">Scotch</a>, <a href="http://www.openblas.net/">OpenBlas</a> and finally MUMPS libraries. To check that the MUMPS Matlab interface was correcly compiled, open Matlab, navigate to the folder <code class="highlighter-rouge">redbKIT/FEM_library/LinearSolver/Mumps/Libraries/MUMPS/MUMPS_5.0.1/MATLAB</code> and run the <code class="highlighter-rouge">simple_example</code>.</p>
+
 
 		</article>
 	</div><!-- /.medium-12.columns -->
