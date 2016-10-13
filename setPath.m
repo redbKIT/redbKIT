@@ -8,6 +8,7 @@ end
 
 addpath(genpath(strcat(pwd,sslash,'RB_library')));
 addpath(genpath(strcat(pwd,sslash,'FEM_library')));
+rmpath(genpath(strcat(pwd,sslash,'FEM_library/LinearSolver/Mumps/Libraries')));
 
 fprintf('\n------------------------------------------')
 fprintf('\n      *** Welcome to redbKIT ***')
