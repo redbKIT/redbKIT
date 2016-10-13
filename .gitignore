@@ -24,3 +24,4 @@ Problems/RB_AcousticHorn_Affine/Figures/
 dmumps.m
 initmumps.m
 zmumps.m
+FEM_library/LinearSolver/Mumps/Libraries
