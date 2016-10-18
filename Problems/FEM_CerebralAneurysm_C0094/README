@@ -1,0 +1,14 @@
+Fluid-structure interaction simulation in a cerebral aneurysm.
+
+The fluid and solid mesh provided in the "mesh" subfolder were obtained using the vmtk software 
+starting from the stl files provided by the Aneurisk project, see
+
+  http://ecm2.mathcs.emory.edu/aneuriskweb/index
+
+Specifically, we consider here the case id C0094.
+
+The "FSI" folder contains the data and main files required to run the simulation. Please note that we 
+use the prestressing technique described in the redbKIT documentation, see
+ 
+  http://redbkit.github.io/redbKIT/math/FSIprestress/
+  
