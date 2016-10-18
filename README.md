@@ -51,7 +51,7 @@ Development
 
 redbKIT is developed and maintained by [`Federico Negri`](http://cmcs.epfl.ch/people/negri) (EPFL).
 
-Paola Gervasio (Università degli Studi di Brescia ) is gratefully acknowledged for granting the use of parts of the finite element code MLife.
+Paola Gervasio (Università degli Studi di Brescia) is gratefully acknowledged for granting the use of parts of the finite element code MLife.
 
 
 Contact

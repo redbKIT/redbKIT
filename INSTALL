@@ -66,3 +66,23 @@ To install the multithreaded version, type
 
 In both cases you will be required to accept FAST's license.
 See http://user.it.uu.se/~stefane/freeware.
+
+
+Install MUMPS (parallel sparse linear solver)
+---------------------------------------------
+
+The LinearSolver class provides the possibility to use MUMPS (a MUltifrontal Massively 
+Parallel sparse direct Solver) as sparse linear solver. 
+To this end, please follow these steps (only for Linux machines):
+
+1 - Open a terminal and navigate to the folder redbKIT/FEM_library/LinearSolver/Mumps
+
+2 - Launch the install script
+
+    $ sh INSTALL.sh
+
+This script automatically download and install into a local folder Metis, Scotch, OpenBlas 
+and finally MUMPS libraries. To check that the MUMPS Matlab interface was correcly compiled, 
+open Matlab, navigate to the folder 
+   redbKIT/FEM_library/LinearSolver/Mumps/Libraries/MUMPS/MUMPS_5.0.1/MATLAB 
+and run the simple_example.
