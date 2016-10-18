@@ -57,7 +57,7 @@ data.Material_Model = 'NeoHookean';%'StVenantKirchhoff', 'Linear','NeoHookean','
 data.Young   = 1e+7;%dyn/cm^2
 data.Poisson = 0.45;
 data.Density = 1.05;
-data.ElasticCoefRobin = 0*10^4;%dyn/cm^2
+data.ElasticCoefRobin = 10^3;%dyn/cm^2
 
 
 % Linear solver
