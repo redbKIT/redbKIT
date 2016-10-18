@@ -412,8 +412,8 @@
 		<div class="medium-9 small-centered columns">
 			<a id="forkme_banner" href="https://github.com/redbKIT/redbKIT">View on GitHub</a>
 			<section id="downloads">
-             			 <a class="zip_download_link" href="https://github.com/redbKIT/redbKIT/archive/v2.1.zip">Download this project as a .zip file</a>
-             			 <a class="tar_download_link" href="https://github.com/redbKIT/redbKIT/archive/v2.1.tar.gz">Download this project as a tar.gz file</a>
+             			 <a class="zip_download_link" href="https://github.com/redbKIT/redbKIT/archive/v2.2.zip">Download this project as a .zip file</a>
+             			 <a class="tar_download_link" href="https://github.com/redbKIT/redbKIT/archive/v2.2.tar.gz">Download this project as a tar.gz file</a>
 			</section>
 			<div class="masthead-title"><b>redbKIT</b> <br/> <small>a MATLAB library for reduced-order modeling of PDEs</small></div>
 		</div> 
@@ -444,9 +444,10 @@
 <ul id="markdown-toc">
   <li><a href="#download" id="markdown-toc-download">Download</a></li>
   <li><a href="#releases" id="markdown-toc-releases">Releases</a>    <ul>
-      <li><a href="#redbkit-v21-pre-releasehttpsgithubcomredbkitredbkitreleasestagv21" id="markdown-toc-redbkit-v21-pre-releasehttpsgithubcomredbkitredbkitreleasestagv21"><a href="https://github.com/redbKIT/redbKIT/releases/tag/v2.1">redbKIT v2.1 (Pre-release)</a></a></li>
-      <li><a href="#redbkit-v20httpsgithubcomredbkitredbkitreleasestagv20" id="markdown-toc-redbkit-v20httpsgithubcomredbkitredbkitreleasestagv20"><a href="https://github.com/redbKIT/redbKIT/releases/tag/v2.0">redbKIT v2.0</a></a></li>
-      <li><a href="#redbkit-v10httpsgithubcomredbkitredbkitreleasestagv10" id="markdown-toc-redbkit-v10httpsgithubcomredbkitredbkitreleasestagv10"><a href="https://github.com/redbKIT/redbKIT/releases/tag/v1.0">redbKIT v1.0</a></a></li>
+      <li><a href="#redbkit-v22httpsgithubcomredbkitredbkitreleasestagv22-18-10-2016" id="markdown-toc-redbkit-v22httpsgithubcomredbkitredbkitreleasestagv22-18-10-2016"><a href="https://github.com/redbKIT/redbKIT/releases/tag/v2.2">redbKIT v2.2</a> (18-10-2016)</a></li>
+      <li><a href="#redbkit-v21httpsgithubcomredbkitredbkitreleasestagv21-13-07-2016" id="markdown-toc-redbkit-v21httpsgithubcomredbkitredbkitreleasestagv21-13-07-2016"><a href="https://github.com/redbKIT/redbKIT/releases/tag/v2.1">redbKIT v2.1</a> (13-07-2016)</a></li>
+      <li><a href="#redbkit-v20httpsgithubcomredbkitredbkitreleasestagv20-17-06-2016" id="markdown-toc-redbkit-v20httpsgithubcomredbkitredbkitreleasestagv20-17-06-2016"><a href="https://github.com/redbKIT/redbKIT/releases/tag/v2.0">redbKIT v2.0</a> (17-06-2016)</a></li>
+      <li><a href="#redbkit-v10httpsgithubcomredbkitredbkitreleasestagv10-02-03-2016" id="markdown-toc-redbkit-v10httpsgithubcomredbkitredbkitreleasestagv10-02-03-2016"><a href="https://github.com/redbKIT/redbKIT/releases/tag/v1.0">redbKIT v1.0</a> (02-03-2016)</a></li>
     </ul>
   </li>
   <li><a href="#installation" id="markdown-toc-installation">Installation</a>    <ul>
@@ -464,15 +465,30 @@
 
 <h2 id="download">Download</h2>
 
-<p>You can directly <a href="https://github.com/redbKIT/redbKIT/archive/v2.1.zip"><strong><code class="highlighter-rouge">download the current release</code></strong></a> or clone the git repository</p>
+<p>You can directly <a href="https://github.com/redbKIT/redbKIT/archive/v2.2.zip"><strong><code class="highlighter-rouge">download the current release</code></strong></a> or clone the git repository</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>$ git clone https://github.com/redbKIT/redbKIT.git /folder_path
+<div class="highlighter-rouge"><pre class="highlight"><code>$ git clone https://github.com/redbKIT/redbKIT.git
 </code></pre>
 </div>
 
 <h2 id="releases">Releases</h2>
 
-<h3 id="redbkit-v21-pre-releasehttpsgithubcomredbkitredbkitreleasestagv21"><a href="https://github.com/redbKIT/redbKIT/releases/tag/v2.1">redbKIT v2.1 (Pre-release)</a></h3>
+<h3 id="redbkit-v22httpsgithubcomredbkitredbkitreleasestagv22-18-10-2016"><a href="https://github.com/redbKIT/redbKIT/releases/tag/v2.2">redbKIT v2.2</a> (18-10-2016)</h3>
+
+<ul>
+  <li>New prestress solver in FSI module</li>
+  <li>POD-DEIM reduced-order models for Computational Solid Mechanics problems</li>
+  <li>New problems: FEM_CSM_Spinning, FEM_CerebralAneurysm_C0094, RB_CSMt_Turek, RB_CSM_ShearCube</li>
+  <li>Some bugfix</li>
+  <li>Resistance conditions for CFD simulations</li>
+  <li>SUPG stabilization for ADRt solver (only linear elements are supported)</li>
+  <li>Faster CSM assembly routines</li>
+  <li>Refactoring of the RB_mixer problem; FOM is now built using redbKIT FEM library rather than being loaded from mat file</li>
+  <li>SUPG assembler for steady NS equations</li>
+  <li>Automatic installation scripts for MUMPS sparse linear solver</li>
+</ul>
+
+<h3 id="redbkit-v21httpsgithubcomredbkitredbkitreleasestagv21-13-07-2016"><a href="https://github.com/redbKIT/redbKIT/releases/tag/v2.1">redbKIT v2.1</a> (13-07-2016)</h3>
 
 <p>Changes only affect the <code class="highlighter-rouge">FEM_library</code> and the <code class="highlighter-rouge">Problems</code> gallery. 
 In particular:</p>
@@ -484,7 +500,7 @@ In particular:</p>
   <li>minor bug fixes plus some cleaning of the CFD and CSM folders in the <code class="highlighter-rouge">FEM_Library</code></li>
 </ul>
 
-<h3 id="redbkit-v20httpsgithubcomredbkitredbkitreleasestagv20"><a href="https://github.com/redbKIT/redbKIT/releases/tag/v2.0">redbKIT v2.0</a></h3>
+<h3 id="redbkit-v20httpsgithubcomredbkitredbkitreleasestagv20-17-06-2016"><a href="https://github.com/redbKIT/redbKIT/releases/tag/v2.0">redbKIT v2.0</a> (17-06-2016)</h3>
 
 <p>Major refactoring of the <code class="highlighter-rouge">FEM_Library</code>:</p>
 
@@ -505,7 +521,7 @@ In particular:</p>
 
 <p><strong>Attention: backward compatibility is not guaranteed</strong></p>
 
-<h3 id="redbkit-v10httpsgithubcomredbkitredbkitreleasestagv10"><a href="https://github.com/redbKIT/redbKIT/releases/tag/v1.0">redbKIT v1.0</a></h3>
+<h3 id="redbkit-v10httpsgithubcomredbkitredbkitreleasestagv10-02-03-2016"><a href="https://github.com/redbKIT/redbKIT/releases/tag/v1.0">redbKIT v1.0</a> (02-03-2016)</h3>
 
 <p>First release of redbKIT. It contains the implementation of the algorithms and solved problems as presented in the companion book:</p>
 
