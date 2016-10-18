@@ -8,6 +8,7 @@
 *.toc
 *.mexa64
 *.mexmaci64
+*.mexw64
 *.vtk
 *.pvsm
 codegen/
@@ -24,4 +25,6 @@ Problems/RB_AcousticHorn_Affine/Figures/
 dmumps.m
 initmumps.m
 zmumps.m
+mumps_help.m
+FEM_library/LinearSolver/Mumps/Libraries
 FEM_library/LinearSolver/Mumps/Libraries
