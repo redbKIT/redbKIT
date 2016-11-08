@@ -10,8 +10,13 @@ clear all
 [~,~,~] = mkdir('SnapshotsTest');
 [~,~,~] = mkdir('FiguresTest');
 
-delete('SnapshotsTest/SystemSnapshots.h5')
-delete('SnapshotsTest/DisplacementSnapshots.h5')
+if exist('SnapshotsTest/SystemSnapshots.h5', 'file')
+    delete('SnapshotsTest/SystemSnapshots.h5')
+end
+
+if exist('SnapshotsTest/DisplacementSnapshots.h5', 'file')
+    delete('SnapshotsTest/DisplacementSnapshots.h5')
+end
 
 %% ========================================================================
 % DATA
