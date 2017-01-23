@@ -2,6 +2,9 @@
 %   Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne (EPFL)
 %   Author: Federico Negri <federico.negri at epfl.ch>   
 
+% Before Running the script: Please generate the mesh using the generate_mesh.sh
+% script in the mesh subfolder (requires gmsh software)
+
 clc
 clear all
 close all
