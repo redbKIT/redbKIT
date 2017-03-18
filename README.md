@@ -21,7 +21,7 @@ License
 
 **redbKIT is distributed under BSD 2-clause license**
 
-Copyright (c) 2015-2016, Ecole Polytechnique Fédérale de Lausanne (EPFL)
+Copyright (c) 2015-2017, Ecole Polytechnique Fédérale de Lausanne (EPFL)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 Development
 -------
 
-redbKIT is developed and maintained by [`Federico Negri`](http://cmcs.epfl.ch/people/negri) (EPFL).
+redbKIT was developed and is currently maintained by [`Federico Negri`](https://www.linkedin.com/in/negrifederico/).
 
 Paola Gervasio (Università degli Studi di Brescia) is gratefully acknowledged for granting the use of parts of the finite element code MLife.
 
