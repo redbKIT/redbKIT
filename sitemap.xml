@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<!-- Pages: 35 links with priority=0.3, changefreq=monthly -->
+<!-- Pages: 32 links with priority=0.3, changefreq=monthly -->
 
 	
 	<url>
 	<loc>http://redbkit.github.io/redbKIT/404.html</loc>
 	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
+		<lastmod>2017-03-18T11:17:30+01:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -22,7 +22,7 @@
 	<url>
 	<loc>http://redbkit.github.io/redbKIT/math/ADR/</loc>
 	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
+		<lastmod>2017-03-18T11:17:30+01:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -37,7 +37,7 @@
 	<url>
 	<loc>http://redbkit.github.io/redbKIT/math/AdvDiffReact/</loc>
 	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
+		<lastmod>2017-03-18T11:17:30+01:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -52,7 +52,7 @@
 	<url>
 	<loc>http://redbkit.github.io/redbKIT/math/AdvDiffReactEx/</loc>
 	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
+		<lastmod>2017-03-18T11:17:30+01:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -67,7 +67,7 @@
 	<url>
 	<loc>http://redbkit.github.io/redbKIT/math/CFD/</loc>
 	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
+		<lastmod>2017-03-18T11:17:30+01:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -82,7 +82,7 @@
 	<url>
 	<loc>http://redbkit.github.io/redbKIT/math/CSM/</loc>
 	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
+		<lastmod>2017-03-18T11:17:30+01:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -97,7 +97,7 @@
 	<url>
 	<loc>http://redbkit.github.io/redbKIT/math/FSI/</loc>
 	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
+		<lastmod>2017-03-18T11:17:30+01:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -112,7 +112,7 @@
 	<url>
 	<loc>http://redbkit.github.io/redbKIT/math/FSIEx/</loc>
 	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
+		<lastmod>2017-03-18T11:17:30+01:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -127,7 +127,7 @@
 	<url>
 	<loc>http://redbkit.github.io/redbKIT/math/FSIprestress/</loc>
 	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
+		<lastmod>2017-03-18T11:17:30+01:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -142,7 +142,7 @@
 	<url>
 	<loc>http://redbkit.github.io/redbKIT/math/FSIsolver/</loc>
 	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
+		<lastmod>2017-03-18T11:17:30+01:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -157,7 +157,7 @@
 	<url>
 	<loc>http://redbkit.github.io/redbKIT/math/NavierStokes/</loc>
 	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
+		<lastmod>2017-03-18T11:17:30+01:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -172,7 +172,7 @@
 	<url>
 	<loc>http://redbkit.github.io/redbKIT/math/NavierStokesEx/</loc>
 	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
+		<lastmod>2017-03-18T11:17:30+01:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -187,7 +187,7 @@
 	<url>
 	<loc>http://redbkit.github.io/redbKIT/math/SolidMechanics/</loc>
 	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
+		<lastmod>2017-03-18T11:17:30+01:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -202,22 +202,7 @@
 	<url>
 	<loc>http://redbkit.github.io/redbKIT/math/SolidMechanicsEx/</loc>
 	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
-	
-	
-		<changefreq>monthly</changefreq>
-	
-	
-		<priority>0.3</priority>
-	
-	</url>
-	
-
-	
-	<url>
-	<loc>http://redbkit.github.io/redbKIT/blog/archive/</loc>
-	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
+		<lastmod>2017-03-18T11:17:30+01:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -234,7 +219,7 @@
 	<url>
 	<loc>http://redbkit.github.io/redbKIT/atom.xml</loc>
 	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
+		<lastmod>2017-03-18T11:17:30+01:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -251,7 +236,7 @@
 	<url>
 	<loc>http://redbkit.github.io/redbKIT/contact/</loc>
 	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
+		<lastmod>2017-03-18T11:17:30+01:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -266,22 +251,7 @@
 	<url>
 	<loc>http://redbkit.github.io/redbKIT/contributors/</loc>
 	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
-	
-	
-		<changefreq>monthly</changefreq>
-	
-	
-		<priority>0.3</priority>
-	
-	</url>
-	
-
-	
-	<url>
-	<loc>http://redbkit.github.io/redbKIT/design/</loc>
-	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
+		<lastmod>2017-03-18T11:17:30+01:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -296,7 +266,7 @@
 	<url>
 	<loc>http://redbkit.github.io/redbKIT/documentation/</loc>
 	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
+		<lastmod>2017-03-18T11:17:30+01:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -311,7 +281,7 @@
 	<url>
 	<loc>http://redbkit.github.io/redbKIT/download-install/</loc>
 	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
+		<lastmod>2017-03-18T11:17:30+01:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -326,7 +296,7 @@
 	<url>
 	<loc>http://redbkit.github.io/redbKIT/math/essentialbc/</loc>
 	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
+		<lastmod>2017-03-18T11:17:30+01:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -341,7 +311,7 @@
 	<url>
 	<loc>http://redbkit.github.io/redbKIT/feed.xml</loc>
 	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
+		<lastmod>2017-03-18T11:17:30+01:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -356,22 +326,7 @@
 	<url>
 	<loc>http://redbkit.github.io/redbKIT/getting-started/</loc>
 	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
-	
-	
-		<changefreq>monthly</changefreq>
-	
-	
-		<priority>0.3</priority>
-	
-	</url>
-	
-
-	
-	<url>
-	<loc>http://redbkit.github.io/redbKIT/blog/</loc>
-	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
+		<lastmod>2017-03-18T11:17:30+01:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -386,7 +341,7 @@
 	<url>
 	<loc>http://redbkit.github.io/redbKIT/</loc>
 	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
+		<lastmod>2017-03-18T11:17:30+01:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -401,7 +356,7 @@
 	<url>
 	<loc>http://redbkit.github.io/redbKIT/probgallery/</loc>
 	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
+		<lastmod>2017-03-18T11:17:30+01:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -416,7 +371,7 @@
 	<url>
 	<loc>http://redbkit.github.io/redbKIT/robots.txt</loc>
 	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
+		<lastmod>2017-03-18T11:17:30+01:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -435,7 +390,7 @@
 	<url>
 	<loc>http://redbkit.github.io/redbKIT/search/</loc>
 	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
+		<lastmod>2017-03-18T11:17:30+01:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -450,7 +405,7 @@
 	<url>
 	<loc>http://redbkit.github.io/redbKIT/sitemap.xml</loc>
 	
-		<lastmod>2016-10-18T17:55:29+02:00</lastmod>
+		<lastmod>2017-03-18T11:17:30+01:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
