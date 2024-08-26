@@ -2,7 +2,7 @@
 <?xml-stylesheet type="text/xsl" href="/assets/xslt/atom.xslt" ?>
 <?xml-stylesheet type="text/css" href="/assets/css/atom.css" ?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-	<id>http://redbkit.github.io/redbKIT/</id>
+	<id>https://redbkit.github.io/redbKIT/</id>
 	<title>redbKIT</title>
 	<updated>2017-03-18T11:17:30+01:00</updated>
 
@@ -19,8 +19,8 @@
 		</author>
 	
 
-	<link href="http://redbkit.github.io/redbKIT/atom.xml" rel="self" type="application/rss+xml" />
-	<link href="http://redbkit.github.io/redbKIT/" rel="alternate" type="text/html" />
+	<link href="https://redbkit.github.io/redbKIT/atom.xml" rel="self" type="application/rss+xml" />
+	<link href="https://redbkit.github.io/redbKIT/" rel="alternate" type="text/html" />
 
 	<generator uri="http://jekyllrb.com" version="3.0.2">Jekyll</generator>
 

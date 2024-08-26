@@ -9,8 +9,8 @@
 		<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Atom Feed (Styled)</title>
-	<link rel="stylesheet" type="text/css" href="http://redbkit.github.io/redbKIT/assets/css/styles_feeling_responsive.css">
-	<script src="http://redbkit.github.io/redbKIT/assets/js/modernizr.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="https://redbkit.github.io/redbKIT/assets/css/styles_feeling_responsive.css">
+	<script src="https://redbkit.github.io/redbKIT/assets/js/modernizr.min.js"></script>
 
 	<script src="https://ajax.googleapis.com/ajax/libs/webfont/1.5.18/webfont.js"></script>
 	<script>
@@ -38,7 +38,7 @@
 	<!-- Facebook Open Graph -->
 	<meta property="og:title" content="Atom Feed (Styled)">
 	<meta property="og:description" content="»redbKIT:« a MATLAB library for reduced-order modeling of parametrized PDEs">
-	<meta property="og:url" content="http://redbkit.github.io/redbKIT/assets/xslt/atom.xslt">
+	<meta property="og:url" content="https://redbkit.github.io/redbKIT/assets/xslt/atom.xslt">
 	<meta property="og:locale" content="en_EN">
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="redbKIT">
@@ -48,34 +48,34 @@
 
 	
 
-	<link type="text/plain" rel="author" href="http://redbkit.github.io/redbKIT/humans.txt">
+	<link type="text/plain" rel="author" href="https://redbkit.github.io/redbKIT/humans.txt">
 
 	
 
 	
 
-	<link rel="icon" sizes="32x32" href="http://redbkit.github.io/redbKIT/assets/img/favicon-32x32.png">
+	<link rel="icon" sizes="32x32" href="https://redbkit.github.io/redbKIT/assets/img/favicon-32x32.png">
 
-	<link rel="icon" sizes="192x192" href="http://redbkit.github.io/redbKIT/assets/img/touch-icon-192x192.png">
+	<link rel="icon" sizes="192x192" href="https://redbkit.github.io/redbKIT/assets/img/touch-icon-192x192.png">
 
-	<link rel="apple-touch-icon-precomposed" sizes="180x180" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-180x180-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" sizes="180x180" href="https://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-180x180-precomposed.png">
 
-	<link rel="apple-touch-icon-precomposed" sizes="152x152" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-152x152-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" sizes="152x152" href="https://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-152x152-precomposed.png">
 
-	<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-144x144-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" sizes="144x144" href="https://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-144x144-precomposed.png">
 
-	<link rel="apple-touch-icon-precomposed" sizes="120x120" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-120x120-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" sizes="120x120" href="https://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-120x120-precomposed.png">
 
-	<link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-114x114-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" sizes="114x114" href="https://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-114x114-precomposed.png">
 
 	
-	<link rel="apple-touch-icon-precomposed" sizes="76x76" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-76x76-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" sizes="76x76" href="https://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-76x76-precomposed.png">
 
-	<link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-72x72-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" sizes="72x72" href="https://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-72x72-precomposed.png">
 
-	<link rel="apple-touch-icon-precomposed" href="http://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-precomposed.png">	
+	<link rel="apple-touch-icon-precomposed" href="https://redbkit.github.io/redbKIT/assets/img/apple-touch-icon-precomposed.png">	
 
-	<meta name="msapplication-TileImage" content="http://redbkit.github.io/redbKIT/assets/img/msapplication_tileimage.png">
+	<meta name="msapplication-TileImage" content="https://redbkit.github.io/redbKIT/assets/img/msapplication_tileimage.png">
 
 	<meta name="msapplication-TileColor" content="#fabb00">
 
@@ -90,7 +90,7 @@
   <nav class="top-bar" role="navigation" data-topbar>
     <ul class="title-area">
       <li class="name">
-      <h1 class="show-for-small-only"><a href="http://redbkit.github.io/redbKIT" class="icon-tree"> redbKIT</a></h1>
+      <h1 class="show-for-small-only"><a href="https://redbkit.github.io/redbKIT" class="icon-tree"> redbKIT</a></h1>
     </li>
        <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
       <li class="toggle-topbar menu-icon"><a href="#"><span>Navigation</span></a></li>
@@ -143,7 +143,7 @@
             
             
               <li class="divider"></li>
-              <li><a href="http://redbkit.github.io/redbKIT/search/">Search</a></li>
+              <li><a href="https://redbkit.github.io/redbKIT/search/">Search</a></li>
 
             
             
@@ -157,7 +157,7 @@
             
             
               <li class="divider"></li>
-              <li><a href="http://redbkit.github.io/redbKIT/contact/">Contact</a></li>
+              <li><a href="https://redbkit.github.io/redbKIT/contact/">Contact</a></li>
 
             
             
@@ -176,7 +176,7 @@
 
             
             
-              <li><a href="http://redbkit.github.io/redbKIT/">About</a></li>
+              <li><a href="https://redbkit.github.io/redbKIT/">About</a></li>
               <li class="divider"></li>
 
             
@@ -191,7 +191,7 @@
 
             
             
-              <li><a href="http://redbkit.github.io/redbKIT/download-install/">Download and Install</a></li>
+              <li><a href="https://redbkit.github.io/redbKIT/download-install/">Download and Install</a></li>
               <li class="divider"></li>
 
             
@@ -206,7 +206,7 @@
 
             
             
-              <li><a href="http://redbkit.github.io/redbKIT/getting-started/">Getting Started</a></li>
+              <li><a href="https://redbkit.github.io/redbKIT/getting-started/">Getting Started</a></li>
               <li class="divider"></li>
 
             
@@ -221,7 +221,7 @@
 
             
             
-              <li><a href="http://redbkit.github.io/redbKIT/probgallery/">Problems Gallery</a></li>
+              <li><a href="https://redbkit.github.io/redbKIT/probgallery/">Problems Gallery</a></li>
               <li class="divider"></li>
 
             
@@ -236,7 +236,7 @@
 
             
             
-              <li><a href="http://redbkit.github.io/redbKIT/contributors/">Development</a></li>
+              <li><a href="https://redbkit.github.io/redbKIT/contributors/">Development</a></li>
               <li class="divider"></li>
 
             
@@ -253,7 +253,7 @@
             
 
               <li class="has-dropdown">
-                <a href="http://redbkit.github.io/redbKIT/documentation/">Documentation</a>
+                <a href="https://redbkit.github.io/redbKIT/documentation/">Documentation</a>
 
                   <ul class="dropdown">
                     
@@ -265,19 +265,19 @@
                       
 		      
 			<li class="has-dropdown">
-                <a href="http://redbkit.github.io/redbKIT/math/ADR/">Advection diffusion reaction</a>
+                <a href="https://redbkit.github.io/redbKIT/math/ADR/">Advection diffusion reaction</a>
 
                   <ul class="dropdown">
                     
 
                       
 
-                      <li><a href="http://redbkit.github.io/redbKIT/math/AdvDiffReact/">Advection diffusion reaction equations</a></li>
+                      <li><a href="https://redbkit.github.io/redbKIT/math/AdvDiffReact/">Advection diffusion reaction equations</a></li>
 			
 
                       
 
-                      <li><a href="http://redbkit.github.io/redbKIT/math/AdvDiffReactEx/">Simulation Setup</a></li>
+                      <li><a href="https://redbkit.github.io/redbKIT/math/AdvDiffReactEx/">Simulation Setup</a></li>
 			
 </ul>
  </li>
@@ -292,19 +292,19 @@
                       
 		      
 			<li class="has-dropdown">
-                <a href="http://redbkit.github.io/redbKIT/math/CFD/">Computational Fluid Dynamics</a>
+                <a href="https://redbkit.github.io/redbKIT/math/CFD/">Computational Fluid Dynamics</a>
 
                   <ul class="dropdown">
                     
 
                       
 
-                      <li><a href="http://redbkit.github.io/redbKIT/math/NavierStokes/">Navier-Stokes equations</a></li>
+                      <li><a href="https://redbkit.github.io/redbKIT/math/NavierStokes/">Navier-Stokes equations</a></li>
 			
 
                       
 
-                      <li><a href="http://redbkit.github.io/redbKIT/math/NavierStokesEx/">Simulation Setup</a></li>
+                      <li><a href="https://redbkit.github.io/redbKIT/math/NavierStokesEx/">Simulation Setup</a></li>
 			
 </ul>
  </li>
@@ -319,19 +319,19 @@
                       
 		      
 			<li class="has-dropdown">
-                <a href="http://redbkit.github.io/redbKIT/math/CSM/">Computational Solid Mechanics</a>
+                <a href="https://redbkit.github.io/redbKIT/math/CSM/">Computational Solid Mechanics</a>
 
                   <ul class="dropdown">
                     
 
                       
 
-                      <li><a href="http://redbkit.github.io/redbKIT/math/SolidMechanics/">Hyperelasticity: static and dynamics</a></li>
+                      <li><a href="https://redbkit.github.io/redbKIT/math/SolidMechanics/">Hyperelasticity: static and dynamics</a></li>
 			
 
                       
 
-                      <li><a href="http://redbkit.github.io/redbKIT/math/SolidMechanicsEx/">Simulation Setup</a></li>
+                      <li><a href="https://redbkit.github.io/redbKIT/math/SolidMechanicsEx/">Simulation Setup</a></li>
 			
 </ul>
  </li>
@@ -346,24 +346,24 @@
                       
 		      
 			<li class="has-dropdown">
-                <a href="http://redbkit.github.io/redbKIT/math/FSI/">Fluid-Structure Interaction</a>
+                <a href="https://redbkit.github.io/redbKIT/math/FSI/">Fluid-Structure Interaction</a>
 
                   <ul class="dropdown">
                     
 
                       
 
-                      <li><a href="http://redbkit.github.io/redbKIT/math/FSIsolver/">Monolithic FSI solver</a></li>
+                      <li><a href="https://redbkit.github.io/redbKIT/math/FSIsolver/">Monolithic FSI solver</a></li>
 			
 
                       
 
-                      <li><a href="http://redbkit.github.io/redbKIT/math/FSIEx/">Simulation Setup</a></li>
+                      <li><a href="https://redbkit.github.io/redbKIT/math/FSIEx/">Simulation Setup</a></li>
 			
 
                       
 
-                      <li><a href="http://redbkit.github.io/redbKIT/math/FSIprestress/">Tissue prestress</a></li>
+                      <li><a href="https://redbkit.github.io/redbKIT/math/FSIprestress/">Tissue prestress</a></li>
 			
 </ul>
  </li>
@@ -377,7 +377,7 @@
 			
                       
 		      
-                      <li><a href="http://redbkit.github.io/redbKIT/math/essentialbc/">Essential Boundary Conditions</a></li>
+                      <li><a href="https://redbkit.github.io/redbKIT/math/essentialbc/">Essential Boundary Conditions</a></li>
 		                          
 		      
 			
@@ -503,7 +503,7 @@
 		
 
 
-<script src="http://redbkit.github.io/redbKIT/assets/js/javascript.min.js"></script>
+<script src="https://redbkit.github.io/redbKIT/assets/js/javascript.min.js"></script>
 
 
 
